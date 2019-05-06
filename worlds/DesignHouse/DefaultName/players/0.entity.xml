@@ -1,0 +1,7 @@
+
+<entity anim="Create" bx="19200" by="5" bz="19200" class="Player" displayName="0" facing="8.3973808288574" item_id="30002" motionX="0" motionY="0" motionZ="0" name="default" onGround="true" rotationYaw="8.3973808288574">
+	<inventory handtool_bagpos="1">
+		<slot count="1" id="52"/>
+	</inventory>
+	<abilities/>
+</entity>

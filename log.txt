@@ -1,0 +1,274 @@
+2019-05-06 17:44:53|775|NPL Runtime started
+NPL bin dir: 
+no packages at: 
+WorkingDir: 
+WritablePath: /Users/chenliao/Documents/Paracraft/files/
+ParaEngine Root Dir is /Volumes/CODE/NPLRuntime/NPLRuntime/build/bin/Debug/Paracraft.app/Contents/Resources/assets/
+search path: /Volumes/CODE/NPLRuntime/NPLRuntime/build/bin/Debug/Paracraft.app/Contents/Resources/assets/npl_packages/main/
+search path: /Volumes/CODE/NPLRuntime/NPLRuntime/build/bin/Debug/Paracraft.app/Contents/Resources/assets/npl_packages/paracraft/
+Archive: main_mobile_res.pkg is opened and read 239 entries
+./packages dir: /Volumes/CODE/NPLRuntime/NPLRuntime/build/bin/Debug/Paracraft.app/Contents/Resources/assets/
+main loop: script/apps/Aries/main_loop.lua 
+Asset manifest file assets_manifest.txt is loaded
+CAssetManifest loaded 48256 files
+CAsyncLoader QueueID:0(Local) has 1 worker threads
+CAsyncLoader QueueID:1(Asset) has 1 worker threads
+CAsyncLoader QueueID:2(Web) has 1 worker threads
+CAsyncLoader QueueID:3(Asset_BigFile) has 1 worker threads
+CAsyncLoader QueueID:4(AudioFile) has 1 worker threads
+CAsyncLoader is started with 1 IO thread and 5 worker threads
+DLLPlugInEntity::INit PhysicsBT.dylib 
+Plug-in loaded: libPhysicsBT.dylib version: 1 
+DLLPlugInEntity::INit cAudioEngine.dylib 
+Plug-in loaded: libcAudioEngine.dylib version: 1 
+Available Audio Playback Devices: 
+0 : CoreAudio Default [DEFAULT]
+font Tahoma;12;bold is created 
+font Tahoma;12;norm is created 
+GLFontAtlasCache create :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0error: font file: Tahoma does not exist or invalid
+non-exist font Tahoma is replaced with system font
+GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0ParaEngine LuaJIT 64bits version:LuaJIT 2.1.0-beta3
+Jit status:true, SSE2, SSE3, SSE4.1, BMI2, fold, cse, dce, fwd, dse, narrow, loop, abc, sink, fuse 
+ffi loaded shared lib: C
+FFI for ParaTerrain installed 
+2019-05-06 17:44:54 297||system|os|hook cm_m_down_hook of type 1 is created
+2019-05-06 17:44:54 297||system|os|hook cm_m_move_hook of type 1 is created
+2019-05-06 17:44:54 298||system|os|hook cm_m_wheel_hook of type 1 is created
+2019-05-06 17:44:54 298||system|os|hook cm_m_up_hook of type 1 is created
+2019-05-06 17:44:54 298||system|os|hook cm_keydown of type 1 is created
+2019-05-06 17:44:54 298||system|os|hook cm_keyup of type 1 is created
+warning: script file script/mainstate.lua not found
+warning: script file script/apps/IMServer/IMserver_client.lua not found
+warning: script file script/lang/lang.lua not found
+warning: script file script/kids/3DMapSystemUI/CCS/ccs.lua not found
+warning: script file script/kids/3DMapSystemUI/CCS/Main.lua not found
+warning: script file script/apps/Aries/Combat/CombatCameraView.lua not found
+directory does not exist /Users/chenliao/Documents/Paracraft/files/packages/ 
+warning: script file script/kids/3DMapSystemUI/InGame/Exit.lua not found
+WARN:unable to load rule mapping from rule file script/AI/animations/mount.rules.table
+warning: script file script/kids/3DMapSystemUI/Movie/Recorder.lua not found
+warning: script file script/kids/3DMapSystemApp/profiles/ProfileManager.lua not found
+warning: script file script/apps/Aries/Desktop/GameMemoryProtector.lua not found
+ParaIPC C++ implementation not found
+2019-05-06 17:44:54 489|main|info|language|UI locale set to: enUS. system default is enUS
+2019-05-06 17:44:54 493|main|info|TranslationGettext|load mo file config/Aries/creator/language/paracraft_enUS.mo with 2801 entries
+2019-05-06 17:44:54 494|main|debug|cur_url|
+2019-05-06 17:44:54 494|main|info|Log|log level is set to info
+2019-05-06 17:44:54 494|main|info|AssetManifest|use local file first
+warning: script file script/apps/GameServer/rest_client.lua not found
+database:Database/apps.db (/Users/chenliao/Documents/Paracraft/files/Database/apps.db) opened
+DLLPlugInEntity::INit ParaSqlite.dylib 
+LibInitParaEngine in sqlite.cpp
+Plug-in loaded: libParaSqlite.dylib version: 1 
+application database has 16 installed apps
+failed to open file: /Users/chenliao/Documents/Paracraft/files/config/Aries/Others/key_settings.csv with mode w+b
+failed to open file: /Volumes/CODE/NPLRuntime/NPLRuntime/build/bin/Debug/Paracraft.app/Contents/Resources/assets/npl_packages/paracraft/config/Aries/Others/key_settings.csv with mode w+b
+failed to open file: /Volumes/CODE/NPLRuntime/NPLRuntime/build/bin/Debug/Paracraft.app/Contents/Resources/assets/npl_packages/main/config/Aries/Others/key_settings.csv with mode w+b
+failed to open file: /Users/chenliao/Documents/Paracraft/files/config/Aries/Others/key_settings.csv with mode w+b
+warning: script file script/kids/3DMapSystemUI/Creator/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/CCS/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/Chat/app_main.lua not found
+warning: script file script/kids/3DMapSystemApp/profiles/app_main.lua not found
+warning: script file script/kids/3DMapSystemApp/Inventory/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/Inventor/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/HomeZone/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/HomeLand/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/FireMaster/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/FreeGrab/app_main.lua not found
+warning: script file script/kids/3DMapSystemApp/Developers/app_main.lua not found
+warning: script file script/kids/3DMapSystemUI/MiniGames/MiniGameCommon.lua not found
+warning:failed DestroyGUIElement HOD_Selected_DoubleLine
+font Tahoma;18;bold is created 
+warning:failed DestroyGUIElement HOD_Selected_SingleLine
+warning:failed DestroyGUIElement HOD_Selected_SecondLine
+warning:failed DestroyGUIElement HOD_OPC
+warning:failed DestroyGUIElement CursorHelp
+warning:failed DestroyGUIElement _HeadOnDisplayText_
+font Tahoma;14;norm is created 
+font Tahoma;14;bold is created 
+warning:failed DestroyGUIElement _HeadOnDisplayText_
+warning:failed DestroyGUIElement 3DImageDefault
+warning:failed DestroyGUIElement 3DTextDefault
+warning: script file script/apps/Aries/Desktop/GUIHelper/ClickToContinue.lua not found
+client version is 0.7.450
+{hosts={"http://update.61.com/haqi/coreupdate/","http://tmlog.paraengine.com/","http://114.80.99.134/",},version_url="http://tmlog.paraengine.com/version.php",}echo:"=========PREDOWNLOAD_VERSION"
+2019-05-06 17:44:54 735|main|info|AssetsManager|local version is: 0.7.450
+echo:"=========DOWNLOADING_VERSION"
+search path: /Volumes/CODE/NPLRuntime/NPLRuntime/build/bin/Debug/Paracraft.app/Contents/Resources/assets/npl_packages/ParacraftBuildinMod/
+echo:"--------------------------init PluginBlueTooth"
+2019-05-06 17:44:54 746|main|info|PluginManager|mod: PluginBlueTooth (PluginBlueTooth) is added
+2019-05-06 17:44:54 760|main|info|ParaWorldAnalytics|installed date:2019-05-06 12-07-30,  0 days since last installed
+2019-05-06 17:44:54 761|main|info|ParaWorldAnalytics|analytics client initialized with UA, user_id, client_id, app_name, app_version, api_rate: UA-129101625-1 nil OE1SVVAcDgxWPQ== paracraft 0.7.450 4
+GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0-->: URL request task http://tmlog.paraengine.com/version.php completed 
+Compile Pass 0successfully linked shader program(glID:1) :IDR_FX_GUI. 
+[:IDR_FX_GUI] Generate passes succeeded.
+2019-05-06 17:44:54 961|main|info|AssetsManager|remote version is: 0.7.455
+2019-05-06 17:44:54 961|main|info|AssetsManager|compared result is: 3
+2019-05-06 17:44:54 961|main|info|AssetsManager|Assets Cache Path is: /Users/chenliao/Documents/Paracraft/files/caches/0.7.455
+echo:"=========VERSION_CHECKED"
+-->: URL request task https://www.google-analytics.com/collect completed 
+warning: script file Mod/WorldShare/cellar/UserConsole/UserConsole.lua not found
+warning: script file Mod/WorldShare/cellar/Common/GenerateMdPage.lua not found
+warning: script file Mod/WorldShare/cellar/Login/LoginUserInfo.lua not found
+warning: script file Mod/WorldShare/cellar/UserConsole.lua not found
+warning: script file Mod/WorldShare/cellar/LoginUserInfo.lua not found
+warning: script file Mod/WorldShare/login.lua not found
+warning: script file Mod/WorldShare/services/HttpRequest.lua not found
+warning: script file Mod/WorldShare/cellar/Login/UserConsole.lua not found
+warning: script file Mod/WorldShare/cellar/Sync/ShareWorld/ShareWorld.lua not found
+warning: script file Mod/WorldShare/cellar/Sync/SyncMain.lua not found
+warning: script file Mod/WorldShare/sync/SyncMain.lua not found
+warning:failed DestroyGUIElement WebBrowser_GUID_ShowLoginModePage_window_window_toplevel
+warning: script file script/ide/math/BlockDirection.lua not found
+warning: script file Mod/ParaXExporter/ParaXHeader.lua not found
+2019-05-06 17:44:56 1530|main|info|ParaXExporter|plugin initialized
+2019-05-06 17:44:56 1530|main|info|PluginManager|mod: ParaXExporter (ParaXExporter) is added
+2019-05-06 17:44:56 1531|main|info|NPLCAD|plugin initialized
+2019-05-06 17:44:56 1532|main|info|PluginManager|mod: NPLCAD (NPLCAD) is added
+2019-05-06 17:44:56 1532|main|info|NplCad2|plugin initialized
+2019-05-06 17:44:56 1532|main|info|PluginManager|mod: NplCad2 (NplCad2) is added
+warning: script file Mod/NplBrowser/main.lua not found
+2019-05-06 17:44:56 1532|main|warn|Modules|mod: NplBrowser ignored, because module_class NplBrowser not exist
+2019-05-06 17:44:56 1532|main|warn|PluginLoader|system plugin NplBrowser not loaded
+2019-05-06 17:44:56 1533|main|info|STLExporter|plugin initialized
+2019-05-06 17:44:56 1533|main|info|PluginManager|mod: STLExporter (STLExporter) is added
+2019-05-06 17:44:56 1537|main|info|PluginManager|mod: WorldShare (WorldShare) is added
+warning: script file Mod/ExplorerStore/store/ExplorerStore.lua not found
+2019-05-06 17:44:56 1547|main|info|PluginManager|mod: ExplorerApp (ExplorerApp) is added
+2019-05-06 17:44:56 1548|main|info|EMapMod|plugin initialized
+2019-05-06 17:44:56 1548|main|info|MapBlock|init
+2019-05-06 17:44:56 1548|main|info|PluginManager|mod: EMapMod (EMapMod) is added
+2019-05-06 17:44:56 1548|main|info|CodeBlockEditor|plugin initialized
+2019-05-06 17:44:56 1548|main|info|PluginManager|mod: CodeBlockEditor (CodeBlockEditor) is added
+2019-05-06 17:44:56 1549|main|info|BtCommand|init
+2019-05-06 17:44:56 1552|main|info|PluginManager|mod: LogitowMonitor (LogitowMonitor) is added
+2019-05-06 17:44:56 1552|main|warn|Modules|mod: PluginBlueTooth ignored, because another module_class PluginBlueTooth already exist
+2019-05-06 17:44:56 1558|main|info|CodeUI|plugin initialized
+2019-05-06 17:44:56 1558|main|info|PluginManager|mod: CodeBlockUI (CodeUI) is added
+2019-05-06 17:44:56 1558|main|info|TexturePackageList|LoadTexturePackageList
+database:Database/userdata.db (/Users/chenliao/Documents/Paracraft/files/Database/userdata.db) opened
+2019-05-06 17:44:56 1567|main|info|TexturePackageList|TexturePackageList initialized
+2019-05-06 17:44:56 1567|main|info|URLResourceStore|Unexpired local version is used for http://www.paraengine.com/twiki/bin/view/CCWeb/RecommendedTextureListData
+database:Database/creator_profile.db (/Users/chenliao/Documents/Paracraft/files/Database/creator_profile.db) opened
+2019-05-06 17:44:56 1671|main|info|NPLCAD|NPL CAD block  is registered
+2019-05-06 17:44:56 1671|main|info|MapBlock|block MapBlock (2333) is registered
+2019-05-06 17:44:56 1671|main|info|MapBlock|block m_magma (2334) is registered
+2019-05-06 17:44:56 1671|main|info|MapBlock|block m_brick (2335) is registered
+2019-05-06 17:44:56 1671|main|info|MapBlock|block m_highway (2336) is registered
+2019-05-06 17:44:56 1671|main|info|MapBlock|block m_wstone (2337) is registered
+2019-05-06 17:44:56 1671|main|info|MapBlock|block m_water (2338) is registered
+2019-05-06 17:44:56 1672|main|info|MapBlock|block m_waterStill (2339) is registered
+2019-05-06 17:44:56 1672|main|info|NplCad2|NPL CAD code block  is registered
+2019-05-06 17:44:56 1673|main|error|NplOceConnection|can't find the function of NPL.GetLuaState.
+|Mod/NplCad2/NplOceConnection.lua:43: in function load
+2019-05-06 17:44:56 1741|main|info|block_types|loaded file from config/Aries/creator/block_types.xml
+CRenderTarget: _miniscenegraph_AvatarMyselfTabCharacter render target renewed (256 256)
+font Tahoma;16;norm is created 
+GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_02019-05-06 17:44:56 1769|main|info|PlayerAssetFile|579 assets loaded from config/Aries/creator/PlayerAssetFile.xml
+2019-05-06 17:44:56 1770|main|info|LocalLoadWorld|default world path: /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse
+font Tahoma;11;norm is created 
+font Tahoma;11;bold is created 
+Compile Pass 0successfully linked shader program(glID:4) :IDR_FX_SIMPLE_MESH_NORMAL. 
+[:IDR_FX_SIMPLE_MESH_NORMAL] Generate passes succeeded.
+Compile Pass 0successfully linked shader program(glID:7) :IDR_FX_SINGLECOLOR. 
+[:IDR_FX_SINGLECOLOR] Generate passes succeeded.
+GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0-->: URL request task https://api.keepwork.com/core/v0/projects/1550/detail completed 
+CRenderTarget: _miniscenegraph_DownloadWorld128 render target renewed (128 128)
+database:Database/localserver.db (/Users/chenliao/Documents/Paracraft/files/Database/localserver.db) opened
+2019-05-06 17:45:00 5647|main|info|RemoteWorld|remote(0) and local(64368) file size differs, we will download again
+2019-05-06 17:45:00 5647|main|info|FileDownloader|begin download file https://git.keepwork.com/gitlab_rls_lsx18/world_FireUp/repository/archive.zip?ref=813d3e6380aaaa81be39297665ac8703cc5417c3
+0 files removed from directory temp/tempdownloads/0-1.dat
+echo:{0,"downloading: 0/0KB",0,0,}
+echo:{0,"downloading: 0/0KB",0,0,}
+-->: URL request task https://git.keepwork.com/gitlab_rls_lsx18/world_FireUp/repository/archive.zip?ref=813d3e6380aaaa81be39297665ac8703cc5417c3 completed 
+echo:{1,"download complete",}
+1 files removed from directory temp/tempdownloads/0-1.dat
+2019-05-06 17:45:00 6337|main|info|FileDownloader|DeleteCacheFile temp/webcache/paraengine.com/http_/_default_1[1]_localserver/20190506T094500.921382-1-archive.zip
+1 files removed from directory temp/webcache/paraengine.com/http_/_default_1[1]_localserver/20190506T094500.921382-1-archive.zip
+2019-05-06 17:45:00 6340|main|info|FileDownloader|successfully downloaded file from https://git.keepwork.com/gitlab_rls_lsx18/world_FireUp/repository/archive.zip?ref=813d3e6380aaaa81be39297665ac8703cc5417c3 to /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/https_git_keepwork_com_gitlab_rls_lsx18_world_FireUp_repository_archive_r.zip
+camera attribute object refreshed 
+Failed to create Audio Source (): No decoder could be found for (.).unable to prepare wave file 
+warning:failed DestroyGUIElement MovieGUIRoot
+2019-05-06 17:45:00 6349|main|info|PlayerSkins|38 skins loaded from config/Aries/creator/PlayerSkins.xml
+2019-05-06 17:45:00 6350|main|info|Aries|Forcing standalone mode since user is not connected. 
+error: failed loading swfloadingtext config file config/Aries/Loading.SwfLoadingText.xml
+2019-05-06 17:45:00 6467|main|info|LoadWorld|real terrain is totally disabled for block world
+Archive: /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/https_git_keepwork_com_gitlab_rls_lsx18_world_FireUp_repository_archive_r.zip is opened and read 28 entries
+2019-05-06 17:45:00 6469|main|info|ParaSandBox.reset|new sandbox created.
+warning: you are deleting an entity _miniscenegraph_AvatarMyselfTabCharacter whose has unreleased external references
+scene has been reset
+ParaIPC C++ implementation not found
+Global terrain engine disabled hence /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/world_fireup-813d3e6380aaaa81be39297665ac8703cc5417c3-813d3e6380aaaa81be39297665ac8703cc5417c3/worldconfig.txt is ignored.
+database: /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/world_fireup-813d3e6380aaaa81be39297665ac8703cc5417c3-813d3e6380aaaa81be39297665ac8703cc5417c3/attribute.db is set to read-only mode
+database:/Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/world_fireup-813d3e6380aaaa81be39297665ac8703cc5417c3-813d3e6380aaaa81be39297665ac8703cc5417c3/attribute.db (/Users/chenliao/Documents/Paracraft/files/temp/tempdatabase/_Users_chenliao_Documents_Paracraft_files_worlds_DesignHouse_userworlds_worldrfireuptexzdzeczewaaaaexbezfyfdccbacedwzccbaxdcztexzdzeczewaaaaexbezfyfdccbacedwzccbaxdcz_attribute.db) opened
+camera attribute object refreshed 
+warning:failed DestroyGUIElement _HeadOnDisplayText_
+font Tahoma;13;bold is created 
+echo:"load world 90% before render:----->6540"
+echo:"load world 90% after render:----->6540"
+echo:"load world 99%:----->6544"
+warning:failed DestroyGUIElement WebBrowser_GUID_MiniGames.SwfLoadingBarPage_window_window_toplevel
+2019-05-06 17:45:00 6545|main|info|UserProfile|UserLoginProcess for nid 0
+2019-05-06 17:45:00 6547|main|info|APISandbox|cleaned up sandbox scripting environment
+2019-05-06 17:45:00 6550|main|info|AutoSaver|tip mode is on
+warn: model: model/blockworld/StairsWood/StairsWood_corner.x is not coplanar. this will cost 4 times more memory. 
+warn: model: model/blockworld/StairsWood/StairsWood.x is not coplanar. this will cost 4 times more memory. 
+warn: model: model/blockworld/StairsWood/StairsWood_reverse_corner.x is not coplanar. this will cost 4 times more memory. 
+warn: model: model/blockworld/Bone/Bone.x is not coplanar. this will cost 4 times more memory. 
+2019-05-06 17:45:00 6614|main|info|block_types|registering 267 block templates
+2019-05-06 17:45:00 6619|main|info|GameLogic|remote_world:false, server_world: false
+warning: script file script/apps/Aries/SlashCommand/cmd_system.lua not found
+warning:failed DestroyGUIElement 3DImageDefault
+warning:failed DestroyGUIElement 3DTextDefault
+Enter Block World  : max region cache 16
+2019-05-06 17:45:01 6653|main|info|ItemClient|loaded block list category from file config/Aries/creator/block_list.xml
+loading local NPC file: /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/world_fireup-813d3e6380aaaa81be39297665ac8703cc5417c3-813d3e6380aaaa81be39297665ac8703cc5417c3/LocalNPC.xml
+2019-05-06 17:45:01 6705|main|info|WeatherEffect|CWeatherEffect created and added to scene
+2019-05-06 17:45:01 6707|main|info|TexturePackage|texturepackage worlds/BlockTextures/official/Paracraft32xMixed_r1.zip already exist locally
+2019-05-06 17:45:01 6708|main|info|TexturePackage|open texture package: worlds/BlockTextures/official/Paracraft32xMixed_r1.zip
+Archive: worlds/BlockTextures/official/Paracraft32xMixed_r1.zip is opened and read 120 entries
+2019-05-06 17:45:01 6710|main|info|TexturePackage|Parent folder: worlds/BlockTextures/official/Paracraft32xMixed
+2019-05-06 17:45:01 6711|main|info|TexturePackage|apply texture package: Paracraft32xMixed_r1.zip (119 textures)
+2019-05-06 17:45:01 6717|main|info|options|actual render dist is set to 96
+sql db closed: /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/world_fireup-813d3e6380aaaa81be39297665ac8703cc5417c3-813d3e6380aaaa81be39297665ac8703cc5417c3/attribute.db
+warning:failed DestroyGUIElement WebBrowser_GUID_UserConsole_window_window_toplevel
+font Tahoma;18;norm is created 
+GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0warning:failed DestroyGUIElement WebBrowser_GUID_MsgBox_window_window_toplevel
+2019-05-06 17:45:01 6731|main|info|ModManager|plugins (mods) loaded in world
+2019-05-06 17:45:01 6754|main|info|SceneContextManager|new context: base registered
+2019-05-06 17:45:01 6755|main|info|SceneContextManager|new context: play registered
+2019-05-06 17:45:01 6756|main|info|SceneContextManager|new context: edit registered
+2019-05-06 17:45:01 6758|main|info|SceneContextManager|new context: movie registered
+2019-05-06 17:45:01 6758|main|info|SceneContextManager|new context: tutorial registered
+2019-05-06 17:45:01 6759|main|info|SceneContextManager|new context: code registered
+2019-05-06 17:45:01 6779|main|info|Game|Game.OnLogin finished
+Load region: 37 37, total regions: 0
+Block loading region 37 37 in Async mode
+Compile Pass 0successfully linked shader program(glID:10) :IDR_FX_SKYDOME. 
+Compile Pass 1successfully linked shader program(glID:13) :IDR_FX_SKYDOME. 
+[:IDR_FX_SKYDOME] Generate passes succeeded.
+warn: LoadParaXMesh error:Header mismatch, file is not an XFile.
+warning: cannot load ParaX model file 
+Failed to Copy Data to Device Object:hr = 80000008; 
+-->: URL request task https://api.keepwork.com/core/v0/projects/1550/visit completed 
+-->: URL request task https://www.google-analytics.com/collect completed 
+2019-05-06 17:45:01 7401|main|info|AutoFindVerticalPosition|player is spawned at highest solid block: 19200 5 19200
+info: Object container automatically created for class: COverlayObject 
+2019-05-06 17:45:01 7439|main|info|CreatorAPISandbox|new sandbox env is created
+font Tahoma;45;norm is created 
+GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0font Tahoma;60;norm is created 
+GLFontAtlasCache hited :fonts/DroidSansFallback.ttf_DYNAMIC_20_outline_0Compile Pass 0successfully linked shader program(glID:16) :IDR_FX_BLOCK. 
+Compile Pass 1successfully linked shader program(glID:19) :IDR_FX_BLOCK. 
+Compile Pass 2successfully linked shader program(glID:22) :IDR_FX_BLOCK. 
+Compile Pass 3successfully linked shader program(glID:25) :IDR_FX_BLOCK. 
+[:IDR_FX_BLOCK] Generate passes succeeded.
+failed to open file: /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/world_fireup-813d3e6380aaaa81be39297665ac8703cc5417c3-813d3e6380aaaa81be39297665ac8703cc5417c3/revision.xml with mode w+b
+failed to open file: /Users/chenliao/Documents/Paracraft/files/worlds/DesignHouse/userworlds/world_fireup-813d3e6380aaaa81be39297665ac8703cc5417c3-813d3e6380aaaa81be39297665ac8703cc5417c3/revision.xml with mode w+b
+warning:failed DestroyGUIElement WebBrowser_GUID_MiniGames.SwfLoadingBarPage_window_window_toplevel
+Compile Pass 0successfully linked shader program(glID:28) :IDR_FX_BMAXMODEL. 
+Compile Pass 0successfully linked shader program(glID:31) :IDR_FX_BMAXMODEL. 
+[:IDR_FX_BMAXMODEL] Generate passes succeeded.
+info: Object container automatically created for class: CRenderTarget 
+CRenderTarget: _miniscenegraph_overlay render target renewed (1280 720)
+Audio Source (grass2) created from Data Source cMemorySource.Audio Source (grass3) created from Data Source cMemorySource.Audio Source (grass1) created from Data Source cMemorySource.2019-05-06 17:45:41 46606|main|info|CodeHelpWindow|code block language configuration file changed to default
+warning: script file script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyDef_Cad.lua not found
