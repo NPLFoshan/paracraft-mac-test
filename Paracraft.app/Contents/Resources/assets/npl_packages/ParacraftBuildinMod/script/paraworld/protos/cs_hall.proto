@@ -1,0 +1,36 @@
+//客户端访问大厅服务器协议
+syntax = "proto2";
+import public  "cs_msgheader.proto";
+
+//登录大厅
+message CSLoginHallReq
+{
+	required	bytes	openid		= 1;
+	required 	bytes 	openkey		= 2;
+	required	bytes	pf			= 3;
+	required	bytes	userip		= 4;
+}
+message CSLoginHallRsp
+{
+	message UserInfo
+	{
+		required	uint32		uid 		= 1;					//全局唯一的uid
+		optional	uint32		channel 	= 2[default = 0];
+		optional	bytes		nickname	= 3;					//QQ昵称, 腾讯返回
+		optional	bytes		gender		= 4;					//性别
+		optional	bytes		figureurl  	= 5;					//头像url
+		optional	bool		is_blue_vip = 6;					//是否蓝钻， ture 代表是
+		optional	bool		is_blue_year_vip 	= 7;			//是否年费蓝钻
+		optional	int32		blue_vip_level	 	= 8;			//蓝钻等级
+		optional	bool		is_super_blue_vip 	= 9;			//是否豪华版蓝钻
+	}
+	required	uint32		status 			= 1;					//状态码0 成功，其余失败
+	optional	int32		open_status 	= 2;					//OpenSdk 返回的错误码
+	optional    bytes		open_error_msg 	= 3;					//对open_status的描述信息	
+	optional	UserInfo 	user_info		= 4;					//成功时返回的用户信息
+	optional    bytes		token			= 5;					//由大厅服务器返回，登录应用服务器时需要验证此token.
+}
+
+
+
+

@@ -1,0 +1,10 @@
+/script
+/*.pkg
+!/main_mobile_res.pkg
+/qconfig.ini
+/readme.txt
+/auto_update_log.txt
+/*.ffs_gui
+/deletefile.list
+/copyright.txt
+/config/Aries
