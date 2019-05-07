@@ -1,4 +1,0 @@
-
-<entities file_version="0.1">
-	<entity IsSimulatedSky="true" class="EntitySky" filename="" name="sky" rainStrength="0" snowStrength="0"/>
-</entities>
