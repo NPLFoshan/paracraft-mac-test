@@ -19,7 +19,7 @@ local self = WorldExitDialog;
 
 -- @param callback: function(res) end.
 function WorldExitDialog.ShowPage(callback)
-    local params = Utils:ShowWindow(500, 320, "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html", "WorldExitDialog")
+    local params = Utils:ShowWindow(610, 400, "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html", "WorldExitDialog")
 
     params._page.OnClose = function()
         Store:Remove('page/WorldExitDialog')
