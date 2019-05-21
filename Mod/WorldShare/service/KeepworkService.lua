@@ -325,14 +325,21 @@ function KeepworkService:GetProjectIdByWorldName(worldName, callback)
                 return false
             end
 
-            local selectWorld = Store:Get('world/selectWorld')
-            local enterWorld = Store:Get('world/enterWorld')
+            local world
 
-            selectWorld.kpProjectId = data[1].projectId
-            enterWorld.kpProjectId = data[1].projectId
+            if Store:Get("world/isEnterWorld") then
+                world = Store:Get('world/enterWorld')
+            else
+                world = Store:Get('world/selectWorld')
+            end
 
-            Store:Set('world/selectWorld', selectWorld)
-            Store:Set('world/enterWorld', enterWorld)
+            world.kpProjectId = data[1].projectId
+
+            if Store:Get("world/isEnterWorld") then
+                Store:Set('world/enterWorld', world)
+            else
+                Store:Set('world/selectWorld', world)
+            end
 
             if type(callback) == 'function' then
                 callback(data[1].projectId)
@@ -484,9 +491,9 @@ end
 -- get keepwork project url
 function KeepworkService:GetShareUrl()
     local env = self:GetEnv()
-    local selectWorld = Store:Get("world/selectWorld")
+    local enterWorld = Store:Get("world/enterWorld")
 
-    if not selectWorld or not selectWorld.kpProjectId then
+    if not enterWorld or not enterWorld.kpProjectId then
         return ''
     end
 
@@ -494,7 +501,7 @@ function KeepworkService:GetShareUrl()
     local foldername = Store:Get("world/foldername")
     local username = Store:Get("user/username")
 
-    return format("%s/pbl/project/%d/", baseUrl, selectWorld.kpProjectId)
+    return format("%s/pbl/project/%d/", baseUrl, enterWorld.kpProjectId)
 end
 
 function KeepworkService:PWDValidation()
