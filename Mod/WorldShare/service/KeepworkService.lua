@@ -672,8 +672,13 @@ end
 
 -- update world info
 function KeepworkService:UpdateRecord(callback)
-    local foldername = Store:Get("world/foldername")
     local username = Store:Get("user/username")
+    local foldername
+    if Store:Get("world/isEnterWorld") then
+        foldername = Store:Get("world/enterFoldername")
+    else
+        foldername = Store:Get("world/foldername")
+    end
 
     local function Handle(data, err)
         if type(data) ~= "table" or #data == 0 then
@@ -690,8 +695,17 @@ function KeepworkService:UpdateRecord(callback)
             return false
         end
 
-        local worldDir = Store:Get("world/worldDir")
-        local selectWorld = Store:Get("world/selectWorld")
+        local worldDir
+        local world
+        if Store:Get("world/isEnterWorld") then
+            worldDir = Store:Get("world/enterWorldDir")
+            world = Store:Get("world/enterWorld")
+        else
+            worldDir = Store:Get("world/worldDir")
+            world = Store:Get("world/selectWorld")
+        end
+
+
         local worldTag = Store:Get("world/worldTag")
         local dataSourceInfo = Store:Get("user/dataSourceInfo")
         local localFiles = LocalService:LoadFiles(worldDir.default)
@@ -708,10 +722,10 @@ function KeepworkService:UpdateRecord(callback)
             foldername.base32
         )
 
-        local filesTotals = selectWorld and selectWorld.size or 0
+        local filesTotals = world and world.size or 0
 
-        local function HandleGetWorld(world)
-            local oldWorldInfo = world or false
+        local function HandleGetWorld(data)
+            local oldWorldInfo = data or false
 
             if not oldWorldInfo then
                 return false
@@ -751,21 +765,21 @@ function KeepworkService:UpdateRecord(callback)
 
             WorldList.SetRefreshing(true)
 
-            if (selectWorld.kpProjectId) then
+            if (world and world.kpProjectId) then
                 local tag = LocalService:GetTag(foldername.default)
     
                 if type(tag) == 'table' then
-                    tag.kpProjectId = selectWorld.kpProjectId
+                    tag.kpProjectId = world.kpProjectId
     
-                    LocalService:SetTag(selectWorld.worldpath, tag)
+                    LocalService:SetTag(world.worldpath, tag)
                 end
     
                 self:GetProject(
-                    selectWorld.kpProjectId,
+                    world.kpProjectId,
                     function(data)
                         if data and data.extra and not data.extra.imageUrl then
                             self:UpdateProject(
-                                selectWorld.kpProjectId,
+                                world.kpProjectId,
                                 {
                                     extra = {
                                         imageUrl = format(
@@ -781,7 +795,7 @@ function KeepworkService:UpdateRecord(callback)
                     end
                 )
             end
-    
+
             self:PushWorld(
                 worldInfo,
                 function(data, err)
@@ -804,7 +818,12 @@ function KeepworkService:UpdateRecord(callback)
 end
 
 function KeepworkService:SetCurrentCommidId(commitId)
-    local worldDir = Store:Get("world/worldDir")
+    local worldDir
+    if Store:Get('world/isEnterWorld') then
+        worldDir = Store:Get("world/enterWorldDir")
+    else
+        worldDir = Store:Get("world/worldDir")
+    end
 
     WorldShare:SetWorldData("revision", {id = commitId}, worldDir.default)
 

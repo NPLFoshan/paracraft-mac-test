@@ -26,9 +26,18 @@ local UPLOAD = "UPLOAD"
 local DELETE = "DELETE"
 
 function SyncToDataSource:Init()
-    self.worldDir = Store:Get("world/worldDir")
-    self.foldername = Store:Get("world/foldername")
-    local selectWorld = Store:Get("world/selectWorld")
+    local world
+
+    if Store:Get("world/isEnterWorld") then
+        self.worldDir = Store:Get("world/enterWorldDir")
+        self.foldername = Store:Get("world/enterFoldername")
+        world = Store:Get("world/enterWorld")
+    else
+        self.worldDir = Store:Get("world/worldDir")
+        self.foldername = Store:Get("world/foldername")
+        world = Store:Get("world/selectWorld")
+    end
+
 
     if (not self.worldDir or not self.worldDir.default or self.worldDir.default == "") then
         _guihelper.MessageBox(L"上传失败，将使用离线模式，原因：上传目录为空")
@@ -56,10 +65,13 @@ function SyncToDataSource:Init()
                             return false
                         end
 
-                        selectWorld.kpProjectId = data.id
+                        world.kpProjectId = data.id
 
-                        Store:Set("world/selectWorld", selectWorld)
-                        Store:Set("world/enterWorld", selectWorld)
+                        if Store:Get("world/isEnterWorld") then
+                            Store:Set("world/enterWorld", world)
+                        else
+                            Store:Set("world/selectWorld", world)
+                        end
 
                         self:SyncToDataSource()
                     end
@@ -221,11 +233,7 @@ function SyncToDataSource:RefreshList()
             Store:Set(
                 "world/CloseProgress",
                 function()
-                    WorldList:RefreshCurrentServerList(
-                        function()
-                            Store:Set("world/shareMode", false)
-                        end
-                    )
+                    WorldList:RefreshCurrentServerList()
                 end
             )
         end

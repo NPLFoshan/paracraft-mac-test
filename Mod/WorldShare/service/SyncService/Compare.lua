@@ -129,20 +129,35 @@ function Compare:CompareRevision(callback)
         world = Store:Get('world/selectWorld')
     end
 
-    if (not foldername or not foldername.utf8) then
+    if (not foldername or not worldDir or not world) then
         return false
     end
 
     local remoteWorldsList = Store:Get("world/remoteWorldsList")
     local remoteRevision = 0
 
-    local currentRevision = WorldRevision:new():init(worldDir.default):Checkout()
-
-    if (not worldDir) then
-        return false
-    end
-
+    
     if (self:HasRevision()) then
+        local function CompareRevision(currentRevision, remoteRevision)
+            if (remoteRevision == 0) then
+                return JUSTLOCAL
+            end
+
+            if (currentRevision < remoteRevision) then
+                return REMOTEBIGGER
+            end
+
+            if (currentRevision > remoteRevision) then
+                return LOCALBIGGER
+            end
+
+            if (currentRevision == remoteRevision) then
+                return EQUAL
+            end
+        end
+
+        local currentRevision = WorldRevision:new():init(worldDir.default):Checkout()
+
         if (world and not world.kpProjectId) then
             currentRevision = tonumber(currentRevision) or 0
             remoteRevision = tonumber(data) or 0
@@ -150,11 +165,13 @@ function Compare:CompareRevision(callback)
             Store:Set("world/currentRevision", currentRevision)
             Store:Set("world/remoteRevision", remoteRevision)
 
+            self:SetFinish(true)
+
             if (type(callback) == "function") then
-                callback(result)
+                callback(CompareRevision(currentRevision, remoteRevision))
             end
 
-            return false
+            return true
         end
 
         local function HandleRevision(data, err)
@@ -171,23 +188,7 @@ function Compare:CompareRevision(callback)
             Store:Set("world/currentRevision", currentRevision)
             Store:Set("world/remoteRevision", remoteRevision)
 
-            local result
-
-            if (remoteRevision == 0) then
-                result = JUSTLOCAL
-            end
-
-            if (currentRevision < remoteRevision) then
-                result = REMOTEBIGGER
-            end
-
-            if (currentRevision > remoteRevision) then
-                result = LOCALBIGGER
-            end
-
-            if (currentRevision == remoteRevision) then
-                result = EQUAL
-            end
+            local result = CompareRevision(currentRevision, remoteRevision)
 
             self:SetFinish(true)
 

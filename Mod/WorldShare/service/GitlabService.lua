@@ -556,7 +556,7 @@ end
 
 function GitlabService:GetWorldRevision(projectId, foldername, callback)
     KeepworkService:GetProject(tonumber(projectId), function(data, err)
-        if not data or not data.world or not data.world.worldName then
+        if not data or not data.world or not data.world.worldName or not data.world.archiveUrl then
             return false
         end
 

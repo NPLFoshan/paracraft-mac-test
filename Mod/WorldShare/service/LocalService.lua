@@ -387,15 +387,9 @@ function LocalService:LoadWorldInfo(ctx, node)
         type(node.attr) ~= 'table') then
         return false
     end
+
     ctx.clientversion = node.attr.clientversion
-
-    local enterWorld = Store:Get('world/enterWorld')
-
-    if type(enterWorld) == 'table' and enterWorld.kpProjectId then
-        ctx.kpProjectId = enterWorld.kpProjectId
-    else 
-        ctx.kpProjectId = node.attr.kpProjectId
-    end
+    ctx.kpProjectId = node.attr.kpProjectId
 end
 
 function LocalService:GetClientVersion(node)

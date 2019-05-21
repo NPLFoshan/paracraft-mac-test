@@ -62,6 +62,7 @@ end
 function SyncMain:CommandEnter(callback)
     Store:Set("world/isCommandEnter", true)
     Store:Set("world/isEnterWorld", true)
+
     local world = self:GetWorldDefaultName()
     local foldername = {}
 
@@ -72,7 +73,7 @@ function SyncMain:CommandEnter(callback)
     Store:Set("world/foldername", foldername)
     Store:Set("world/enterFoldername", foldername)
 
-    local function HandleSelectWorld()
+    local function Handle()
         local compareWorldList = Store:Get("world/compareWorldList")
 
         local currentWorld = nil
@@ -88,23 +89,20 @@ function SyncMain:CommandEnter(callback)
             worldDir.default = format("%s/", currentWorld.worldpath)
             worldDir.utf8 = Encoding.DefaultToUtf8(worldDir.default)
 
-            Store:Set("world/worldDir", worldDir)
             Store:Set("world/enterWorldDir", worldDir)
-
+            
             local worldTag = LocalService:GetTag(foldername.default)
-
+            
             worldTag.size = filesize
             LocalService:SetTag(worldDir.default, worldTag)
             Store:Set("world/worldTag", worldTag)
-
-            Store:Set("world/selectWorld", currentWorld)
             Store:Set("world/enterWorld", currentWorld)
         end
     end
 
     WorldList:RefreshCurrentServerList(
         function()
-            HandleSelectWorld()
+            Handle()
 
             if type(callback) == "function" then
                 callback()
@@ -261,7 +259,14 @@ function SyncMain:GetCurrentRevisionInfo()
 end
 
 function SyncMain:CheckWorldSize()
-    local worldDir = Store:Get("world/worldDir")
+    local worldDir
+
+    if Store:Get("world/isEnterWorld") then
+        worldDir = Store:Get("world/enterWorldDir")
+    else
+        worldDir = Store:Get("world/worldDir")
+    end
+
     local userType = Store:Get("user/userType")
 
     local filesTotal = LocalService:GetWorldSize(worldDir.default)

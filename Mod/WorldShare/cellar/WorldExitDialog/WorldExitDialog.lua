@@ -29,7 +29,7 @@ function WorldExitDialog.ShowPage(callback)
             params._page.OnClose = function()
                 Store:Remove('page/WorldExitDialog')
             end
-    
+
             local WorldExitDialogPage = Store:Get('page/WorldExitDialog')
             if(WorldExitDialogPage) then
                 if(not GameLogic.IsReadOnly() and not ParaIO.DoesFileExist(self.GetPreviewImagePath(), false)) then
@@ -124,7 +124,17 @@ end
 function WorldExitDialog:CanSetStart()
     if not KeepworkService:IsSignedIn() then
         LoginModal:Init(function()
-            self:Refresh()
+            local enterWorld = Store:Get('world/enterWorld')
+
+            if enterWorld and enterWorld.kpProjectId then
+                KeepworkService:GetProject(tonumber(enterWorld.kpProjectId), function(data)
+                    if data and data.world and data.world.worldName then
+                        self.currentWorldKeepworkInfo = data
+                    end
+
+                    self:Refresh()
+                end)
+            end
         end)
 
         return false
