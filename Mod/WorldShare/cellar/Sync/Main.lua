@@ -11,8 +11,6 @@ local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
-local GenerateMdPage = NPL.load("(gl)Mod/WorldShare/cellar/Common/GenerateMdPage.lua")
-local LoginUserInfo = NPL.load("(gl)Mod/WorldShare/cellar/Login/LoginUserInfo.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
@@ -21,6 +19,7 @@ local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local SyncToLocal = NPL.load("(gl)Mod/WorldShare/service/SyncService/SyncToLocal.lua")
 local SyncToDataSource = NPL.load("(gl)Mod/WorldShare/service/SyncService/SyncToDataSource.lua")
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
 local WorldShare = commonlib.gettable("Mod.WorldShare")
 local Encoding = commonlib.gettable("commonlib.Encoding")
@@ -63,14 +62,13 @@ function SyncMain:CommandEnter(callback)
     Store:Set("world/isCommandEnter", true)
     Store:Set("world/isEnterWorld", true)
 
-    local world = self:GetWorldDefaultName()
+    local worldName = self:GetWorldDefaultName()
     local foldername = {}
 
-    foldername.default = world
+    foldername.default = worldName
     foldername.utf8 = Encoding.DefaultToUtf8(foldername.default)
     foldername.base32 = GitEncoding.Base32(foldername.utf8)
 
-    Store:Set("world/foldername", foldername)
     Store:Set("world/enterFoldername", foldername)
 
     local function Handle()
@@ -90,13 +88,44 @@ function SyncMain:CommandEnter(callback)
             worldDir.utf8 = Encoding.DefaultToUtf8(worldDir.default)
 
             Store:Set("world/enterWorldDir", worldDir)
-            
+
             local worldTag = LocalService:GetTag(foldername.default)
-            
+
             worldTag.size = filesize
             LocalService:SetTag(worldDir.default, worldTag)
             Store:Set("world/worldTag", worldTag)
             Store:Set("world/enterWorld", currentWorld)
+        else
+            local originWorldPath = ParaWorld.GetWorldDirectory()
+
+            worldDir.default = originWorldPath
+            worldDir.utf8 = Encoding.DefaultToUtf8(originWorldPath)
+
+            Store:Set("world/enterWorldDir", worldDir)
+
+            local worldTag = WorldCommon.GetWorldInfo()
+            echo(worldTag, true)
+            Store:Set("world/worldTag", worldTag)
+            Store:Set("world/enterWorld", {
+                IsFolder = false,
+                Title = worldTag.name,
+                author = "None",
+                costTime = "0:0:0",
+                filesize = 0,
+                foldername = foldername.default,
+                grade = "primary",
+                icon = "Texture/3DMapSystem/common/page_world.png",
+                ip = "127.0.0.1",
+                mode = "survival",
+                modifyTime = 0,
+                nid = "",
+                order = 0,
+                preview = "",
+                progress = "0",
+                revision = LocalService:GetZipRevision(originWorldPath),
+                size = 0,
+                worldpath = originWorldPath
+            })
         end
     end
 

@@ -18,7 +18,6 @@ local FileDownloader = commonlib.gettable("Mod.WorldShare.service.FileDownloader
 local GitlabService = NPL.load("./GitlabService")
 local GithubService = NPL.load("./GithubService")
 local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
-local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/Login/UserConsole.lua")
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
@@ -242,39 +241,41 @@ function LocalService:MoveZipToFolder(path)
     ParaAsset.CloseArchive(path)
 end
 
-function LocalService:FileDownloader(foldername, path, callback)
-    local foldername = GitEncoding.Base32(SyncMain.foldername.utf8)
-
-    local url = ""
-    local downloadDir = ""
-
-    if (UserConsole.dataSourceType == "github") then
-    elseif (UserConsole.dataSourceType == "gitlab") then
-        url =
-            UserConsole.rawBaseUrl ..
-            "/" .. UserConsole.dataSourceUsername .. "/" .. foldername .. "/raw/" .. SyncMain.commitId .. "/" .. path
-        downloadDir = SyncMain.worldDir.default .. path
+--[[
+    function LocalService:FileDownloader(foldername, path, callback)
+        local foldername = GitEncoding.Base32(SyncMain.foldername.utf8)
+    
+        local url = ""
+        local downloadDir = ""
+    
+        if (UserConsole.dataSourceType == "github") then
+        elseif (UserConsole.dataSourceType == "gitlab") then
+            url =
+                UserConsole.rawBaseUrl ..
+                "/" .. UserConsole.dataSourceUsername .. "/" .. foldername .. "/raw/" .. SyncMain.commitId .. "/" .. path
+            downloadDir = SyncMain.worldDir.default .. path
+        end
+    
+        local Files =
+            FileDownloader:new():Init(
+            _path,
+            url,
+            downloadDir,
+            function(bSuccess, downloadPath)
+                local content = LocalService:getFileContent(downloadPath)
+    
+                if (bSuccess) then
+                    local returnData = {filename = _path, content = content}
+                    return callback(bSuccess, returnData)
+                else
+                    return callback(bSuccess, nil)
+                end
+            end,
+            "access plus 5 mins",
+            true
+        )
     end
-
-    local Files =
-        FileDownloader:new():Init(
-        _path,
-        url,
-        downloadDir,
-        function(bSuccess, downloadPath)
-            local content = LocalService:getFileContent(downloadPath)
-
-            if (bSuccess) then
-                local returnData = {filename = _path, content = content}
-                return callback(bSuccess, returnData)
-            else
-                return callback(bSuccess, nil)
-            end
-        end,
-        "access plus 5 mins",
-        true
-    )
-end
+]]
 
 function LocalService:GetWorldSize(WorldDir)
     local files =

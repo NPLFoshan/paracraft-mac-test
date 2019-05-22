@@ -135,7 +135,6 @@ function Compare:CompareRevision(callback)
 
     local remoteWorldsList = Store:Get("world/remoteWorldsList")
     local remoteRevision = 0
-
     
     if (self:HasRevision()) then
         local function CompareRevision(currentRevision, remoteRevision)

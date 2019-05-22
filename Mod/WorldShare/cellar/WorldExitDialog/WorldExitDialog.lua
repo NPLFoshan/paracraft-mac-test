@@ -16,16 +16,19 @@ local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+local Grade = NPL.load("./Grade.lua")
 
 local WorldExitDialog = NPL.export()
 local self = WorldExitDialog
 
 -- @param callback: function(res) end.
 function WorldExitDialog.ShowPage(callback)
+    -- TODO: if world is read only we should not compare revision
+
     Compare:Init(function()
         local function Handle()
             local params = Utils:ShowWindow(610, 400, "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html", "WorldExitDialog")
-    
+
             params._page.OnClose = function()
                 Store:Remove('page/WorldExitDialog')
             end
@@ -46,6 +49,8 @@ function WorldExitDialog.ShowPage(callback)
                 if data and data.world and data.world.worldName then
                     self.currentWorldKeepworkInfo = data
                 end
+
+                Grade:GetScoreFromKeepwork()
 
                 Handle()
             end)

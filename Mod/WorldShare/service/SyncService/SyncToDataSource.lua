@@ -8,7 +8,6 @@ use the lib:
 local SyncToDataSource = NPL.load("(gl)Mod/WorldShare/cellar/Sync/SyncToDataSource.lua")
 ------------------------------------------------------------
 ]]
-local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/SyncMain.lua")
 local Progress = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Progress/Progress.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")

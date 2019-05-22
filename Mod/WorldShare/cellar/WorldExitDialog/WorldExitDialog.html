@@ -9,14 +9,11 @@
         <script type="text/npl" src="WorldExitDialog.lua" refresh="false">
             <![CDATA[
                 local WorldExitDialog = NPL.load('./WorldExitDialog.lua')
-                local SyncMain = NPL.load('(gl)Mod/WorldShare/cellar/Sync/SyncMain.lua')
                 local Utils = NPL.load('(gl)Mod/WorldShare/helper/Utils.lua')
                 local Store = NPL.load('(gl)Mod/WorldShare/store/Store.lua')
                 local ShareWorld = NPL.load('(gl)Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua')
                 local KeepworkService = NPL.load('(gl)Mod/WorldShare/service/KeepworkService.lua')
-
-                local score = 0
-                local star_table = {{selected = false}, {selected = false}, {selected = false}, {selected = false}, {selected = false}}
+                local Grade = NPL.load('./Grade.lua')
 
                 WorldExitDialog:OnInit()
 
@@ -25,11 +22,11 @@
                     return WorldCommon.GetWorldTag("name");
                 end
 
-                function OnClickCancel()
+                function on_click_cancel()
                     WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel)
                 end
 
-                function OnClickShareWorld()
+                function on_click_share_world()
                     WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel);
                     GameLogic.RunCommand("/menu file.uploadworld");
                 end
@@ -39,14 +36,15 @@
                 end
 
                 function save_as()
-
+                    WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel)
+                    GameLogic.RunCommand("/menu file.saveworldas")
                 end
 
-                function OnClickExitWithoutSave()
+                function on_click_exit_without_save()
                     WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
                 end
 
-                function GetElapsedUnSavedSeconds()
+                function get_elapsed_unsaved_seconds()
                     return math.floor(GameLogic.options:GetElapsedUnSavedTime()/1000);
                 end
 
@@ -84,7 +82,7 @@
                 end
 
                 function get_star()
-                    return star_table
+                    return Grade.starTable
                 end
 
                 function set_star(index)
@@ -92,7 +90,7 @@
                         return false
                     end
 
-                    for key, item in ipairs(star_table) do
+                    for key, item in ipairs(Grade.starTable) do
                         if key > index then
                             item.selected = false
                         else
@@ -106,7 +104,7 @@
                 function update_score()
                     local count_score = 0
 
-                    for key, item in ipairs(star_table) do
+                    for key, item in ipairs(Grade.starTable) do
                         if item.selected == true then
                             count_score = count_score + 1
                         end
@@ -114,7 +112,9 @@
 
                     score = count_score
 
-                    WorldExitDialog:Refresh(0.01)
+                    Grade:UpdateScore(score, function()
+                        WorldExitDialog:Refresh(0.01)
+                    end)
                 end
 
                 function get_project_id()
@@ -168,7 +168,7 @@
                 }
             }
         </style>
-        <aries:window mode="thin" width="610" height="400" title='<%=format("%s", get_cur_world_name() or "") %>' title_height="40" close_height="25" onclose="OnClickCancel">
+        <aries:window mode="thin" width="610" height="400" title='<%=format("%s", get_cur_world_name() or "") %>' title_height="40" close_height="25" onclose="on_click_cancel">
             <div style="padding:20px;padding-bottom:25px;color:#ffffff">
                 <div>
                     <div style="float:left">
@@ -248,7 +248,7 @@
             <div style="height:1px;margin-left:-5px;" width="99.99%" class="mc_line"></div>
             <div style="padding-left:20px;padding-right: 20px;color:#ffffff">
                 <div style="margin-top:20x;base-font-size:15px;font-size:15px;">
-                    <%= L"您上次保存世界是:"%> <span style="color:#ff6a00"><%=format(L"%d秒前", GetElapsedUnSavedSeconds())%></span>
+                    <%= L"您上次保存世界是:"%> <span style="color:#ff6a00"><%=format(L"%d秒前", get_elapsed_unsaved_seconds())%></span>
                 </div>
                 <div style="margin-top:25x;">
                     <pe:if condition="<%= not is_user_world() %>">
@@ -257,7 +257,7 @@
                     <pe:if condition="<%= is_user_world() %>">
                         <input type="button" onclick="on_click_save_and_exit()" value='<%=L"保存并退出" %>' class="mc_big_button" style="min-width:155px;height:35px;" />
                     </pe:if>
-                    <input type="button" onclick="OnClickExitWithoutSave()" value='<%=L"直接退出" %>' class="mc_big_button" style="margin-left:45px;min-width:155px;height:35px;" />
+                    <input type="button" onclick="on_click_exit_without_save()" value='<%=L"直接退出" %>' class="mc_big_button" style="margin-left:45px;min-width:155px;height:35px;" />
                     <input type="button" onclick="OnClickCancel()" value='<%=L"取消" %>' class="mc_big_button" style="margin-left:45x;min-width:155px;height:35px;" />
                 </div>
             </div>

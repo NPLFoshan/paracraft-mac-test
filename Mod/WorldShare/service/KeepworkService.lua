@@ -443,51 +443,6 @@ function KeepworkService:DeleteWorld(kpProjectId, callback)
     self:Request(url, "DELETE", {}, headers, callback)
 end
 
-function KeepworkService:GetRatedProject(kpProjectId, callback)
-    if not kpProjectId then
-        return false
-    end
-
-    if not self:IsSignedIn() then
-        return false
-    end
-
-    local url = format("/projectRates?projectId=%d", kpProjectId)
-    local headers = self:GetHeaders()
-
-    self:Request(url, "GET", {}, headers, callback)
-end
-
-function KeepworkService:SetRatedProject(kpProjectId, rate, callback)
-    if not kpProjectId then
-        return false
-    end
-
-    if not self:IsSignedIn() then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    local params = {
-        projectId = kpProjectId,
-        rate = rate
-    }
-
-    self:GetRatedProject(
-        kpProjectId,
-        function(data, err)
-            if err ~= 200 or #data == 0 then
-                self:Request("/projectRates", "POST", params, headers, callback)
-            end
-
-            if err == 200 and type(data) == 'table' and #data == 1 and type(data[1].projectId) == 'number' then
-                self:Request(format("/projectRates/%d", data[1].projectId), "PUT", params, headers, callback)
-            end
-        end
-    )
-end
-
 -- get keepwork project url
 function KeepworkService:GetShareUrl()
     local env = self:GetEnv()
