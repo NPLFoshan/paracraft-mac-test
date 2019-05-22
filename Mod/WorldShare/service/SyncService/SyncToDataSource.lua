@@ -53,7 +53,27 @@ function SyncToDataSource:Init()
     self:IsProjectExist(
         function(beExisted)
             if beExisted then
-                self:SyncToDataSource()
+                -- update world
+                KeepworkService:GetProjectIdByWorldName(self.foldername.utf8, function()
+                    if Store:Get('world/isEnterWorld') then
+                        world = Store:Get('world/enterWorld') 
+                    else
+                        world = Store:Get('world/selectWorld')
+                    end
+
+                    if world and world.kpProjectId then
+                        local tag = LocalService:GetTag(self.foldername.utf8)
+
+                        if type(tag) == 'table' then
+                            tag.kpProjectId = world.kpProjectId
+
+                            LocalService:SetTag(world.worldpath, tag)
+                        end
+                    end
+
+                    self:SyncToDataSource()
+                end)
+
             else
                 KeepworkService:CreateProject(
                     self.foldername.utf8,
@@ -65,6 +85,16 @@ function SyncToDataSource:Init()
                         end
 
                         world.kpProjectId = data.id
+
+                        if (world and world.kpProjectId) then
+                            local tag = LocalService:GetTag(self.foldername.utf8)
+
+                            if type(tag) == 'table' then
+                                tag.kpProjectId = world.kpProjectId
+
+                                LocalService:SetTag(world.worldpath, tag)
+                            end
+                        end
 
                         if Store:Get("world/isEnterWorld") then
                             Store:Set("world/enterWorld", world)

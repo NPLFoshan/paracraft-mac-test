@@ -137,6 +137,10 @@
                     end
                 end
 
+                function is_rated()
+                    return WorldExitDialog.isRated
+                end
+
                 function get_remote_revision()
                     return Store:Get('world/remoteRevision') or L'无'
                 end
@@ -194,7 +198,7 @@
                                 </div>
                             </div>
                         </div>
-                        <pe:if condition="<%= not has_project_id() or is_user_world() %>">
+                        <pe:if condition="<%= not GameLogic.IsReadOnly() and not has_project_id() or is_user_world() %>">
                             <div>
                                 <div style="float:right;width: 105px;">
                                     <div style="color: #b2b2b2">

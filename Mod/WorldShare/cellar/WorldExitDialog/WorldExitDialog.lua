@@ -10,11 +10,13 @@ WorldExitDialog.ShowPage();
 ------------------------------------------------------------
 ]]
 local ShareWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage")
+local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision");
 
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local Grade = NPL.load("./Grade.lua")
 
@@ -23,43 +25,66 @@ local self = WorldExitDialog
 
 -- @param callback: function(res) end.
 function WorldExitDialog.ShowPage(callback)
-    -- TODO: if world is read only we should not compare revision
+    local function Handle()
+        local params = Utils:ShowWindow(610, 400, "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html", "WorldExitDialog")
 
-    Compare:Init(function()
-        local function Handle()
-            local params = Utils:ShowWindow(610, 400, "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html", "WorldExitDialog")
-
-            params._page.OnClose = function()
-                Store:Remove('page/WorldExitDialog')
-            end
-
-            local WorldExitDialogPage = Store:Get('page/WorldExitDialog')
-            if(WorldExitDialogPage) then
-                if(not GameLogic.IsReadOnly() and not ParaIO.DoesFileExist(self.GetPreviewImagePath(), false)) then
-                    WorldExitDialog.Snapshot()
-                end
-                WorldExitDialogPage.callback = callback
-            end
+        params._page.OnClose = function()
+            Store:Remove('page/WorldExitDialog')
         end
 
+        local WorldExitDialogPage = Store:Get('page/WorldExitDialog')
+        if(WorldExitDialogPage) then
+            if(not GameLogic.IsReadOnly() and not ParaIO.DoesFileExist(self.GetPreviewImagePath(), false)) then
+                WorldExitDialog.Snapshot()
+            end
+            WorldExitDialogPage.callback = callback
+        end
+    end
+
+    if GameLogic.IsReadOnly() then
         local enterWorld = Store:Get('world/enterWorld')
 
-        if enterWorld and enterWorld.kpProjectId then
-            KeepworkService:GetProject(tonumber(enterWorld.kpProjectId), function(data)
-                if data and data.world and data.world.worldName then
-                    self.currentWorldKeepworkInfo = data
-                end
-
-                Grade:GetScoreFromKeepwork()
-
-                Handle()
-            end)
-
-            return true
+        if not enterWorld or not enterWorld.worldpath then
+            return false
         end
-        
+
+        local worldRevision = WorldRevision:new():init(enterWorld.worldpath)
+        local currentRevision = worldRevision:GetRevision()
+
+        Store:Set('world/currentRevision', currentRevision)
+
+        if KeepworkService:IsSignedIn() then
+            Grade:GetScoreFromKeepwork(function()
+
+            end)
+        end
+
         Handle()
-    end)
+    else
+        Compare:Init(function()
+            local enterWorld = Store:Get('world/enterWorld')
+    
+            if enterWorld and enterWorld.kpProjectId then
+                KeepworkService:GetProject(tonumber(enterWorld.kpProjectId), function(data)
+                    if data and data.world and data.world.worldName then
+                        self.currentWorldKeepworkInfo = data
+                    end
+
+                    if KeepworkService:IsSignedIn() then
+                        Grade:GetScoreFromKeepwork(function()
+
+                        end)
+                    end
+    
+                    Handle()
+                end)
+    
+                return true
+            end
+            
+            Handle()
+        end)
+    end
 end
 
 function WorldExitDialog:IsUserWorld()
@@ -137,7 +162,9 @@ function WorldExitDialog:CanSetStart()
                         self.currentWorldKeepworkInfo = data
                     end
 
-                    self:Refresh()
+                    Grade:GetScoreFromKeepwork(function()
+                        self:Refresh()
+                    end)
                 end)
             end
         end)

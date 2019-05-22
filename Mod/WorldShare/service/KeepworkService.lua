@@ -558,18 +558,6 @@ function KeepworkService:SaveSigninInfo(info)
     end
 end
 
-function KeepworkService:GetProjectFromUrlProtocol()
-    local cmdline = ParaEngine.GetAppCommandLine()
-    local urlProtocol = string.match(cmdline or "", "paracraft://(.*)$")
-    urlProtocol = Encoding.url_decode(urlProtocol or "")
-
-    local kpProjectId = urlProtocol:match('kpProjectId="([%S]+)"')
-
-    if kpProjectId then
-        return kpProjectId
-    end
-end
-
 -- return nil or user token in url protocol
 function KeepworkService:GetUserTokenFromUrlProtocol()
     local cmdline = ParaEngine.GetAppCommandLine()
@@ -720,36 +708,26 @@ function KeepworkService:UpdateRecord(callback)
 
             WorldList.SetRefreshing(true)
 
-            if (world and world.kpProjectId) then
-                local tag = LocalService:GetTag(foldername.default)
-    
-                if type(tag) == 'table' then
-                    tag.kpProjectId = world.kpProjectId
-    
-                    LocalService:SetTag(world.worldpath, tag)
-                end
-    
-                self:GetProject(
-                    world.kpProjectId,
-                    function(data)
-                        if data and data.extra and not data.extra.imageUrl then
-                            self:UpdateProject(
-                                world.kpProjectId,
-                                {
-                                    extra = {
-                                        imageUrl = format(
-                                            "%s/%s/%s/raw/master/preview.jpg",
-                                            dataSourceInfo.rawBaseUrl,
-                                            dataSourceInfo.dataSourceUsername,
-                                            foldername.base32
-                                        )
-                                    }
+            self:GetProject(
+                world.kpProjectId,
+                function(data)
+                    if data and data.extra and not data.extra.imageUrl then
+                        self:UpdateProject(
+                            world.kpProjectId,
+                            {
+                                extra = {
+                                    imageUrl = format(
+                                        "%s/%s/%s/raw/master/preview.jpg",
+                                        dataSourceInfo.rawBaseUrl,
+                                        dataSourceInfo.dataSourceUsername,
+                                        foldername.base32
+                                    )
                                 }
-                            )
-                        end
+                            }
+                        )
                     end
-                )
-            end
+                end
+            )
 
             self:PushWorld(
                 worldInfo,

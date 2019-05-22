@@ -71,74 +71,79 @@ function SyncMain:CommandEnter(callback)
 
     Store:Set("world/enterFoldername", foldername)
 
-    local function Handle()
-        local compareWorldList = Store:Get("world/compareWorldList")
+    if GameLogic.IsReadOnly() then
+        local originWorldPath = ParaWorld.GetWorldDirectory()
 
-        local currentWorld = nil
-        local worldDir = {}
+        local worldDir = {
+            default = originWorldPath,
+            utf8 = Encoding.DefaultToUtf8(originWorldPath)
+        }
 
-        for key, item in ipairs(compareWorldList) do
-            if (item.foldername == foldername.utf8) then
-                currentWorld = item
+        Store:Set("world/enterWorldDir", worldDir)
+
+        local worldTag = WorldCommon.GetWorldInfo() or {}
+
+        Store:Set("world/worldTag", worldTag)
+        Store:Set("world/enterWorld", {
+            IsFolder = false,
+            is_zip = true,
+            Title = worldTag.name,
+            author = "None",
+            costTime = "0:0:0",
+            filesize = 0,
+            foldername = foldername.default,
+            grade = "primary",
+            icon = "Texture/3DMapSystem/common/page_world.png",
+            ip = "127.0.0.1",
+            mode = "survival",
+            modifyTime = 0,
+            nid = "",
+            order = 0,
+            preview = "",
+            progress = "0",
+            size = 0,
+            worldpath = originWorldPath,
+            kpProjectId = worldTag.kpProjectId
+        })
+    else
+        local function Handle()
+            local compareWorldList = Store:Get("world/compareWorldList")
+    
+            local currentWorld = nil
+            local worldDir = {}
+    
+            for key, item in ipairs(compareWorldList) do
+                if (item.foldername == foldername.utf8) then
+                    currentWorld = item
+                end
+            end
+    
+            if (currentWorld) then
+                worldDir.default = format("%s/", currentWorld.worldpath)
+                worldDir.utf8 = Encoding.DefaultToUtf8(worldDir.default)
+    
+                Store:Set("world/enterWorldDir", worldDir)
+    
+                local worldTag = LocalService:GetTag(foldername.default)
+    
+                worldTag.size = filesize
+                LocalService:SetTag(worldDir.default, worldTag)
+                Store:Set("world/worldTag", worldTag)
+                Store:Set("world/enterWorld", currentWorld)
             end
         end
-
-        if (currentWorld) then
-            worldDir.default = format("%s/", currentWorld.worldpath)
-            worldDir.utf8 = Encoding.DefaultToUtf8(worldDir.default)
-
-            Store:Set("world/enterWorldDir", worldDir)
-
-            local worldTag = LocalService:GetTag(foldername.default)
-
-            worldTag.size = filesize
-            LocalService:SetTag(worldDir.default, worldTag)
-            Store:Set("world/worldTag", worldTag)
-            Store:Set("world/enterWorld", currentWorld)
-        else
-            local originWorldPath = ParaWorld.GetWorldDirectory()
-
-            worldDir.default = originWorldPath
-            worldDir.utf8 = Encoding.DefaultToUtf8(originWorldPath)
-
-            Store:Set("world/enterWorldDir", worldDir)
-
-            local worldTag = WorldCommon.GetWorldInfo()
-            echo(worldTag, true)
-            Store:Set("world/worldTag", worldTag)
-            Store:Set("world/enterWorld", {
-                IsFolder = false,
-                Title = worldTag.name,
-                author = "None",
-                costTime = "0:0:0",
-                filesize = 0,
-                foldername = foldername.default,
-                grade = "primary",
-                icon = "Texture/3DMapSystem/common/page_world.png",
-                ip = "127.0.0.1",
-                mode = "survival",
-                modifyTime = 0,
-                nid = "",
-                order = 0,
-                preview = "",
-                progress = "0",
-                revision = LocalService:GetZipRevision(originWorldPath),
-                size = 0,
-                worldpath = originWorldPath
-            })
-        end
+    
+        WorldList:RefreshCurrentServerList(
+            function()
+                Handle()
+    
+                if type(callback) == "function" then
+                    callback()
+                end
+            end,
+            true
+        )
     end
-
-    WorldList:RefreshCurrentServerList(
-        function()
-            Handle()
-
-            if type(callback) == "function" then
-                callback()
-            end
-        end,
-        true
-    )
 end
 
 function SyncMain:GetWorldFolder()

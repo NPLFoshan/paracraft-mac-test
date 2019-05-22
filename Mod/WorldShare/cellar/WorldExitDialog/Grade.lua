@@ -52,18 +52,20 @@ function Grade:UpdateScore(score, callback)
         rate,
         function(data, err)
             if err == 200 then
+                if type(callback) == 'function' then
+                    callback()
+                end
                 -- GradeLocalData:RecordProjectId(KeepworkServiceProject:GetProjectId(), username)
             end
         end
     )
-
-    self:ClosePage()
 end
 
 function Grade:GetScoreFromKeepwork(callback)
     KeepworkServiceRate:GetRatedProject(
         KeepworkServiceProject:GetProjectId(),
         function(data, err)
+            echo('from grade get score from keepwork!!!!!!', true)
             echo(data, true)
         end
     )
