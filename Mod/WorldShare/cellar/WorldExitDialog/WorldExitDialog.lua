@@ -54,12 +54,13 @@ function WorldExitDialog.ShowPage(callback)
         Store:Set('world/currentRevision', currentRevision)
 
         if KeepworkService:IsSignedIn() then
-            Grade:GetScoreFromKeepwork(function()
-
+            Grade:IsRated(function(isRated)
+                self.isRated = isRated
+                Handle()
             end)
+        else
+            Handle()
         end
-
-        Handle()
     else
         Compare:Init(function()
             local enterWorld = Store:Get('world/enterWorld')
@@ -71,17 +72,18 @@ function WorldExitDialog.ShowPage(callback)
                     end
 
                     if KeepworkService:IsSignedIn() then
-                        Grade:GetScoreFromKeepwork(function()
-
+                        Grade:IsRated(function(isRated)
+                            self.isRated = isRated
+                            Handle()
                         end)
+                    else
+                        Handle()
                     end
-    
-                    Handle()
                 end)
-    
+
                 return true
             end
-            
+
             Handle()
         end)
     end
@@ -162,7 +164,8 @@ function WorldExitDialog:CanSetStart()
                         self.currentWorldKeepworkInfo = data
                     end
 
-                    Grade:GetScoreFromKeepwork(function()
+                    Grade:IsRated(function(isRated)
+                        self.isRated = isRated
                         self:Refresh()
                     end)
                 end)

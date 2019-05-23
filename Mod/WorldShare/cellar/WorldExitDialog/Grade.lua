@@ -61,12 +61,19 @@ function Grade:UpdateScore(score, callback)
     )
 end
 
-function Grade:GetScoreFromKeepwork(callback)
+function Grade:IsRated(callback)
     KeepworkServiceRate:GetRatedProject(
         KeepworkServiceProject:GetProjectId(),
         function(data, err)
-            echo('from grade get score from keepwork!!!!!!', true)
-            echo(data, true)
+            if type(callback) ~= 'function' then
+                return false
+            end
+
+            if data and #data > 0 then
+                callback(true)
+            else
+                callback(false)
+            end
         end
     )
 end

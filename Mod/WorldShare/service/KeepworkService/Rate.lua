@@ -48,8 +48,6 @@ function KeepworkServiceRate:SetRatedProject(kpProjectId, rate, callback)
   self:GetRatedProject(
       kpProjectId,
       function(data, err)
-          echo(data, true)
-
           if err ~= 200 or #data == 0 then
             KeepworkService:Request("/projectRates", "POST", params, headers, callback)
           end

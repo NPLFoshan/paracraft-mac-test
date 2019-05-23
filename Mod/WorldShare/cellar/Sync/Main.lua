@@ -132,7 +132,7 @@ function SyncMain:CommandEnter(callback)
                 Store:Set("world/enterWorld", currentWorld)
             end
         end
-    
+
         WorldList:RefreshCurrentServerList(
             function()
                 Handle()
