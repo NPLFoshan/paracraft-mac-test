@@ -37,10 +37,8 @@ function SyncMain:OnWorldLoad()
         end
     end
 
-    self:GetCurrentWorldInfo(function()
-        CreateWorld:CheckRevision(function()
-            Handle()
-        end)
+    CreateWorld:CheckRevision(function()
+        self:GetCurrentWorldInfo(Handle)
     end)
 end
 
@@ -53,8 +51,6 @@ function SyncMain:GetCurrentWorldInfo(callback)
     }
 
     Store:Set("world/foldername", foldername)
-
-    local currentWorld = Store:Get("world/currentWorld")
 
     if GameLogic.IsReadOnly() then
         local originWorldPath = ParaWorld.GetWorldDirectory()

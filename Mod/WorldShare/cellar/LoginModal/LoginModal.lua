@@ -7,13 +7,17 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
-LoginModal:ShowPage()
+if(not UserConsole.IsSignedIn()) then
+    UserConsole.ShowLoginModal(callbackFunc)
+end
 ------------------------------------------------------------
 ]]
 
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
+local UserConsole = NPL.load("../UserConsole.lua")
+local LoginUserInfo = NPL.load("../LoginUserInfo.lua")
 local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
