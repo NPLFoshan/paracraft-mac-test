@@ -8,12 +8,10 @@ use the lib:
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 ------------------------------------------------------------
 ]]
-NPL.load("./FileDownloader/FileDownloader.lua")
 local Files = commonlib.gettable("commonlib.Files")
 
 local SystemEncoding = commonlib.gettable("System.Encoding")
 local CommonlibEncoding = commonlib.gettable("commonlib.Encoding")
-local FileDownloader = commonlib.gettable("Mod.WorldShare.service.FileDownloader.FileDownloader")
 
 local GitlabService = NPL.load("./GitlabService")
 local GithubService = NPL.load("./GithubService")
