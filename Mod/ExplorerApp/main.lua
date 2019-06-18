@@ -12,7 +12,7 @@ local ExplorerApp = commonlib.gettable("Mod.ExplorerApp")
 ]]
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Task.lua")
-NPL.load("(gl)Mod/ExplorerStore/store/ExplorerStore.lua")
+NPL.load("(gl)Mod/ExplorerApp/store/ExplorerStore.lua")
 NPL.load("(gl)Mod/ExplorerApp/tasks/ExplorerTask.lua")
 NPL.load("(gl)script/ide/AudioEngine/AudioEngine.lua")
 NPL.load("(gl)script/ide/System/Core/UniString.lua")
@@ -55,13 +55,13 @@ function ExplorerApp:OnWorldLoad()
         return false
     end
 
-    GameLogic.GetFilters():add_filter(
-        "HandleEscapeKey",
-        function()
-            ProactiveEnd:Toggle()
-            return true
-        end
-    )
+    -- GameLogic.GetFilters():add_filter(
+    --     "HandleEscapeKey",
+    --     function()
+    --         ProactiveEnd:Toggle()
+    --         return true
+    --     end
+    -- )
 
     GameLogic.GetCodeGlobal():RegisterTextEvent("dead", function()
         GameOver:ShowPage()
