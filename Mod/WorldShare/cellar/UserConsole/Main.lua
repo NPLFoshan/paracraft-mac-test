@@ -239,7 +239,7 @@ function UserConsole:HandleWorldId(pid)
                     else
                         LoadWorld(world, "never")
                     end
-                end, _guihelper.MessageBoxButtons.YesNo)
+                end, _guihelper.MessageBoxButtons.YesNo);
             else
                 LoadWorld(world, "auto")
             end

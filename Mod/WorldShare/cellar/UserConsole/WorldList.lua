@@ -330,19 +330,10 @@ function WorldList:SyncWorldsList(callback)
             end
 
             if (not isExist) then
-                local currentWorld = LItem
+                currentWorld = LItem
                 currentWorld.modifyTime = self:UnifiedTimestampFormat(currentWorld.writedate)
                 currentWorld.text = currentWorld.foldername
                 currentWorld.status = 1 --仅本地
-
-                if currentWorld.kpProjectId then
-                    currentWorld.kpProjectId = nil
-
-                    local tag = WorldCommon.LoadWorldTag(currentWorld["worldpath"])
-                    tag.kpProjectId = nil
-                    LocalService:SetTag(currentWorld["worldpath"], tag)
-                end
-
                 compareWorldList:push_back(currentWorld)
             end
         end
