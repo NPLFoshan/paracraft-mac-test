@@ -9,6 +9,7 @@
                 WorldList = NPL.load("./WorldList")
                 UserInfo = NPL.load("./UserInfo.lua")
                 Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
+                MySchool = NPL.load("(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua")
                 UniString = commonlib.gettable("System.Core.UniString")
 
                 UserConsole:SetPage()
@@ -224,7 +225,8 @@
                 end
 
                 function my_school()
-                    
+                    UserConsole:ClosePage()
+                    MySchool:Show()
                 end
             ]]>
         </script>
