@@ -40,7 +40,5 @@ end
 
 function MySchool.GetUrl()
     local token = Store:Get("user/token") or ''
-    local url = KeepworkService:GetKeepworkUrl() .. '/p/org/home?port=8099&token=' .. token
-
-    return url
+    return KeepworkService:GetKeepworkUrl() .. '/p/org/home?port=8099&token=' .. token
 end
