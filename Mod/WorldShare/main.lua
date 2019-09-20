@@ -51,7 +51,10 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local WorldShare = commonlib.inherit(commonlib.gettable("Mod.ModBase"), commonlib.gettable("Mod.WorldShare"))
 
 WorldShare:Property({"Name", "WorldShare"})
-WorldShare.version = '0.0.5'
+WorldShare.version = '0.0.6'
+
+-- register mod global variable
+WorldShare.Store = Store
 
 -- LOG.SetLogLevel("DEBUG");
 LOG.std(nil, "info", "WorldShare", "world share version %s", WorldShare.version)

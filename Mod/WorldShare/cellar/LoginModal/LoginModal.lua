@@ -57,16 +57,12 @@ function LoginModal:ShowPage()
     end
 
     local forgotUrl = format("%s/u/set", KeepworkService:GetKeepworkUrl())
-    local registerUrl = format("%s/u/r/register", KeepworkService:GetKeepworkUrl())
+    -- local registerUrl = format("%s/u/r/register", KeepworkService:GetKeepworkUrl())
 
     LoginModalPage:GetNode('forgot'):SetAttribute('href', forgotUrl)
-    LoginModalPage:GetNode('register'):SetAttribute('href', registerUrl)
+    -- LoginModalPage:GetNode('register'):SetAttribute('onclick', registerUrl)
 
     self:Refresh(0.01)
-end
-
-function LoginModal:SetPage()
-    Store:Set('page/LoginModal', document:GetPageCtrl())
 end
 
 function LoginModal:ClosePage()
@@ -230,14 +226,6 @@ function LoginModal:SetRememberMe()
     LoginModalPage:SetValue("password", password)
 
     self:Refresh()
-end
-
-function LoginModal:IsEnglish()
-    if Translation.GetCurrentLanguage() == 'enUS' then
-        return true
-    else
-        return false
-    end
 end
 
 function LoginModal:RemoveAccount(username)

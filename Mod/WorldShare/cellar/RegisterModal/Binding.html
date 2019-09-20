@@ -1,0 +1,64 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type="text/npl" refresh="false">
+                <![CDATA[
+                    RegisterModal = NPL.load("./RegisterModal.lua")
+                    Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
+
+                    page = document:GetPageCtrl()
+                    Store:Set('page/Binding', page)
+
+                    function close()
+                        page:CloseWindow()
+                    end
+                ]]>
+            </script>
+            <style type="type/mcss">
+                {
+                    box = {
+                        color = '#ffffff',
+                        textcolor = '#ffffff'
+                    }
+                }
+            </style>
+            <aries:window mode="thin" width="320" style="float:left;" title_height="40" close_height="25" title='<%=L"账号绑定" %>' onclose="close()">
+                <div class="box">
+                    <div><%= L"您的账号尚未设置绑定信息，建议绑定手机号码或者email。" %></div>
+                    <div>
+                        <pe:tabs name="verifyinfo" class="tabs" >
+                            <pe:tab-item name="phonenumber" text="<%= L'手机号码' %>" selected="true">
+                                <div style="margin-bottom:12px;">
+                                    <div style="float:left;min-width:65px"><%= L"手机号：" %></div>
+                                    <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;" name="text" />
+                                </div>
+                                <div style="margin-bottom:12px;">
+                                    <div style="float:left;min-width:65px"><%= L"验证码：" %></div>
+                                    <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入验证码" %>' style="height: 30px;" name="text" />
+                                </div>
+                                <div>
+                                    <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"以后再说"%>' />
+                                    <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"完成绑定"%>' />
+                                </div>
+                            </pe:tab-item>
+                            <pe:tab-item name="email" text="<%= L'EMAIL' %>">
+                                <div style="margin-bottom:12px;">
+                                    <div style="float:left;min-width:65px"><%= L"EMAIL：" %></div>
+                                    <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入EMAIL" %>' style="height: 30px;" name="text" />
+                                </div>
+                                <div style="margin-bottom:12px;">
+                                    <div style="float:left;min-width:65px"><%= L"验证码：" %></div>
+                                    <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入验证码" %>' style="height: 30px;" name="text" />
+                                </div>
+                                <div>
+                                    <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"以后再说"%>' />
+                                    <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"完成绑定"%>' />
+                                </div>
+                            </pe:tab-item>
+                        </pe:tabs>
+                    </div>
+                </div>
+            </aries:window>
+        </pe:mcml>
+    </body>
+</html>

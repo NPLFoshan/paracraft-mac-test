@@ -1,0 +1,82 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type="text/npl" refresh="false">
+                <![CDATA[
+                    Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
+                    Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
+                    RegisterModal = NPL.load("./RegisterModal.lua")
+
+                    page = document:GetPageCtrl()
+                    Store:Set('page/RegisterModal', page)
+
+                    function close()
+                        page:CloseWindow()
+                    end
+
+                    function get_server_list()
+                        return RegisterModal:GetServerList()
+                    end
+
+                    function is_english()
+                        return Utils:IsEnglish()
+                    end
+
+                    function get_english_style(styleStr)
+                        if is_english() then
+                            return styleStr
+                        else
+                            return ''
+                        end
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    user_register = {
+                        color = '#ffffff'
+                        textcolor = '#ffffff'
+                    }
+                }
+            </style>
+            <aries:window mode="thin" width="320" style="float:left;" title_height="40" close_height="25" title='<%=L"注册" %>' onclose="close()">
+                <div name="register" class="user_register">
+                    <div><%=L"填写基本注册信息"%></div>
+                    <div style="margin-bottom:12px;">
+                        <div style="<%='float:left;min-width:40px;' .. get_english_style('min-width:73px;') %>"><%= L"服务器："%></div>
+                        <select name="registerServer" DataSource="<%= get_server_list()%>" style="height: 30px;width: 165px;" class="text_field"></select>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:73px;') %>"><%= L"账号：" %></div>
+                        <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入账号" %>' style="height: 30px;" name="account" />
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <div style="float:left;min-width:65px"><%= L"密码：" %></div>
+                        <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;" name="password" />
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <div style="float:left;min-width:65px"><%= L"验证码：" %></div>
+                        <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入验证码" %>' style="height: 30px;" name="password" />
+                    </div>
+                    <div><%=L"实名验证（推荐）"%></div>
+                    <div style="margin-bottom:12px;">
+                        <div style="float:left;min-width:65px"><%= L"手机号：" %></div>
+                        <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;" name="password" />
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <div style="float:left;min-width:65px"><%= L"验证码：" %></div>
+                        <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入验证码" %>' style="height: 30px;" name="password" />
+                    </div>
+                    <div>
+                        <input type="checkbox" style="float:left;margin-top:3px;min-width:90px;" name="rememberMe" onclick="set_remember_me()"/>
+                        <div style="float:left" for="rememberMe"><%= L"我同意《Paracraft用户协议》中的内容" %></div>
+                    </div>
+                    <div>
+                        <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"取消"%>' />
+                        <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"注册"%>' />
+                    </div>
+                </div>
+            </aries:window>
+        </pe:mcml>
+    </body>
+</html>
