@@ -25,6 +25,10 @@ function RegisterModal:ShowPage()
     end
 end
 
+function RegisterModal:ShowBindingPage()
+    
+end
+
 function RegisterModal:GetServerList()
     local serverList = KeepworkService:GetServerList()
 

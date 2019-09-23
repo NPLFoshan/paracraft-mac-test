@@ -106,7 +106,7 @@ function LoginModal:LoginAction()
 
     local account = LoginModalPage:GetValue("account")
     local password = LoginModalPage:GetValue("password")
-    local loginServer = LoginModalPage:GetValue("loginServer")
+    local loginServer = 'ONLINE' -- LoginModalPage:GetValue("loginServer")
     local autoLogin = LoginModalPage:GetValue("autoLogin")
     local rememberMe = LoginModalPage:GetValue("rememberMe")
 
@@ -188,7 +188,7 @@ function LoginModal:SetAutoLogin()
     local autoLogin = LoginModalPage:GetValue("autoLogin")
     local rememberMe = LoginModalPage:GetValue("rememberMe")
     local password = LoginModalPage:GetValue("password")
-    self.loginServer = LoginModalPage:GetValue("loginServer")
+    self.loginServer = 'ONLINE' -- LoginModalPage:GetValue("loginServer")
     self.account = string.lower(LoginModalPage:GetValue("account"))
 
     if autoLogin then
@@ -210,10 +210,10 @@ function LoginModal:SetRememberMe()
         return false
     end
 
-    local loginServer = LoginModalPage:GetValue("loginServer")
+    local loginServer = 'ONLINE' -- LoginModalPage:GetValue("loginServer")
     local password = LoginModalPage:GetValue("password")
     local rememberMe = LoginModalPage:GetValue("rememberMe")
-    self.loginServer = LoginModalPage:GetValue("loginServer")
+    self.loginServer = 'ONLINE' -- LoginModalPage:GetValue("loginServer")
     self.account = string.lower(LoginModalPage:GetValue("account"))
 
     if rememberMe then
