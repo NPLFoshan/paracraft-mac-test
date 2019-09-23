@@ -36,6 +36,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua
 NPL.load("(gl)script/ide/System/os/os.lua")
 
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
+local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
@@ -55,6 +56,7 @@ WorldShare.version = '0.0.6'
 
 -- register mod global variable
 WorldShare.Store = Store
+WorldShare.MsgBox = MsgBox
 
 -- LOG.SetLogLevel("DEBUG");
 LOG.std(nil, "info", "WorldShare", "world share version %s", WorldShare.version)

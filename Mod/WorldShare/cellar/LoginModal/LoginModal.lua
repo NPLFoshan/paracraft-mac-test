@@ -111,17 +111,17 @@ function LoginModal:LoginAction()
     local rememberMe = LoginModalPage:GetValue("rememberMe")
 
     if (not account or account == "") then
-        _guihelper.MessageBox(L"账号不能为空")
+        GameLogic.AddBBS(nil, L"账号不能为空", 3000, "255 0 0")
         return false
     end
-
+    
     if (not password or password == "") then
-        _guihelper.MessageBox(L"密码不能为空")
+        GameLogic.AddBBS(nil, L"密码不能为空", 3000, "255 0 0")
         return false
     end
-
+    
     if (not loginServer) then
-        _guihelper.MessageBox(L"登陆站点不能为空")
+        GameLogic.AddBBS(nil, L"登陆站点不能为空", 3000, "255 0 0")
         return false
     end
 
