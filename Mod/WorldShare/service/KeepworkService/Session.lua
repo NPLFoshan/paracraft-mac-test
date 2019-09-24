@@ -206,6 +206,20 @@ function KeepworkServiceSession:BindEmail(email, captcha, callback)
     )
 end
 
-function KeepworkServiceSession:ResetPassword()
+function KeepworkServiceSession:ResetPassword(key, password, captcha, callback)
+    if type(key) ~= 'string' or type(password) ~= 'string' or type(captcha) ~= 'string' then
+        return false
+    end
 
+    KeepworkService:Request(
+        '/users/email_captcha',
+        'POST',
+        {
+            key = key,
+            password = password,
+            captcha = captcha
+        },
+        nil,
+        callback
+    )
 end
