@@ -42,7 +42,17 @@
                     end
 
                     function update_captcha()
-                        KeepworkServiceSession:FetchCaptcha(function() page:Refresh(0.01) end)
+                        KeepworkServiceSession:FetchCaptcha(function()
+                            local account = page:GetValue('account')
+                            local password = page:GetValue('password')
+                            local phone = page:GetValue('phone')
+                            local phonecaptcha = page:GetValue('phonecaptcha')
+                            page:Refresh(0.01)
+                            page:SetValue('account', account)
+                            page:SetValue('password', password)
+                            page:SetValue('phone', phone)
+                            page:SetValue('phonecaptcha', phonecaptcha)
+                        end)
                     end
 
                     local isClickedGetPhoneCaptcha = false
@@ -58,8 +68,6 @@
                         end
 
                         isClickedGetPhoneCaptcha = true
-
-                        KeepworkServiceSession:GetPhoneCaptcha(page:GetValue("phone"))
 
                         local times = 60
 
@@ -77,7 +85,38 @@
                             end
                         })
 
+                        KeepworkServiceSession:GetPhoneCaptcha(page:GetValue("phone"), function(data, err)
+                            if err == 500 then
+                                isClickedGetPhoneCaptcha = false
+                                page:SetValue("getPhonecaptcha", L"获取验证码")
+                                GameLogic.AddBBS(nil, L"发送验证码失败", 3000, "255 0 0")
+                                timer:Change(nil, nil)
+                            end
+                        end)
+
                         timer:Change(1000, 1000)
+                    end
+
+                    local beShowPassword = false
+
+                    function set_show_password()
+                        local account = page:GetValue('account')
+                        local password = page:GetValue('password')
+                        local phone = page:GetValue('phone')
+                        local phonecaptcha = page:GetValue('phonecaptcha')
+
+                        beShowPassword = not beShowPassword
+
+                        if beShowPassword then
+                            page:GetNode('password'):SetAttribute('PasswordChar', nil)
+                        else
+                            page:GetNode('password'):SetAttribute('PasswordChar', "*")
+                        end
+                        page:Refresh(0.01)
+                        page:SetValue('account', account)
+                        page:SetValue('password', password)
+                        page:SetValue('phone', phone)
+                        page:SetValue('phonecaptcha', phonecaptcha)
                     end
                 ]]>
             </script>
@@ -120,7 +159,8 @@
                     </div>
                     <div style="margin-bottom:12px;">
                         <div style="float:left;min-width:65px"><%= L"密码：" %></div>
-                        <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;" name="password" />
+                        <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;width: 160px;" name="password" />
+                        <div onclick="set_show_password()" style="float:left;font-size: 12px;">隐藏/显示</div>
                     </div>
                     <div style="margin-bottom:12px;">
                         <div style="float:left;min-width:65px"><%= L"验证码：" %></div>

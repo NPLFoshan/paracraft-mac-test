@@ -35,23 +35,81 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         captcha = captcha
     }
 
-    if #cellphone == 11 then
-        params = {
-            username = username,
-            password = password,
-            cellphone = cellphone,
-            captcha = cellphoneCaptcha
-        }
-    end
-
     KeepworkService:Request(
         '/users/register',
         'POST',
         params,
         nil,
-        function (data, err)
+        function (registerData, err)
+            if err == 200 and registerData.id then
+                KeepworkService:Login(
+                    username,
+                    password,
+                    function(loginData, err)
+                        if err ~= 200 then
+                            registerData.message = '注册成功，登录失败，实名认证失败'
+                            registerData.code = 9
+
+                            if type(callback) == 'function' then
+                                callback(registerData)
+                            end
+
+                            return false
+                        end
+
+                        KeepworkService:LoginResponse(loginData, err, function()
+                            KeepworkService:SaveSigninInfo(
+                                {
+                                    account = username,
+                                    password = password,
+                                    token = loginData["token"] or "",
+                                    loginServer = Mod.WorldShare.Store:Get('user/env'),
+                                    autoLogin = false,
+                                    rememberMe = false
+                                }
+                            )
+
+                            if #cellphone == 11 then
+                                KeepworkService:Request(
+                                    '/users/cellphone_captcha',
+                                    'POST',
+                                    {
+                                        cellphone = cellphone,
+                                        captcha = cellphoneCaptcha,
+                                        realname = true
+                                    },
+                                    KeepworkService:GetHeaders(),
+                                    function(validatedData, err)
+                                        if err == 200 then
+                                            if type(callback) == 'function' then
+                                                callback(registerData)
+                                            end
+                                            return true
+                                        end
+
+                                        registerData.message = '注册成功，实名认证失败'
+                                        registerData.code = 10
+
+                                        if type(callback) == 'function' then
+                                            callback(registerData)
+                                        end 
+                                    end,
+                                    { 400 }
+                                )
+                            else
+                                if type(callback) == 'function' then
+                                    callback(registerData)
+                                end 
+                            end
+                        end)
+                    end
+                )
+
+                return true
+            end
+
             if type(callback) == 'function' then
-                callback(data)
+                callback(registerData)
             end
         end,
         { 400 }
@@ -84,7 +142,7 @@ function KeepworkServiceSession:GetCaptcha()
     return KeepworkService:GetCoreApi() .. '/keepworks/captcha/' .. self.captchaKey
 end
 
-function KeepworkServiceSession:GetPhoneCaptcha(phone)
+function KeepworkServiceSession:GetPhoneCaptcha(phone, callback)
     if not phone or type(phone) ~= 'string' then
         return false
     end
@@ -94,9 +152,7 @@ function KeepworkServiceSession:GetPhoneCaptcha(phone)
         'GET',
         nil,
         nil,
-        function (data, err)
-            -- echo(data, true)
-        end
+        callback
     )
 end
 
@@ -118,7 +174,7 @@ function KeepworkServiceSession:BindPhone(cellphone, captcha, callback)
     )
 end
 
-function KeepworkServiceSession:GetEmailCaptcha(email)
+function KeepworkServiceSession:GetEmailCaptcha(email, callback)
     if not email or type(email) ~= 'string' then
         return false
     end
@@ -128,10 +184,7 @@ function KeepworkServiceSession:GetEmailCaptcha(email)
         'GET',
         nil,
         nil,
-        function (data, err)
-            -- echo(data, true)
-            -- echo(err, true)
-        end
+        callback
     )
 end
 
@@ -151,4 +204,8 @@ function KeepworkServiceSession:BindEmail(email, captcha, callback)
         KeepworkService:GetHeaders(),
         callback
     )
+end
+
+function KeepworkServiceSession:ResetPassword()
+
 end

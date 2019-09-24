@@ -12,6 +12,7 @@ RegisterModal:ShowPage()
 ]]
 
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 
 local RegisterModal = NPL.export()
@@ -71,25 +72,34 @@ function RegisterModal:Register()
 
     if not captcha or captcha == "" then
         GameLogic.AddBBS(nil, L"验证码不能为空", 3000, "255 0 0")
+        return false
     end
 
     if #phone > 0 and #phone < 11 then
         GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
+        return false
     end
 
-    if #phone > 0 and #captcha == 0 then
+    if #phone > 0 and #phonecaptcha == 0 then
         GameLogic.AddBBS(nil, L"手机验证码不能为空", 3000, "255 0 0")
+        return false
     end
 
     Mod.WorldShare.Store:Set("user/env", loginServer)
 
-    Mod.WorldShare.MsgBox:Show(L"正在注册，可能需要10-15秒的时间，请稍后...", 20000, L"链接超时", 500)
+    Mod.WorldShare.MsgBox:Show(L"正在注册，可能需要10-15秒的时间，请稍后...", 20000, L"链接超时", 500, 120)
 
     KeepworkServiceSession:Register(account, password, captcha, phone, phonecaptcha, function(state)
         if state and state.id then
-            GameLogic.AddBBS(nil, L"注册成功，请登录", 5000, "0 255 0")
+            if state.code then
+                GameLogic.AddBBS(nil, state.message, 5000, "0 0 255")
+            else
+                GameLogic.AddBBS(nil, L"注册成功", 5000, "0 255 0")
+            end
+
             RegisterModalPage:CloseWindow()
             Mod.WorldShare.MsgBox:Close()
+            WorldList:RefreshCurrentServerList()
             return true
         end
 
@@ -148,10 +158,14 @@ function RegisterModal:Bind(method)
         end
 
         KeepworkServiceSession:BindEmail(email, emailcaptcha, function(data, err)
-            --BindingPage:CloseWindow()
+            BindingPage:CloseWindow()
 
-            echo(data, true)
-            echo(err, true)
+            if data == 'true' and err == 200 then
+                GameLogic.AddBBS(nil, L"绑定成功", 3000, "0 255 0")
+                return true
+            end
+
+            GameLogic.AddBBS(nil, L"绑定失败", 3000, "255 0 0")
         end)
 
         return true
