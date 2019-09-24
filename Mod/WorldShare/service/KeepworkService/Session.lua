@@ -49,7 +49,7 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         'POST',
         params,
         nil,
-        function(data, err)
+        function (data, err)
             if type(callback) == 'function' then
                 callback(data)
             end
@@ -64,7 +64,7 @@ function KeepworkServiceSession:FetchCaptcha(callback)
         "GET",
         nil,
         nil,
-        function(data, err)
+        function (data, err)
             if err == 200 and type(data) == 'table' then
                 self.captchaKey = data.key
 
@@ -94,8 +94,61 @@ function KeepworkServiceSession:GetPhoneCaptcha(phone)
         'GET',
         nil,
         nil,
-        function(data, err)
+        function (data, err)
             -- echo(data, true)
         end
+    )
+end
+
+function KeepworkServiceSession:BindPhone(cellphone, captcha, callback)
+    if not cellphone or type(cellphone) ~= 'string' or not captcha or type(captcha) ~= 'string' then
+        return false
+    end
+
+    KeepworkService:Request(
+        '/users/cellphone_captcha',
+        'POST',
+        {
+            cellphone = cellphone,
+            captcha = captcha,
+            isBind = true
+        },
+        KeepworkService:GetHeaders(),
+        callback
+    )
+end
+
+function KeepworkServiceSession:GetEmailCaptcha(email)
+    if not email or type(email) ~= 'string' then
+        return false
+    end
+
+    KeepworkService:Request(
+        '/users/email_captcha?email=' .. email,
+        'GET',
+        nil,
+        nil,
+        function (data, err)
+            -- echo(data, true)
+            -- echo(err, true)
+        end
+    )
+end
+
+function KeepworkServiceSession:BindEmail(email, captcha, callback)
+    if not email or type(email) ~= 'string' or not captcha or type(captcha) ~= 'string' then
+        return false
+    end
+
+    KeepworkService:Request(
+        '/users/email_captcha',
+        'POST',
+        {
+            email = email,
+            captcha = captcha,
+            isBind = true
+        },
+        KeepworkService:GetHeaders(),
+        callback
     )
 end

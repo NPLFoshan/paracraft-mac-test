@@ -7,6 +7,7 @@
                     Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
                     LoginModal = NPL.load("./LoginModal.lua")
                     RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
+                    ForgetPassword = NPL.load("(gl)Mod/WorldShare/cellar/ForgetPassword/ForgetPassword.lua")
 
                     page = document:GetPageCtrl()
                     Store:Set('page/LoginModal', page)
@@ -60,9 +61,13 @@
                     end
 
                     function register()
-                        echo('3333333', true)
                         LoginModal:Close()
                         RegisterModal:ShowPage()
+                    end
+
+                    function forget_password()
+                        LoginModal:Close()
+                        ForgetPassword:ShowPage()
                     end
                 ]]>
             </script>
@@ -122,7 +127,7 @@
                         <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"登 录"%>' />
                     </div>
                     <div style="<%='text-align:left;margin-left:55px;' .. get_english_style('margin-left:15px;')%>">
-                        <a name="forgot" style="background:url(textures/worldshare_32bits.png#399 76 64 30:0 0 0 0);height:30px;width:150px;font-size: 14px;color: #ffffff;"><%= L"忘记密码" %></a>
+                        <a name="forgot" onclick="forget_password()" style="background:url(textures/worldshare_32bits.png#399 76 64 30:0 0 0 0);height:30px;width:150px;font-size: 14px;color: #ffffff;"><%= L"忘记密码" %></a>
                         <span style="color:#ffffff;">|</span>
                         <a name="register" onclick="register()" style="background:url(textures/worldshare_32bits.png#399 76 64 30:0 0 0 0);height:30px;width:150px;font-size: 14px;color: #fe5927;"><%= L"点击注册" %></a>
                     </div>

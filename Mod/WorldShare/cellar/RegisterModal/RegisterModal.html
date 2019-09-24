@@ -48,16 +48,16 @@
                     local isClickedGetPhoneCaptcha = false
 
                     function get_phone_captcha()
+                        if #page:GetValue("phone") ~= 11 then
+                            GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
+                            return false
+                        end
+
                         if isClickedGetPhoneCaptcha then
                            return false 
                         end
 
                         isClickedGetPhoneCaptcha = true
-
-                        if #page:GetValue("phone") ~= 11 then
-                            GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
-                            return false
-                        end
 
                         KeepworkServiceSession:GetPhoneCaptcha(page:GetValue("phone"))
 

@@ -17,6 +17,7 @@ local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
+local RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
 
 local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
 
@@ -35,10 +36,6 @@ function LoginModal:ShowPage()
 
     local params = Utils:ShowWindow(320, 470, "Mod/WorldShare/cellar/LoginModal/LoginModal.html", "LoginModal", nil, nil, nil, nil)
 
-    params._page.OnClose = function()
-        Store:Remove('page/LoginModal')
-    end
-
     local LoginModalPage = Store:Get('page/LoginModal')
 
     if not LoginModalPage then
@@ -56,10 +53,10 @@ function LoginModal:ShowPage()
         self.account = PWDInfo.account
     end
 
-    local forgotUrl = format("%s/u/set", KeepworkService:GetKeepworkUrl())
+    -- local forgotUrl = format("%s/u/set", KeepworkService:GetKeepworkUrl())
     -- local registerUrl = format("%s/u/r/register", KeepworkService:GetKeepworkUrl())
 
-    LoginModalPage:GetNode('forgot'):SetAttribute('href', forgotUrl)
+    -- LoginModalPage:GetNode('forgot'):SetAttribute('href', forgotUrl)
     -- LoginModalPage:GetNode('register'):SetAttribute('onclick', registerUrl)
 
     self:Refresh(0.01)
@@ -158,6 +155,10 @@ function LoginModal:LoginAction()
         account,
         password,
         function(response, err)
+            if type(response) == 'table' and not response.cellphone and not response.email then
+                RegisterModal:ShowBindingPage()
+            end
+
             KeepworkService:LoginResponse(response, err, HandleLogined)
         end
     )

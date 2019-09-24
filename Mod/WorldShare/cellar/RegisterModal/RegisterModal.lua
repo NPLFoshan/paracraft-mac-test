@@ -11,22 +11,17 @@ RegisterModal:ShowPage()
 ------------------------------------------------------------
 ]]
 
-local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 
 local RegisterModal = NPL.export()
 
 function RegisterModal:ShowPage()
-    local params = Utils:ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal", nil, nil, nil, nil)
-
-    params._page.OnClose = function()
-        Mod.WorldShare.Store:Remove('page/RegisterModal')
-    end
+    Mod.WorldShare.Utils:ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
 end
 
 function RegisterModal:ShowBindingPage()
-    
+    Mod.WorldShare.Utils:ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/Binding.html", "Binding")
 end
 
 function RegisterModal:GetServerList()
@@ -51,7 +46,7 @@ function RegisterModal:Register()
         return false
     end
 
-    local loginServer = RegisterModalPage:GetValue("loginServer")
+    local loginServer = 'ONLINE' -- RegisterModalPage:GetValue("loginServer")
     local account = RegisterModalPage:GetValue("account")
     local password = RegisterModalPage:GetValue("password")
     local captcha = RegisterModalPage:GetValue("captcha")
@@ -101,4 +96,64 @@ function RegisterModal:Register()
         GameLogic.AddBBS(nil, format("%s%s(%d)", L"注册失败，错误信息：", state.message, state.code), 5000, "255 0 0")
         Mod.WorldShare.MsgBox:Close()
     end)
+end
+
+function RegisterModal:Bind(method)
+    local BindingPage = Mod.WorldShare.Store:Get('page/Binding')
+
+    if not BindingPage then
+        return false
+    end
+
+    if method == 'bindphone' then
+        local phone = BindingPage:GetValue("phone")
+        local phonecaptcha = BindingPage:GetValue("phonecaptcha")
+
+        if #phone ~= 11 then
+            GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
+            return false
+        end
+
+        if phonecaptcha == '' then
+            GameLogic.AddBBS(nil, L"手机验证码不能为空", 3000, "255 0 0")
+            return false
+        end
+
+        KeepworkServiceSession:BindPhone(phone, phonecaptcha, function(data, err)
+            BindingPage:CloseWindow()
+
+            if data == 'true' and err == 200 then
+                GameLogic.AddBBS(nil, L"绑定成功", 3000, "0 255 0")
+                return true
+            end
+
+            GameLogic.AddBBS(nil, L"绑定失败", 3000, "255 0 0")
+        end)
+
+        return true
+    end
+
+    if method == 'bindemail' then
+        local email = BindingPage:GetValue("email")
+        local emailcaptcha = BindingPage:GetValue("emailcaptcha")
+
+        if email == '' then
+            GameLogic.AddBBS(nil, L"EMAIL不能为空", 3000, "255 0 0")
+            return false
+        end
+
+        if emailcaptcha == '' then
+            GameLogic.AddBBS(nil, L"EMAIL验证码不能为空", 3000, "255 0 0")
+            return false
+        end
+
+        KeepworkServiceSession:BindEmail(email, emailcaptcha, function(data, err)
+            --BindingPage:CloseWindow()
+
+            echo(data, true)
+            echo(err, true)
+        end)
+
+        return true
+    end
 end
