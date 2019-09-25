@@ -11,6 +11,7 @@ RegisterModal:ShowPage()
 ------------------------------------------------------------
 ]]
 
+local Validated = NPL.load("(gl)Mod/WorldShare/helper/Validated.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
@@ -79,8 +80,8 @@ function RegisterModal:Register()
         return false
     end
 
-    if #phone > 0 and #phone < 11 then
-        GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
+    if not Validated:Phone(phone) then
+        GameLogic.AddBBS(nil, L"手机格式错误", 3000, "255 0 0")
         return false
     end
 
@@ -123,8 +124,8 @@ function RegisterModal:Bind(method)
         local phone = BindingPage:GetValue("phone")
         local phonecaptcha = BindingPage:GetValue("phonecaptcha")
 
-        if #phone ~= 11 then
-            GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
+        if not Validated:Phone(phone) then
+            GameLogic.AddBBS(nil, L"手机号码格式错误", 3000, "255 0 0")
             return false
         end
 
@@ -151,8 +152,8 @@ function RegisterModal:Bind(method)
         local email = BindingPage:GetValue("email")
         local emailcaptcha = BindingPage:GetValue("emailcaptcha")
 
-        if email == '' then
-            GameLogic.AddBBS(nil, L"EMAIL不能为空", 3000, "255 0 0")
+        if not Validated:Email(email) then
+            GameLogic.AddBBS(nil, L"EMAIL格式错误", 3000, "255 0 0")
             return false
         end
 
