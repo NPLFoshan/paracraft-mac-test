@@ -31,11 +31,11 @@ function ForgetPassword:Reset()
     local captcha = ForgetPasswordPage:GetValue('captcha')
     local password = ForgetPasswordPage:GetValue('password')
 
-    if not Validated:Email(key) or not Validated:Phone(str) then
+    if not Validated:Email(key) and not Validated:Phone(key) then
         GameLogic.AddBBS(nil, L"账号格式错误", 3000, "255 0 0")
         return false
     end
-    
+
     if captcha == '' then
         GameLogic.AddBBS(nil, L"验证码不能为空", 3000, "255 0 0")
         return false
@@ -46,5 +46,17 @@ function ForgetPassword:Reset()
         return false
     end
 
-    -- KeepworkServiceSession:ResetPassword()
+    KeepworkServiceSession:ResetPassword(key, password, captcha, function(data, err)
+        if err == 200 and data == 'OK' then
+            GameLogic.AddBBS(nil, L"重置密码成功", 3000, "0 255 0")
+            ForgetPasswordPage:CloseWindow()
+            return true
+        end
+
+        if type(data) ~= 'table' then
+            return false
+        end
+
+        GameLogic.AddBBS(nil, format("%s%s(%d)", L"重置密码失败，错误信息：", data.message, data.code), 5000, "255 0 0")
+    end)
 end

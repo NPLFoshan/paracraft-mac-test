@@ -21,6 +21,10 @@ function RegisterModal:ShowPage()
     Mod.WorldShare.Utils:ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
 end
 
+function RegisterModal:ShowUserAgreementPage()
+    Mod.WorldShare.Utils:ShowWindow(800, 580, "Mod/WorldShare/cellar/RegisterModal/UserAgreement.html", "UserAgreement")
+end
+
 function RegisterModal:ShowBindingPage()
     Mod.WorldShare.Utils:ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/Binding.html", "Binding")
 end

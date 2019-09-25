@@ -212,7 +212,7 @@ function KeepworkServiceSession:ResetPassword(key, password, captcha, callback)
     end
 
     KeepworkService:Request(
-        '/users/email_captcha',
+        '/users/reset_password',
         'POST',
         {
             key = key,
@@ -220,6 +220,7 @@ function KeepworkServiceSession:ResetPassword(key, password, captcha, callback)
             captcha = captcha
         },
         nil,
-        callback
+        callback,
+        { 400 }
     )
 end

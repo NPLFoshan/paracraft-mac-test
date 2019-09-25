@@ -155,7 +155,7 @@ function LoginModal:LoginAction()
         account,
         password,
         function(response, err)
-            if type(response) == 'table' and not response.cellphone and not response.email then
+            if err == 200 and type(response) == 'table' and not response.cellphone and not response.email then
                 RegisterModal:ShowBindingPage()
             end
 

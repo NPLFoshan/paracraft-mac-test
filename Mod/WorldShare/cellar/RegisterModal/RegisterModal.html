@@ -103,7 +103,15 @@
                         local account = page:GetValue('account')
                         local password = page:GetValue('password')
                         local phone = page:GetValue('phone')
+                        local captcha = page:GetValue('captcha')
                         local phonecaptcha = page:GetValue('phonecaptcha')
+                        local checkboxPassword = page:GetNode('checkboxPassword'):GetAttribute("checked")
+                        
+                        if checkboxPassword == "false" then
+                            checkboxPassword = "true"
+                        elseif checkboxPassword == "true" then
+                            checkboxPassword = "false"
+                        end
 
                         beShowPassword = not beShowPassword
 
@@ -116,7 +124,14 @@
                         page:SetValue('account', account)
                         page:SetValue('password', password)
                         page:SetValue('phone', phone)
+                        page:SetValue('captcha', captcha)
                         page:SetValue('phonecaptcha', phonecaptcha)
+                        echo(checkboxPassword, true)
+                        page:GetNode('checkboxPassword'):SetAttribute('checked', checkboxPassword)
+                    end
+
+                    function user_agreement()
+                        RegisterModal:ShowUserAgreementPage()
                     end
                 ]]>
             </script>
@@ -159,8 +174,8 @@
                     </div>
                     <div style="margin-bottom:12px;">
                         <div style="float:left;min-width:65px"><%= L"密码：" %></div>
-                        <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;width: 160px;" name="password" />
-                        <div onclick="set_show_password()" style="float:left;font-size: 12px;">隐藏/显示</div>
+                        <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;" name="password" />
+                        <input name="checkboxPassword" type="checkbox" checked="false" iconsize="22" style="position: relative;margin-left: -25px;margin-top: 5px;" CheckedBG="Texture/Aries/Common/Teen/map/players_shown_32bits.png;0 0 22 22" UncheckedBG="Texture/Aries/Common/Teen/map/players_hidden_32bits.png;0 0 22 22" onclick="set_show_password"/>
                     </div>
                     <div style="margin-bottom:12px;">
                         <div style="float:left;min-width:65px"><%= L"验证码：" %></div>
@@ -188,11 +203,18 @@
                     </div>
                     <div style="margin-top: 5px;margin-bottom: 5px;">
                         <input type="checkbox" style="float:left;margin-top:3px;min-width:90px;" name="agree" onclick="set_remember_me()" checked="checked"/>
-                        <div style="float:left"><a style="color: white;font-size: 12px;" href="https://keepwork.com"><%= L"我同意《Paracraft用户协议》中的内容" %></a></div>
+                        <div style="float:left; color: white;font-size: 12px;" onclick="">
+                            <%= L"我同意" %>
+                            <div style="float:left;color: #fe5927" onclick="user_agreement()"><%= L"《Paracraft用户协议》" %></div>
+                            <%= L"中的内容" %>
+                        </div>
                     </div>
                     <div>
                         <input type="button" DefaultButton="true" class="common_button mc_light_grey_button_with_fillet" onclick="close()" value='<%= L"取消"%>' />
                         <input type="button" DefaultButton="true" class="common_button mc_light_grey_button_with_fillet" style="margin-left: 10px;" onclick="register()" value='<%= L"注册"%>' />
+                    </div>
+                    <div style="margin-top: 10px;margin-left: 45px">
+                        <a style="font-size: 11px;color: #fe5927;background:url(textures/worldshare_32bits.png#176 0 64 21);" isbuttonstyle="true" tooltip="" href="https://keepwork.com/u/r/register">如果出现问题，点击此处去官网注册</a>
                     </div>
                 </div>
             </aries:window>

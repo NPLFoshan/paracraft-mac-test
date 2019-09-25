@@ -19,7 +19,7 @@ function Validated:Email(str)
 end
 
 function Validated:Phone(str)
-    if not string.find(str, "^%d%d%d%d%d%d%d%d%d%d%d$") then
+    if not string.find(tostring(str), "^%d%d%d%d%d%d%d%d%d%d%d$") then
         return false
     else
         return true
@@ -27,6 +27,7 @@ function Validated:Phone(str)
 end
 
 function Validated:Password(str)
+    str = tostring(str)
     if str == '' or #str > 64 then
         return false
     else
