@@ -163,7 +163,7 @@
             </style>
             <aries:window mode="thin" width="360" style="float:left;" title_height="40" close_height="25" title='<%=L"注册" %>' onclose="close()">
                 <div name="register" class="user_register">
-                    <div><%=L"填写基本注册信息"%></div>
+                    <div style="margin-bottom:12px;"><%=L"填写基本注册信息"%></div>
                     <!-- <div style="margin-bottom:12px;">
                         <div style="<%='float:left;min-width:40px;' .. get_english_style('min-width:73px;') %>"><%= L"服务器："%></div>
                         <select name="registerServer" DataSource="<%= get_server_list()%>" style="height: 30px;width: 205px;" class="text_field"></select>
@@ -180,9 +180,11 @@
                     <div style="margin-bottom:12px;">
                         <div style="float:left;min-width:65px"><%= L"验证码：" %></div>
                         <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入验证码" %>' style="height: 30px;width: 100px;" name="captcha" />
-                        <img style="height: 30px;width: 60px;" src="<%= get_captcha() %>" onclick="update_captcha()"/>
+                        <div style="float:left;background-color: #e9f4ff;margin-left: 5px;width: 60px; height: 30px;padding: 4px;">
+                            <img style="height: 26px;width: 56px;" src="<%= get_captcha() %>" onclick="update_captcha()"/>
+                        </div>
                     </div>
-                    <div><%=L"实名验证（推荐）"%></div>
+                    <div style="margin-bottom:12px;"><%=L"实名验证（推荐）"%></div>
                     <div style="margin-bottom:12px;">
                         <div style="float:left;min-width:65px"><%= L"手机号：" %></div>
                         <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="height: 30px;" name="phone" />
