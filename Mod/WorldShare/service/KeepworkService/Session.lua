@@ -32,7 +32,8 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         username = username,
         password = password,
         key = self.captchaKey,
-        captcha = captcha
+        captcha = captcha,
+        channel = 3
     }
 
     KeepworkService:Request(

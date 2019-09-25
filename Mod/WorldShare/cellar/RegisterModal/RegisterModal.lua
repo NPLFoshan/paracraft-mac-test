@@ -80,7 +80,7 @@ function RegisterModal:Register()
         return false
     end
 
-    if not Validated:Phone(phone) then
+    if #phone > 0 and not Validated:Phone(phone) then
         GameLogic.AddBBS(nil, L"手机格式错误", 3000, "255 0 0")
         return false
     end
