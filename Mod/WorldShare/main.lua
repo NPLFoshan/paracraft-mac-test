@@ -54,7 +54,7 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local WorldShare = commonlib.inherit(commonlib.gettable("Mod.ModBase"), commonlib.gettable("Mod.WorldShare"))
 
 WorldShare:Property({"Name", "WorldShare"})
-WorldShare.version = '0.0.6'
+WorldShare.version = '0.0.7'
 
 -- register mod global variable
 WorldShare.Store = Store
@@ -127,6 +127,19 @@ function WorldShare:init()
         "save_world_info",
         function(ctx, node)
             LocalService:SaveWorldInfo(ctx, node)
+        end
+    )
+
+    GameLogic.GetFilters():add_filter(
+        "cmd_loadworld", 
+        function(url, options)
+            local pid = UserConsole:GetProjectId(url)
+            if pid then
+                UserConsole:HandleWorldId(pid)
+                return
+            else
+                return url
+            end
         end
     )
 end
