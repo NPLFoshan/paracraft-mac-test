@@ -288,7 +288,21 @@
                 end
 
                 function test()
+                    echo('test!!!!!!', true)
                     local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer")
+                    local att = NPL.GetAttributeObject()
+
+                    -- start udp server
+                    local port = 8099;
+                    local i = 0;
+                    while not att:GetField("IsUDPServerStarted") and i <= 20 do
+                        att:SetField("EnableUDPServer", port + i);
+                       i = i + 1;
+                    end
+
+                    LobbyServer.GetSingleton():Start()
+
+                    LobbyServer.GetSingleton():AutoDiscovery()
                 end
             ]]>
         </script>
@@ -466,7 +480,7 @@
             }
         </style>
         <div class="default" style="<%= container() %>">
-            <div onclick="test">test lobby</div>
+            <div><input type="button" onclick="test" value="test lobby" /></div>
             <div style="<%=header()%>" width="100%">
                 <div style="float:left;margin-top:5px"></div>
                 <div style="float:left;margin-top:5px;margin-left:10px;">
