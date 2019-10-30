@@ -286,6 +286,10 @@
                 function update_temp_modify_worldname(name, mcmlNode)
                     temp_modify_worldname = mcmlNode:GetUIValue()
                 end
+
+                function test()
+                    local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer")
+                end
             ]]>
         </script>
         <style type="text/mcss">
@@ -462,6 +466,7 @@
             }
         </style>
         <div class="default" style="<%= container() %>">
+            <div onclick="test">test lobby</div>
             <div style="<%=header()%>" width="100%">
                 <div style="float:left;margin-top:5px"></div>
                 <div style="float:left;margin-top:5px;margin-left:10px;">

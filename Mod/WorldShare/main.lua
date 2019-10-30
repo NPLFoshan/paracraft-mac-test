@@ -35,6 +35,8 @@ NPL.load("(gl)script/ide/System/Core/Event.lua")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua")
 NPL.load("(gl)script/ide/System/os/os.lua")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua")
+NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServer.lua")
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua")
 
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
@@ -47,6 +49,7 @@ local HistoryManager = NPL.load("(gl)Mod/WorldShare/cellar/HistoryManager/Histor
 local WorldExitDialog = NPL.load("(gl)Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local Grade = NPL.load("(gl)Mod/WorldShare/cellar/Grade/Grade.lua")
+local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer")
 
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
