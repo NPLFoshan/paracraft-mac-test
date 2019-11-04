@@ -297,9 +297,10 @@
 
                 function test()
                     echo('test!!!!!!', true)
-                    local LobbyServer = commonlib.gettable("MyCompany.Aries.Game.Network.LobbyServer")
-                    local att = NPL.GetAttributeObject()
+                    local SocketService = NPL.load("(gl)Mod/WorldShare/service/SocketService")
 
+                    local att = NPL.GetAttributeObject()
+                    echo(att, true)
                     -- start udp server
                     local port = 8099;
                     local i = 0;
