@@ -294,25 +294,6 @@
                         return Eval("remote_tagname")
                     end
                 end
-
-                function test()
-                    echo('test!!!!!!', true)
-                    local SocketService = NPL.load("(gl)Mod/WorldShare/service/SocketService")
-
-                    local att = NPL.GetAttributeObject()
-                    echo(att, true)
-                    -- start udp server
-                    local port = 8099;
-                    local i = 0;
-                    while not att:GetField("IsUDPServerStarted") and i <= 20 do
-                        att:SetField("EnableUDPServer", port + i);
-                       i = i + 1;
-                    end
-
-                    LobbyServer.GetSingleton():Start()
-
-                    LobbyServer.GetSingleton():AutoDiscovery()
-                end
             ]]>
         </script>
         <style type="text/mcss">
@@ -489,7 +470,6 @@
             }
         </style>
         <div class="default" style="<%= container() %>">
-            <div><input type="button" onclick="test" value="test lobby" /></div>
             <div style="<%=header()%>" width="100%">
                 <div style="float:left;margin-top:5px"></div>
                 <div style="float:left;margin-top:5px;margin-left:10px;">
