@@ -10,6 +10,7 @@ local Server = NPL.load("(gl)Mod/WorldShare/cellar/Server/Server.lua")
 ]]
 local Screen = commonlib.gettable("System.Windows.Screen")
 local SocketService = commonlib.gettable("Mod.WorldShare.service.SocketService")
+local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain")
 
 local Server = NPL.export()
 
@@ -70,4 +71,8 @@ end
 
 function Server:IsSeachFinished()
     return self.seachFinished == true
+end
+
+function Server:Connect(...)
+    NetworkMain:Connect(...)
 end
