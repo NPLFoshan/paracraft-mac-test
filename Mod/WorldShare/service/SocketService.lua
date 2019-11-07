@@ -107,13 +107,13 @@ function SocketService:ReceiveUDPMsg(msg)
 				return false
 			end
 
-			local udpServerList = Mod.WorldShare.Store:Get('user/udpServerList') or {}
+			local udpServerList = {}
 
-			for key, item in ipairs(udpServerList) do
-				if item.ip == msg.ip then
-					return false
-				end
-			end
+			-- for key, item in ipairs(udpServerList) do
+			-- 	if item.ip == msg.ip then
+			-- 		return false
+			-- 	end
+			-- end
 
 			udpServerList[#udpServerList + 1] = { ip = msg.ip, port = msg.port }
 

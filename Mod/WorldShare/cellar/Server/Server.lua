@@ -8,10 +8,12 @@ use the lib:
 local Server = NPL.load("(gl)Mod/WorldShare/cellar/Server/Server.lua")
 ------------------------------------------------------------
 ]]
-
 local Screen = commonlib.gettable("System.Windows.Screen")
+local SocketService = commonlib.gettable("Mod.WorldShare.service.SocketService")
 
 local Server = NPL.export()
+
+Server.seachFinished = false
 
 function Server:ShowPage()
     local params = Mod.WorldShare.Utils:ShowWindow(0, 0, "Mod/WorldShare/cellar/Server/Server.html", "Server", 0, 0, "_fi", false)
@@ -23,6 +25,8 @@ function Server:ShowPage()
         Mod.WorldShare.Store:Remove('page/Server')
         Screen:Disconnect("sizeChanged", self, self.OnScreenSizeChange)
     end
+
+    self:GetOnlineList()
 end
 
 function Server.OnScreenSizeChange()
@@ -45,4 +49,25 @@ function Server.OnScreenSizeChange()
     areaContentNode:SetCssStyle('margin-left', marginLeft)
 
     ServerPage:Refresh(0.01)
+end
+
+function Server:GetOnlineList()
+    local ServerPage = Mod.WorldShare.Store:Get('page/Server')
+    self.seachFinished = false
+    ServerPage:Refresh(0.01)
+
+    SocketService:SendUDPWhoOnlineMsg()
+
+    Mod.WorldShare.Utils.SetTimeOut(function()
+        local udpServerList = Mod.WorldShare.Store:Get('user/udpServerList')
+
+        ServerPage:GetNode("udp_server_list"):SetAttribute("DataSource", udpServerList)
+
+        self.seachFinished = true
+        ServerPage:Refresh(0.01)
+    end, 3000)
+end
+
+function Server:IsSeachFinished()
+    return self.seachFinished == true
 end
