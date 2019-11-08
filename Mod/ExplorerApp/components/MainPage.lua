@@ -78,6 +78,9 @@ function MainPage:ShowPage(callback)
 
     Screen:Connect("sizeChanged", MainPage, MainPage.OnScreenSizeChange, "UniqueConnection")
     MainPage.OnScreenSizeChange()
+
+    -- KeepworkServiceProjects:GetRecommandProjects()
+    -- //TODO: Next TODO
 end
 
 function MainPage:SetPage()
