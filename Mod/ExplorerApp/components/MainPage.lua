@@ -284,8 +284,8 @@ function MainPage:SetWorksTree(categoryItem, sort)
                     mapData[#mapData + 1] = {
                         id = item.id,
                         name = item.name,
-                        cover = item.extra.imageUrl or "",
-                        username = item.user.username or ""
+                        cover = item.extra and item.extra.imageUrl or "",
+                        username = item.user and item.user.username or ""
                     }
                 end
 

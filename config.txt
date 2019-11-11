@@ -1,1 +1,1 @@
-cmdline=noupdate="true" debug="main" httpdebug="true" mc="true" bootstrapper="script/apps/Aries/main_loop.lua" loadpackage="npl_packages/paracraft/;main_mobile_res.pkg"
+cmdline=noupdate="true" debug="main" worldshareenv="STAGE" httpdebug="true" mc="true" bootstrapper="script/apps/Aries/main_loop.lua" loadpackage="npl_packages/paracraft/;main_mobile_res.pkg"
