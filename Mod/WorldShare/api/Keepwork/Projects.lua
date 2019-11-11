@@ -33,7 +33,6 @@ function Projects:SearchForParacraft(xPerPage, xPage, params, callback)
             url = url .. '&x-page=' .. xPage
         end
     end
-    echo('from projects search for paracraft', true)
-    echo(params, true)
+
     KeepworkBaseApi:Post(url, params, nil, callback)
 end

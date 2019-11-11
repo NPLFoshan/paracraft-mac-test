@@ -45,6 +45,7 @@ MainPage.categoryTree = {
 MainPage.worksTree = {}
 MainPage.downloadedGame = "all"
 MainPage.curPage = 1
+MainPage.mainId = 0
 
 function MainPage:ShowPage(callback)
     if type(callback) then
@@ -54,8 +55,16 @@ function MainPage:ShowPage(callback)
     self.balance = Wallet:GetUserBalance()
     self.playerBalance = Wallet:GetPlayerBalance()
 
-    Store:Set("explorer/selectSortIndex", 1)
-    Store:Set("explorer/sortList", {{value = L"综合"}, {value = L"最新"}, {value = L"热门"}})
+    Mod.WorldShare.Store:Set("explorer/selectSortIndex", 1)
+    Mod.WorldShare.Store:Set(
+        "explorer/sortList",
+        {
+            {value = L"推荐", key="recommend"},
+            {value = L"综合", key="synthesize"},
+            {value = L"最新", key="updated_at"},
+            {value = L"热门", key="recent_view"}
+        }
+    )
 
     local params =
         Utils:ShowWindow(
@@ -70,7 +79,14 @@ function MainPage:ShowPage(callback)
         2
     )
 
-    local MainPagePage = Store:Get("page/MainPage")
+    params._page.OnClose = function()
+        self.worksTree = {}
+        self.downloadedGame = "all"
+        self.curPage = 1
+        self.mainId = 0
+    end
+
+    local MainPagePage = Mod.WorldShare.Store:Get("page/MainPage")
 
     if MainPagePage then
         self:SetCategoryTree()
@@ -78,17 +94,14 @@ function MainPage:ShowPage(callback)
 
     Screen:Connect("sizeChanged", MainPage, MainPage.OnScreenSizeChange, "UniqueConnection")
     MainPage.OnScreenSizeChange()
-
-    -- KeepworkServiceProjects:GetRecommandProjects()
-    -- //TODO: Next TODO
 end
 
 function MainPage:SetPage()
-    Store:Set("page/MainPage", document:GetPageCtrl())
+    Mod.WorldShare.Store:Set("page/MainPage", document:GetPageCtrl())
 end
 
 function MainPage:Refresh(times)
-    local MainPagePage = Store:Get("page/MainPage")
+    local MainPagePage = Mod.WorldShare.Store:Get("page/MainPage")
 
     if MainPagePage then
         MainPagePage:Refresh(times or 0.01)
@@ -96,7 +109,7 @@ function MainPage:Refresh(times)
 end
 
 function MainPage:Close()
-    local MainPagePage = Store:Get("page/MainPage")
+    local MainPagePage = Mod.WorldShare.Store:Get("page/MainPage")
 
     if MainPagePage then
         if type(self.CloseCallback) == 'function' then
@@ -108,9 +121,9 @@ function MainPage:Close()
 end
 
 function MainPage.OnScreenSizeChange()
-    local MainPage = Store:Get("page/MainPage")
+    local MainPage = Mod.WorldShare.Store:Get("page/MainPage")
 
-    if (not MainPage) then
+    if not MainPage then
         return false
     end
 
@@ -137,25 +150,11 @@ function MainPage:UpdateCoins()
 end
 
 function MainPage:UpdateSort()
-    local sort
-
-    if Store:Get("explorer/selectSortIndex") == 2 then
-        sort = "updated_at"
-    end
-
-    if Store:Get("explorer/selectSortIndex") == 3 then
-        sort = "recent_view"
-    end
-
-    if self.categorySelected ~= 0 then
-        self:SetWorksTree(self.categorySelected, sort)
-    else
-        self:Search(sort)
-    end
+    self:SetWorksTree(self.categorySelected, Mod.WorldShare.Store:Getter('explorer/GetSortKey'))
 end
 
 function MainPage:SetCategoryTree()
-    local MainPagePage = Store:Get("page/MainPage")
+    local MainPagePage = Mod.WorldShare.Store:Get("page/MainPage")
 
     if not MainPagePage then
         return false
@@ -166,7 +165,7 @@ function MainPage:SetCategoryTree()
     KeepworkServiceProjects:GetAllTags(
         function(data, err)
             if err ~= 200 or type(data) ~= "table" or not data.rows then
-                self:SetWorksTree(L"收藏")
+                self:SetWorksTree(MainPage.categoryTree[1], Mod.WorldShare.Store:Getter('explorer/GetSortKey'))
                 return false
             end
 
@@ -174,45 +173,54 @@ function MainPage:SetCategoryTree()
 
             for key, item in ipairs(data.rows) do
                 if item and item.tagname ~= "paracraft专用" then
-                    local curItem = {value = item.tagname or ""}
+                    local curItem = { value = item.tagname or "", id = item.id }
 
                     if item and item.extra and item.extra.enTagname and self:IsEnglish() then
                         curItem.enValue = item.extra.enTagname
                     end
 
                     self.remoteCategoryTree[#self.remoteCategoryTree + 1] = curItem
+                else
+                    self.mainId = item.id
                 end
             end
 
-            self.remoteCategoryTree[#self.remoteCategoryTree + 1] = {value = L"收藏"}
+            self.remoteCategoryTree[#self.remoteCategoryTree + 1] = { value = L"收藏", id = -1 }
 
             MainPagePage:GetNode("categoryTree"):SetAttribute("DataSource", self.remoteCategoryTree)
-            self:SetWorksTree(self.remoteCategoryTree[1].value)
+            self:SetWorksTree(self.remoteCategoryTree[1], Mod.WorldShare.Store:Getter('explorer/GetSortKey'))
         end
     )
 end
 
-function MainPage:SetWorksTree(value, sort)
-    local MainPage = Store:Get("page/MainPage")
+function MainPage:SetWorksTree(categoryItem, sort)
+    local MainPage = Mod.WorldShare.Store:Get("page/MainPage")
 
-    if (not MainPage) then
+    if not MainPage then
         return false
     end
 
-    if not value then
-        value = L"精选"
+    if not sort then
+        return false
     end
 
-    if value == L"收藏" then
+    if categoryItem.value == L"收藏" then
+        if sort == 'recommend' or sort == 'synthesize' then
+            sort = nil
+        end
+
         local allFavoriteProjects = ProjectsDatabase:GetAllFavoriteProjects()
 
         KeepworkServiceProjects:GetProjectById(
             allFavoriteProjects,
             sort,
+            { page = self.curPage },
             function(data, err)
                 if not data or not data.rows then
                     return false
                 end
+
+                self.categorySelected = categoryItem
 
                 -- map to es data format
                 for key, item in ipairs(data.rows) do
@@ -239,30 +247,99 @@ function MainPage:SetWorksTree(value, sort)
                     return false
                 end
 
-                self.categorySelected = value
-                self.worksTree = self:HandleWorldsTree(rows)
-                MainPage:GetNode("worksTree"):SetAttribute("DataSource", rows)
+                if self.curPage ~= 1 then
+                    rows = self:HandleWorldsTree(rows)
+        
+                    for key, item in ipairs(rows) do
+                        self.worksTree[#self.worksTree + 1] = item
+                    end
+                else
+                    self.worksTree = self:HandleWorldsTree(rows)
+                end
+
+                MainPage:GetNode("worksTree"):SetAttribute("DataSource", self.worksTree)
+                self:Refresh()
+            end
+        )
+
+        return true
+    end
+
+    if sort == 'recommend' then
+        KeepworkServiceProjects:GetRecommandProjects(
+            categoryItem.id,
+            self.mainId,
+            { page = self.curPage },
+            function(data, err)
+                if not data or err ~= 200 then
+                    return false
+                end
+
+                self.categorySelected = categoryItem
+
+                local mapData = {}
+
+                -- map data struct
+                for key, item in ipairs(data.rows) do
+                    mapData[#mapData + 1] = {
+                        id = item.id,
+                        name = item.name,
+                        cover = item.extra.imageUrl or "",
+                        username = item.user.username or ""
+                    }
+                end
+
+                local rows = {}
+
+                if self.downloadedGame == "all" then
+                    rows = mapData
+                elseif self.downloadedGame == "local" then
+                    for key, item in ipairs(mapData) do
+                        if ProjectsDatabase:IsProjectDownloaded(item.id) then
+                            rows[#rows + 1] = item
+                        end
+                    end
+                else
+                    return false
+                end
+
+                if self.curPage ~= 1 then
+                    rows = self:HandleWorldsTree(rows)
+
+                    for key, item in ipairs(rows) do
+                        self.worksTree[#self.worksTree + 1] = item
+                    end
+                else
+                    self.worksTree = self:HandleWorldsTree(rows)
+                end
+
+                MainPage:GetNode("worksTree"):SetAttribute("DataSource", self.worksTree)
+
                 self:Refresh()
             end
         )
         return true
     end
 
-    local filter = {"paracraft专用", value}
+    if sort == 'synthesize' then
+        sort = nil
+    end
+
+    local filter = { "paracraft专用", categoryItem.value }
 
     KeepworkEsServiceProjects:GetEsProjectsByFilter(
         filter,
         sort,
-        {page = self.curPage},
+        { page = self.curPage },
         function(data, err)
             if not data or err ~= 200 then
                 return false
             end
-
-            self.categorySelected = value
-
+    
+            self.categorySelected = categoryItem
+    
             local rows = {}
-
+    
             if self.downloadedGame == "all" then
                 rows = data.hits
             elseif self.downloadedGame == "local" then
@@ -274,17 +351,17 @@ function MainPage:SetWorksTree(value, sort)
             else
                 return false
             end
-
+    
             if self.curPage ~= 1 then
                 rows = self:HandleWorldsTree(rows)
-
+    
                 for key, item in ipairs(rows) do
                     self.worksTree[#self.worksTree + 1] = item
                 end
             else
                 self.worksTree = self:HandleWorldsTree(rows)
             end
-
+    
             MainPage:GetNode("worksTree"):SetAttribute("DataSource", self.worksTree)
             self:Refresh()
         end
@@ -292,9 +369,9 @@ function MainPage:SetWorksTree(value, sort)
 end
 
 function MainPage:Search(sort)
-    local MainPage = Store:Get("page/MainPage")
+    local MainPage = Mod.WorldShare.Store:Get("page/MainPage")
 
-    if (not MainPage) then
+    if not MainPage then
         return false
     end
 
@@ -456,7 +533,7 @@ end
 function MainPage:SelectProject(index)
     self.curProjectIndex = index
 
-    if self.playerBalance <= 0 and not Store:Get("world/personalMode") then
+    if self.playerBalance <= 0 and not Mod.WorldShare.Store:Get("world/personalMode") then
         GameOver:ShowPage(3)
         return false
     end
@@ -573,7 +650,7 @@ function MainPage:HandleGameProcess()
 end
 
 function MainPage:SelectDownloadedCategory(value)
-    local MainPagePage = Store:Get("page/MainPage")
+    local MainPagePage = Mod.WorldShare.Store:Get("page/MainPage")
 
     if not MainPagePage or not value then
         return false
@@ -581,7 +658,7 @@ function MainPage:SelectDownloadedCategory(value)
 
     self.curPage = 1
     self.downloadedGame = value
-    self:SetWorksTree(self.categorySelected)
+    self:SetWorksTree(self.categorySelected, Mod.WorldShare.Store:Getter('explorer/GetSortKey'))
 end
 
 function MainPage:GetSortIndex()
