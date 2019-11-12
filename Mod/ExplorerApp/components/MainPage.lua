@@ -447,6 +447,14 @@ function MainPage:DownloadWorld(index)
             end
 
             local archiveUrl = data.world.archiveUrl
+            local downloadFileName = string.match(archiveUrl, "(.+)%.zip")
+
+            if type(downloadFileName) ~= 'string' then
+                Toast:ShowPage(L"数据错误")
+                return false
+            end
+
+            downloadFileName = format(LocalLoadWorld.GetWorldFolder() .. "/userworlds/%s_r.zip", downloadFileName:gsub("[%W%s]+", "_"))
 
             DownloadWorld.ShowPage(
                 format("【%s%d】 %s %s%s", L"项目ID:", curItem.id, curItem.name, L"作者：", curItem.username)
@@ -454,10 +462,7 @@ function MainPage:DownloadWorld(index)
             FileDownloader:new():Init(
                 "official_texture_package",
                 archiveUrl,
-                format(
-                    LocalLoadWorld.GetWorldFolder() .. "/userworlds/%s_r.zip",
-                    string.match(archiveUrl, "(.+)%.zip%?ref.+$"):gsub("[%W%s]+", "_")
-                ),
+                downloadFileName,
                 function(bSuccess, downloadPath)
                     if bSuccess then
                         Toast:ShowPage(L"下载成功")
@@ -465,6 +470,8 @@ function MainPage:DownloadWorld(index)
                         -- self:HandleWorldsTree(self.worksTree)
                         -- self:Refresh()
                         self:SelectProject(index)
+                    else
+                        Toast:ShowPage(L"文件下载失败，请确认世界是否存在")
                     end
 
                     DownloadWorld.Close()
