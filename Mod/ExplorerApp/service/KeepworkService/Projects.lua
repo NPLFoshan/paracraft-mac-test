@@ -124,7 +124,7 @@ function Projects:GetAllTags(callback)
     local headers = KeepworkService:GetHeaders()
 
     KeepworkService:Request(
-        "/systemTags/search?classify=1&x-order=extra.sn-desc",
+        "/systemTags/search?classify=1&x-order=extra.sn-asc",
         "POST",
         {},
         headers,
