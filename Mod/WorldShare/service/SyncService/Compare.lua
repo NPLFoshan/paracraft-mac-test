@@ -96,6 +96,7 @@ function Compare:GetCompareResult(callback)
 
     if not currentWorld then
         Mod.WorldShare.MsgBox:Close()
+        return false
     end
 
     if currentWorld.status == 2 then
