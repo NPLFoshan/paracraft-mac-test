@@ -200,20 +200,12 @@ function MainPage:SetWorksTree(categoryItem, sort)
         return false
     end
 
-    if not sort then
-        return false
-    end
-
     if categoryItem.value == L"收藏" then
-        if sort == 'recommend' or sort == 'synthesize' then
-            sort = nil
-        end
-
         local allFavoriteProjects = ProjectsDatabase:GetAllFavoriteProjects()
 
-        KeepworkServiceProjects:GetProjectById(
+        KeepworkServiceProjects:GetProjectByIds(
+            self.mainId,
             allFavoriteProjects,
-            sort,
             { page = self.curPage },
             function(data, err)
                 if not data or not data.rows then
@@ -222,23 +214,24 @@ function MainPage:SetWorksTree(categoryItem, sort)
 
                 self.categorySelected = categoryItem
 
-                -- map to es data format
-                for key, item in ipairs(data.rows) do
-                    if item.extra and item.extra.imageUrl then
-                        item.cover = item.extra.imageUrl
-                    end
+                local mapData = {}
 
-                    if item.user and item.user.username then
-                        item.username = item.user.username
-                    end
+                -- map data struct
+                for key, item in ipairs(data.rows) do
+                    mapData[#mapData + 1] = {
+                        id = item.id,
+                        name = item.extra and type(item.extra.worldTagName) == 'string' and item.extra.worldTagName or item.name or "",
+                        cover = item.extra and type(item.extra.imageUrl) == 'string' and item.extra.imageUrl or "",
+                        username = item.user and type(item.user.username) == 'string' and item.user.username or ""
+                    }
                 end
 
                 local rows = {}
 
                 if self.downloadedGame == "all" then
-                    rows = data.rows
+                    rows = mapData
                 elseif self.downloadedGame == "local" then
-                    for key, item in ipairs(data.rows) do
+                    for key, item in ipairs(mapData) do
                         if ProjectsDatabase:IsProjectDownloaded(item.id) then
                             rows[#rows + 1] = item
                         end
@@ -263,6 +256,10 @@ function MainPage:SetWorksTree(categoryItem, sort)
         )
 
         return true
+    end
+
+    if not sort then
+        return false
     end
 
     if sort == 'recommend' then
@@ -374,7 +371,7 @@ function MainPage:SetWorksTree(categoryItem, sort)
     )
 end
 
-function MainPage:Search(sort)
+function MainPage:Search()
     local MainPage = Mod.WorldShare.Store:Get("page/MainPage")
 
     if not MainPage then
@@ -387,9 +384,9 @@ function MainPage:Search(sort)
         return false
     end
 
-    KeepworkServiceProjects:GetProjectById(
-        {projectId},
-        sort,
+    KeepworkServiceProjects:GetProjectByIds(
+        self.mainId,
+        { projectId },
         {},
         function(data, err)
             if not data or not data.rows then
