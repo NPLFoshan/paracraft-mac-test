@@ -243,6 +243,14 @@ function UserConsole:HandleWorldId(pid)
                         return false
                     end
 
+                    local worldName = ''
+
+                    if worldInfo and worldInfo.extra and worldInfo.extra.worldTagName then
+                        worldName = worldInfo.extra.worldTagName
+                    else
+                        worldName = worldInfo.worldName
+                    end
+
                     local params = Mod.WorldShare.Utils:ShowWindow(
                         0,
                         0,
@@ -250,7 +258,7 @@ function UserConsole:HandleWorldId(pid)
                             .. pid
                             .. "&remote_revision=" .. remoteRevision
                             .. "&local_revision=" .. localRevision
-                            .. "&world_name=" .. (worldInfo and worldInfo.worldName or ""),
+                            .. "&world_name=" .. worldName,
                         "ProjectIdEnter",
                         0,
                         0,
