@@ -177,9 +177,8 @@ end
 
 function KeepworkService:Logout()
     if (self:IsSignedIn()) then
-        local SetToken = Store:Action("user/SetToken")
-        SetToken(nil)
-        Store:Remove('user/username')
+        local Logout = Store:Action("user/Logout")
+        Logout()
         WorldList:RefreshCurrentServerList()
     end
 end
