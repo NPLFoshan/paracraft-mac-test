@@ -26,13 +26,6 @@ function UserStore:Action()
             commonlib.setfield("System.User.username", username)
             commonlib.setfield("System.User.keepworkUsername", username)
             commonlib.setfield("System.User.NickName", nickname)
-
-            local player = MyCompany.Aries.Game.EntityManager.GetPlayer()
-
-            if player then
-                player:ShowHeadOnDisplay(true)
-                player:UpdateDisplayName(username)
-            end
         end,
         SetPlayerController = function(playerController)
             self.playerController = playerController
@@ -46,13 +39,6 @@ function UserStore:Action()
             commonlib.setfield("System.User.username", nil)
             commonlib.setfield("System.User.keepworkUsername", nil)
             commonlib.setfield("System.User.NickName", nil)
-
-            local player = MyCompany.Aries.Game.EntityManager.GetPlayer()
-
-            if player then
-                player:UpdateDisplayName("")
-                player:ShowHeadOnDisplay(false)
-            end
         end
     }
 end

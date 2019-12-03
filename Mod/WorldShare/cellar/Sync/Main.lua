@@ -31,18 +31,6 @@ local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandl
 local SyncMain = NPL.export()
 
 function SyncMain:OnWorldLoad()
-    local player = MyCompany.Aries.Game.EntityManager.GetPlayer()
-
-    if player then
-        if KeepworkService:IsSignedIn() then
-            player:ShowHeadOnDisplay(true)
-            player:UpdateDisplayName(Mod.WorldShare.Store:Get('user/username'))
-        else
-            player:ShowHeadOnDisplay(false)
-            player:UpdateDisplayName("")
-        end
-    end
-
     self:GetCurrentWorldInfo(function()
         CreateWorld:CheckRevision()
     end)
