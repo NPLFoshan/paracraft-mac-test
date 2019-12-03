@@ -30,8 +30,8 @@ function LoginModal:Init(callbackFunc)
 end
 
 function LoginModal:ShowPage()
-    if KeepworkService:LoginWithTokenApi() then
-        return true
+    if KeepworkService:GetCurrentUserToken() then
+        return false
     end
 
     local params = Utils:ShowWindow(320, 470, "Mod/WorldShare/cellar/LoginModal/LoginModal.html", "LoginModal", nil, nil, nil, nil)
@@ -118,15 +118,14 @@ function LoginModal:LoginAction()
     end
 
     if not loginServer then
-        -- GameLogic.AddBBS(nil, L"登陆站点不能为空", 3000, "255 0 0")
         return false
     end
-
-    -- Mod.WorldShare.Store:Set("user/env", loginServer)
 
     Mod.WorldShare.MsgBox:Show(L"正在登陆，请稍后...", 8000, L"链接超时", 300, 120)
 
     local function HandleLogined()
+        Mod.WorldShare.MsgBox:Close()
+
         local token = Mod.WorldShare.Store:Get("user/token") or ""
 
         KeepworkService:SaveSigninInfo(
@@ -142,6 +141,10 @@ function LoginModal:LoginAction()
 
         self:ClosePage()
 
+        if not Mod.WorldShare.Store:Get('user/isVerified') then
+            RegisterModal:ShowBindingPage()
+        end
+
         local AfterLogined = Mod.WorldShare.Store:Get('user/AfterLogined')
 
         if type(AfterLogined) == 'function' then
@@ -154,8 +157,9 @@ function LoginModal:LoginAction()
         account,
         password,
         function(response, err)
-            if err == 200 and type(response) == 'table' and not response.cellphone and not response.email then
-                RegisterModal:ShowBindingPage()
+            if err == 503 then
+                Mod.WorldShare.MsgBox:Close()
+                return false
             end
 
             KeepworkService:LoginResponse(response, err, HandleLogined)

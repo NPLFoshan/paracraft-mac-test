@@ -71,7 +71,9 @@ function UserConsole:ShowPage()
 
         KeepworkService:GetUserTokenFromUrlProtocol()
 
-        if KeepworkService:LoginWithTokenApi(function() WorldList:RefreshCurrentServerList() end) then
+        -- for restart game
+        if KeepworkService:GetCurrentUserToken() then
+            UserInfo:LoginWithToken()
             return false
         end
 

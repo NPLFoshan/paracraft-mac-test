@@ -21,6 +21,7 @@ local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
 local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
+local KeepworkUsersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Users.lua")
 
 local KeepworkService = NPL.export()
 
@@ -122,42 +123,39 @@ function KeepworkService:LoginResponse(response, err, callback)
     local nickname = response["nickname"] or ""
 
     local SetUserinfo = Store:Action("user/SetUserinfo")
-    SetUserinfo(token, username, nickname)
+    SetUserinfo(token, userId, username, nickname)
 
-    Store:Set("user/userId", userId)
-    Store:Set("user/username", username)
+    if not response.cellphone and not response.email then
+        Mod.WorldShare.Store:Set("user/isVerified", false)
+    else
+        Mod.WorldShare.Store:Set("user/isVerified", true)
+    end
 
-    -- new api remove verified field, set all users are verified
-    Store:Set("user/isVerified", true)
-    -- new api remove vip field, set all users are vip
-    Store:Set("user/userType", 'vip')
+    if response.vip and response.vip == 1 then
+        Mod.WorldShare.Store:Set("user/userType", 'plain')
+    else
+        Mod.WorldShare.Store:Set("user/userType", 'vip')
+    end
 
     local function HandleGetDataSource(data, err)
-        if (not data or not data.token) then
-            GameLogic.AddBBS(nil, L"Token已过期，请重新登录", 3000, "255 0 0")
-            self:Logout()
-            Mod.WorldShare.MsgBox:Close()
-            return false
+        if data and data.token then
+            local dataSourceType = 'gitlab'
+            local env = self:GetEnv()
+    
+            local dataSourceInfo = {
+                dataSourceToken = data.token, -- 数据源Token
+                dataSourceUsername = data.git_username, -- 数据源用户名
+                dataSourceType = dataSourceType, -- 数据源类型
+                apiBaseUrl = Config.dataSourceApiList[dataSourceType][env], -- 数据源api
+                rawBaseUrl = Config.dataSourceRawList[dataSourceType][env] -- 数据源raw
+            }
+    
+            Mod.WorldShare.Store:Set("user/dataSourceInfo", dataSourceInfo)
         end
 
-        local dataSourceType = 'gitlab'
-        local env = self:GetEnv()
-
-        local dataSourceInfo = {
-            dataSourceToken = data.token, -- 数据源Token
-            dataSourceUsername = data.git_username, -- 数据源用户名
-            dataSourceType = dataSourceType, -- 数据源类型
-            apiBaseUrl = Config.dataSourceApiList[dataSourceType][env], -- 数据源api
-            rawBaseUrl = Config.dataSourceRawList[dataSourceType][env] -- 数据源raw
-        }
-
-        Store:Set("user/dataSourceInfo", dataSourceInfo)
-
-        if (type(callback) == "function") then
-            callback()
+        if type(callback) == "function" then
+            callback(data, err)
         end
-
-        Mod.WorldShare.MsgBox:Close()
     end
 
     GitGatewayService:Accounts(HandleGetDataSource)
@@ -184,33 +182,14 @@ function KeepworkService:Logout()
 end
 
 function KeepworkService:Login(account, password, callback)
-    if type(account) ~= "string" or type(password) ~= "string" then
-        return false
-    end
-
-    local params = {
-        username = account,
-        password = password
-    }
-
-    self:Request(
-        "/users/login",
-        "POST",
-        params,
-        {},
+    KeepworkUsersApi:Login(
+        account,
+        password,
         function(data, err)
-            if (err == 503) then
-                Mod.WorldShare.MsgBox:Close()
-                -- _guihelper.MessageBox(L"keepwork正在维护中，我们马上回来")
-
-                return false
-            end
-
-            if (type(callback) == "function") then
+            if type(callback) == "function" then
                 callback(data, err)
             end
-        end,
-        {503, 400}
+        end
     )
 end
 
@@ -281,16 +260,7 @@ end
 function KeepworkService:Profile(callback, token)
     local headers = self:GetHeaders()
 
-    if (type(token) == "string" and #token > 0) then
-        headers =
-            self:GetHeaders(
-            {
-                Authorization = format("Bearer %s", token)
-            }
-        )
-    end
-
-    self:Request("/users/profile", "GET", nil, headers, callback)
+    KeepworkUsersApi:Profile(token, callback)
 end
 
 function KeepworkService:GetWorldsList(callback)
@@ -494,38 +464,10 @@ function KeepworkService:GetUserTokenFromUrlProtocol()
 end
 
 function KeepworkService:GetCurrentUserToken()
-    return System.User and System.User.keepworktoken
-end
-
-local tryTimes = 0
-function KeepworkService:LoginWithTokenApi(callback)
-    local usertoken = Store:Get("user/token") or self:GetCurrentUserToken()
-
-    if type(usertoken) == "string" and #usertoken > 0 and tryTimes <= 3 then
-        Mod.WorldShare.MsgBox:Show(L"正在登陆，请稍后...")
-
-        self:Profile(
-            function(data)
-                if type(data) == 'table' then
-                    data.token = usertoken
-
-                    self:LoginResponse(data, err, callback)
-                else
-                    System.User.keepworktoken = nil
-                    Mod.WorldShare.MsgBox:Close()
-
-                    UserConsole:ClosePage()
-                    UserConsole:ShowPage()
-
-                    tryTimes = tryTimes + 1
-                end
-            end,
-            usertoken
-        )
-
-        return true
+    if Mod.WorldShare.Store:Get("user/token") then
+        return Mod.WorldShare.Store:Get("user/token")
     else
-        return false
+        return System.User and System.User.keepworktoken
     end
 end
 

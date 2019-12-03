@@ -116,6 +116,58 @@ function UserInfo:GetUserName()
     return username
 end
 
+-- for restart game
+function UserInfo:LoginWithToken()
+    local usertoken = KeepworkService:GetCurrentUserToken()
+
+    if type(usertoken) ~= "string" or #usertoken <= 0 then
+        GameLogic.AddBBS(nil, L"Token不存在", 3000, "255 0 0")
+        return false
+    end
+
+    Mod.WorldShare.MsgBox:Show(L"正在登陆，请稍后...", 8000, L"链接超时")
+
+    KeepworkService:Profile(
+        function(data, err)
+            if err == 401 then
+                Mod.WorldShare.MsgBox:Close()
+                GameLogic.AddBBS(nil, L"Token已过期，请重新登录", 3000, "255 0 0")
+
+                return false
+            elseif err ~= 200 then
+                Mod.WorldShare.MsgBox:Close()
+                GameLogic.AddBBS(nil, format("%s%d", L"登陆失败了， 错误码：", err), 3000, "255 0 0")
+
+                return false
+            end
+
+            if type(data) == 'table' and data.username then
+                data.token = usertoken
+                KeepworkService:LoginResponse(
+                    data,
+                    err,
+                    function(gitGateWayData, gitGateWayErr)
+                        Mod.WorldShare.MsgBox:Close()
+
+                        if not gitGateWayData or not gitGateWayData.token then
+                            GameLogic.AddBBS(nil, L"Token已过期，请重新登录", 3000, "255 0 0")
+                            KeepworkService:Logout()
+                            return false
+                        end
+
+                        WorldList:RefreshCurrentServerList()
+
+                        if type(callback) == "function" then
+                            callback()
+                        end
+                    end
+                )
+            end
+        end,
+        usertoken
+    )
+end
+
 function UserInfo:CheckDoAutoSignin(callback)
     local info = KeepworkService:LoadSigninInfo()
 
@@ -124,8 +176,6 @@ function UserInfo:CheckDoAutoSignin(callback)
     end
 
     Mod.WorldShare.MsgBox:Show(L"正在登陆，请稍后...", 8000, L"链接超时")
-
-    -- Store:Set("user/env", info.loginServer)
 
     KeepworkService:Profile(
         function(data, err)
@@ -144,22 +194,30 @@ function UserInfo:CheckDoAutoSignin(callback)
                 return false
             end
 
-            if (type(data) == 'table' and data.username) then
+            if type(data) == 'table' and data.username then
                 data.token = info.token
                 KeepworkService:LoginResponse(
                     data,
                     err,
-                    function()
+                    function(gitGateWayData, gitGateWayErr)
+                        Mod.WorldShare.MsgBox:Close()
+
+                        if not gitGateWayData or not gitGateWayData.token then
+                            GameLogic.AddBBS(nil, L"Token已过期，请重新登录", 3000, "255 0 0")
+                            KeepworkService:Logout()
+                            return false
+                        end
+
                         WorldList:RefreshCurrentServerList()
 
                         local AfterLogined = Store:Get('user/AfterLogined')
 
                         if type(AfterLogined) == 'function' then
                             AfterLogined(true)
-                            Store:Remove('user/AfterLogined')
+                            Mod.WorldShare.Store:Remove('user/AfterLogined')
                         end
 
-                        if (type(callback) == "function") then
+                        if type(callback) == "function" then
                             callback()
                         end
                     end
