@@ -194,7 +194,35 @@
                 end
 
                 function username()
-                    return UserInfo:GetUserName()
+                    local iconList = {
+                        [1] = "textures/worldshare_32bits.png#12 310 26 18",
+                        [2] = "textures/worldshare_32bits.png#48 310 26 18",
+                        [3] = "textures/worldshare_32bits.png#84 310 26 18",
+                        [4] = "textures/worldshare_32bits.png#119 310 26 18",
+                        [5] = "textures/worldshare_32bits.png#155 310 26 18",
+                        vip = "textures/worldshare_32bits.png#195 310 18 18",
+                    }
+
+                    local userType = Mod.WorldShare.Store:Get('user/userType')
+                    local username = UserInfo.GetUserName()
+                    local textWidth = _guihelper.GetTextWidth(username)
+
+                    if userType == 'teacher' then
+                        local tLevel = Mod.WorldShare.Store:Get('user/tLevel')
+                        local left = (140 - 23 - 2 - textWidth) / 2
+
+                        if tLevel and iconList[tLevel] then
+                            return '<img style="margin-top: 4px;margin-left:' .. left .. 'px;margin-right: 2px;width: 23px;height: 15px;background:url(' .. iconList[tLevel] .. ')" />' .. username
+                        else
+                            return '<div style="text-align: center">' .. username .. '</div>'
+                        end
+                    elseif userType == 'vip' then
+                        local left = (140 - 16 - 2 - textWidth) / 2
+
+                        return '<img style="margin-top: 3px;margin-left:' .. left .. 'px;margin-right: 2px;width: 16px;height: 16px;background:url(' .. iconList['vip'] .. ')" />' .. username
+                    else
+                        return '<div style="text-align: center">' .. username .. '</div>'
+                    end
                 end
 
                 function register()
@@ -230,10 +258,6 @@
 
                 function is_signed_in()
                     return UserInfo.IsSignedIn()
-                end
-
-                function share_person_page()
-                    return ''
                 end
 
                 function delete_world(index)
@@ -516,7 +540,8 @@
                 </div>
                 <input onclick="close()"
                        style="margin-top:0px;float:left;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#363 59 26 26:7 7 7 7);width:26px;height:26px"
-                       type="button" align="right" />
+                       type="button"
+                       align="right" />
             </div>
             <div style="height:2px;" width="100%" class="mc_line"></div>
             <div class="user_area">
@@ -547,8 +572,7 @@
                     </pe:if>
                     <pe:if condition="<%= is_signed_in() %>">
                         <div name="loginsuccess" class="user_login" style="width:290px;">
-                            <div style="text-align:center;width:140px;color:#ff6666" onclick="share_person_page()"
-                                tooltip='<%= string.format(L"点击打开:%s", share_person_page()) %>'>
+                            <div style="width:140px;color:#ffffff">
                                 <%= username() %>
                             </div>
                             <div style="margin-top:10px">

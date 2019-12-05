@@ -145,7 +145,7 @@ function HttpRequest:Retry(err, msg, data, params, callback)
     )
 end
 
-function HttpRequest:Get(url, params, headers, callback, error)
+function HttpRequest:Get(url, params, headers, callback, error, noTryStatus)
     if not url then
         return false
     end
@@ -166,11 +166,12 @@ function HttpRequest:Get(url, params, headers, callback, error)
             else
                 if type(error) == 'function' then error(data, err) end
             end
-        end
+        end,
+        noTryStatus
     )
 end
 
-function HttpRequest:Post(url, params, headers, callback, error)
+function HttpRequest:Post(url, params, headers, callback, error, noTryStatus)
     if not url then
         return false
     end
@@ -191,12 +192,13 @@ function HttpRequest:Post(url, params, headers, callback, error)
             else
                 if type(error) == 'function' then error(data, err) end
             end
-        end
+        end,
+        noTryStatus
     )
 
 end
 
-function HttpRequest:Put(url, params, headers, callback, error)
+function HttpRequest:Put(url, params, headers, callback, error, noTryStatus)
     if not url then
         return false
     end
@@ -217,11 +219,12 @@ function HttpRequest:Put(url, params, headers, callback, error)
             else
                 if type(error) == 'function' then error(data, err) end
             end
-        end
+        end,
+        noTryStatus
     )
 end
 
-function HttpRequest:Delete(url, params, headers, callback, error)
+function HttpRequest:Delete(url, params, headers, callback, error, noTryStatus)
     if not url then
         return false
     end
@@ -242,6 +245,7 @@ function HttpRequest:Delete(url, params, headers, callback, error)
             else
                 if type(error) == 'function' then error(data, err) end
             end
-        end
+        end,
+        noTryStatus
     )
 end

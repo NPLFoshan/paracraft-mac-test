@@ -111,7 +111,7 @@ function KeepworkService:LoginResponse(response, err, callback)
         return false
     end
 
-    if (type(response) ~= "table") then
+    if type(response) ~= "table" then
         Mod.WorldShare.MsgBox:Close()
         GameLogic.AddBBS(nil, L"服务器连接失败", 3000, "255 0 0")
         return false
@@ -132,9 +132,12 @@ function KeepworkService:LoginResponse(response, err, callback)
     end
 
     if response.vip and response.vip == 1 then
-        Mod.WorldShare.Store:Set("user/userType", 'plain')
-    else
         Mod.WorldShare.Store:Set("user/userType", 'vip')
+    elseif response.tLevel and response.tLevel > 0 then
+        Mod.WorldShare.Store:Set("user/userType", 'teacher')
+        Mod.WorldShare.Store:Set("user/tLevel", response.tLevel)
+    else
+        Mod.WorldShare.Store:Set("user/userType", 'plain')
     end
 
     local function HandleGetDataSource(data, err)
@@ -182,15 +185,7 @@ function KeepworkService:Logout()
 end
 
 function KeepworkService:Login(account, password, callback)
-    KeepworkUsersApi:Login(
-        account,
-        password,
-        function(data, err)
-            if type(callback) == "function" then
-                callback(data, err)
-            end
-        end
-    )
+    KeepworkUsersApi:Login(account, password, callback, callback)
 end
 
 -- This api will create a keepwork paracraft project and associated with paracraft world.

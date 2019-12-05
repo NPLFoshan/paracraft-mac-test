@@ -21,7 +21,7 @@ local KeepworkUsersApi = NPL.export()
     password string 必须 密码
 ]]
 -- return: object
-function KeepworkUsersApi:Login(account, password, callback)
+function KeepworkUsersApi:Login(account, password, callback, error)
     if type(account) ~= "string" or type(password) ~= "string" then
         return false
     end
@@ -31,7 +31,7 @@ function KeepworkUsersApi:Login(account, password, callback)
         password = password
     }
 
-    KeepworkBaseApi:Post("/users/login", params, nil, callback, { 503, 400 })
+    KeepworkBaseApi:Post("/users/login", params, nil, callback, error, { 503, 400 })
 end
 
 -- url: /users/profile
@@ -41,12 +41,12 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:Profile(token, callback)
+function KeepworkUsersApi:Profile(token, callback, error)
     if type(token) ~= "string" and #token == 0 then
         return false
     end
 
     local headers = { Authorization = format("Bearer %s", token) }
 
-    KeepworkBaseApi:Get("/users/profile", nil, headers, callback)
+    KeepworkBaseApi:Get("/users/profile", nil, headers, callback, error)
 end

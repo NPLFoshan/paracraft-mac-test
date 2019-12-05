@@ -23,7 +23,7 @@ local Projects = NPL.export()
     projectId	integer	非必须 要搜索的项目ID
 ]]
 -- return: object
-function Projects:SearchForParacraft(xPerPage, xPage, params, callback)
+function Projects:SearchForParacraft(xPerPage, xPage, params, callback, error)
     local url = '/projects/searchForParacraft'
 
     if type(xPerPage) == 'number' then
@@ -34,5 +34,5 @@ function Projects:SearchForParacraft(xPerPage, xPage, params, callback)
         end
     end
 
-    KeepworkBaseApi:Post(url, params, nil, callback)
+    KeepworkBaseApi:Post(url, params, nil, callback, error)
 end
