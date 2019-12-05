@@ -255,7 +255,7 @@ end
 function KeepworkService:Profile(callback, token)
     local headers = self:GetHeaders()
 
-    KeepworkUsersApi:Profile(token, callback)
+    KeepworkUsersApi:Profile(token, callback, callback)
 end
 
 function KeepworkService:GetWorldsList(callback)

@@ -48,5 +48,5 @@ function KeepworkUsersApi:Profile(token, callback, error)
 
     local headers = { Authorization = format("Bearer %s", token) }
 
-    KeepworkBaseApi:Get("/users/profile", nil, headers, callback, error)
+    KeepworkBaseApi:Get("/users/profile", nil, headers, callback, error, 401)
 end

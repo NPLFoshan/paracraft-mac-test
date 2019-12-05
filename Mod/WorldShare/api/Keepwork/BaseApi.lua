@@ -35,29 +35,29 @@ function KeepworkBaseApi:GetHeaders(headers)
 end
 
 -- public
-function KeepworkBaseApi:Get(url, params, headers, callback, error)
+function KeepworkBaseApi:Get(url, params, headers, callback, error, noTryStatus)
     url = self:GetApi() .. url
 
-    BaseApi:Get(url, params, self:GetHeaders(headers), callback, error)
+    BaseApi:Get(url, params, self:GetHeaders(headers), callback, error, noTryStatus)
 end
 
 -- public
-function KeepworkBaseApi:Post(url, params, headers, callback, error)
+function KeepworkBaseApi:Post(url, params, headers, callback, error, noTryStatus)
     url = self:GetApi() .. url
 
-    BaseApi:Post(url, params, self:GetHeaders(headers), callback, error)
+    BaseApi:Post(url, params, self:GetHeaders(headers), callback, error, noTryStatus)
 end
 
 -- public
-function KeepworkBaseApi:Put(url, params, headers, callback, error)
+function KeepworkBaseApi:Put(url, params, headers, callback, error, noTryStatus)
     url = self:GetApi() .. url
 
-    BaseApi:Put(url, params, self:GetHeaders(headers), callback, error)
+    BaseApi:Put(url, params, self:GetHeaders(headers), callback, error, noTryStatus)
 end
 
 -- public
-function KeepworkBaseApi:Delete(url, params, headers, callback, error)
+function KeepworkBaseApi:Delete(url, params, headers, callback, error, noTryStatus)
     url = self:GetApi() .. url
 
-    BaseApi:Delete(url, params, self:GetHeaders(headers), callback, error)
+    BaseApi:Delete(url, params, self:GetHeaders(headers), callback, error, noTryStatus)
 end
