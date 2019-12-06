@@ -185,8 +185,16 @@ function UserConsole:HandleWorldId(pid)
 
     pid = tonumber(pid)
 
+    local world
+    local overtimeEnter = false
+    local fetchSuccess = false
+
     local function HandleLoadWorld(url, worldInfo, offlineMode)
         if not url then
+            return false
+        end
+
+        if overtimeEnter and Mod.WorldShare.Store:Get('world/isEnterWorld') then
             return false
         end
 
@@ -218,9 +226,9 @@ function UserConsole:HandleWorldId(pid)
 
         if url:match("^https?://") then
             world = RemoteWorld.LoadFromHref(url, "self")
-            local url = world:GetLocalFileName()
+            local fileUrl = world:GetLocalFileName()
 
-            if ParaIO.DoesFileExist(url) then
+            if ParaIO.DoesFileExist(fileUrl) then
                 if offlineMode then
                     LoadWorld(world, "never")
                     return false
@@ -228,7 +236,7 @@ function UserConsole:HandleWorldId(pid)
 
                 Mod.WorldShare.MsgBox:Show(L"请稍后...")
                 GitService:GetWorldRevision(pid, false, function(data, err)
-                    local localRevision = tonumber(LocalService:GetZipRevision(url)) or 0
+                    local localRevision = tonumber(LocalService:GetZipRevision(fileUrl)) or 0
                     local remoteRevision = tonumber(data) or 0
 
                     Mod.WorldShare.MsgBox:Close()
@@ -282,12 +290,90 @@ function UserConsole:HandleWorldId(pid)
         end
 	end
 
-    Mod.WorldShare.MsgBox:Show(L"请稍后...")
+    -- show view over 5 seconds
+    Mod.WorldShare.Utils.SetTimeOut(function()
+        if fetchSuccess then
+            return false
+        end
+
+        Mod.WorldShare.Store:Set('world/openKpProjectId', pid)
+
+        local cacheWorldInfo = CacheProjectId:GetProjectIdInfo(pid)
+
+        if not cacheWorldInfo or not cacheWorldInfo.worldInfo or not cacheWorldInfo.worldInfo.archiveUrl then
+            return false
+        end
+
+        local worldInfo = cacheWorldInfo.worldInfo
+        local url = cacheWorldInfo.worldInfo.archiveUrl
+        local world = RemoteWorld.LoadFromHref(url, "self")
+        local fileUrl = world:GetLocalFileName()   
+        local localRevision = tonumber(LocalService:GetZipRevision(fileUrl)) or 0
+
+        local worldName = ''
+
+        if worldInfo and worldInfo.extra and worldInfo.extra.worldTagName then
+            worldName = worldInfo.extra.worldTagName
+        else
+            worldName = worldInfo.worldName
+        end
+
+        local function LoadWorld(world, refreshMode)
+            if world then
+                local url = world:GetLocalFileName()
+                DownloadWorld.ShowPage(url)
+                local mytimer = commonlib.Timer:new(
+                    {
+                        callbackFunc = function(timer)
+                            InternetLoadWorld.LoadWorld(
+                                world,
+                                nil,
+                                refreshMode or "auto",
+                                function(bSucceed, localWorldPath)
+                                    DownloadWorld.Close()
+                                end
+                            );
+                        end
+                    }
+                );
+
+                -- prevent recursive calls.
+                mytimer:Change(1,nil);
+            else
+                _guihelper.MessageBox(L"无效的世界文件");
+            end
+        end
+
+        local params = Mod.WorldShare.Utils:ShowWindow(
+            0,
+            0,
+            "Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html?project_id=" 
+                .. pid
+                .. "&remote_revision=" .. 0
+                .. "&local_revision=" .. localRevision
+                .. "&world_name=" .. worldName,
+            "ProjectIdEnter",
+            0,
+            0,
+            "_fi",
+            false
+        )
+
+        params._page.callback = function(data)
+            if data == 'local' then
+                overtimeEnter = true
+                LoadWorld(world, "never")
+            end
+        end
+    end, 5000)
+
+    Mod.WorldShare.MsgBox:Show(L"请稍后...", 20000)
 
     KeepworkService:GetWorldByProjectId(
         pid,
         function(worldInfo, err)
             Mod.WorldShare.MsgBox:Close()
+            fetchSuccess = true
 
             if err == 0 then
                 local cacheWorldInfo = CacheProjectId:GetProjectIdInfo(pid)
@@ -304,7 +390,7 @@ function UserConsole:HandleWorldId(pid)
             end
 
             if err == 404 then
-                GameLogic.AddBBS(nil, L"世界不存在", 3000, "255 0 0")
+                GameLogic.AddBBS(nil, L"项目不存在", 3000, "255 0 0")
                 return false
             end
 
@@ -312,6 +398,8 @@ function UserConsole:HandleWorldId(pid)
                 Mod.WorldShare.Store:Set('world/openKpProjectId', pid)
                 HandleLoadWorld(worldInfo.archiveUrl, worldInfo)
                 CacheProjectId:SetProjectIdInfo(pid, worldInfo)
+            else
+                GameLogic.AddBBS(nil, L"世界没有创建，请联系作者", 3000, "255 0 0")
             end
         end
     )
