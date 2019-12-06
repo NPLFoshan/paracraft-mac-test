@@ -390,7 +390,7 @@ function UserConsole:HandleWorldId(pid)
             end
 
             if err == 404 then
-                GameLogic.AddBBS(nil, L"项目不存在", 3000, "255 0 0")
+                GameLogic.AddBBS(nil, L"未找到对应内容", 3000, "255 0 0")
                 return false
             end
 
@@ -399,7 +399,7 @@ function UserConsole:HandleWorldId(pid)
                 HandleLoadWorld(worldInfo.archiveUrl, worldInfo)
                 CacheProjectId:SetProjectIdInfo(pid, worldInfo)
             else
-                GameLogic.AddBBS(nil, L"世界没有创建，请联系作者", 3000, "255 0 0")
+                GameLogic.AddBBS(nil, L"未找到对应内容", 3000, "255 0 0")
             end
         end
     )
