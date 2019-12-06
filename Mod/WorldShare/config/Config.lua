@@ -50,10 +50,10 @@ Config.esGatewayList = {
 }
 
 Config.lessonList = {
-  ONLINE = "https://api.keepwork.com/lesson/v0",
-  STAGE = "http://api-dev.kp-para.cn/lesson/v0",
-  RELEASE = "http://api-rls.kp-para.cn/lesson/v0",
-  LOCAL = "http://api-dev.kp-para.cn/lesson/v0"
+  ONLINE = "https://api.keepwork.com/lessonapi/v0",
+  STAGE = "http://api-dev.kp-para.cn/lessonapi/v0",
+  RELEASE = "http://api-rls.kp-para.cn/lessonapi/v0",
+  LOCAL = "http://api-dev.kp-para.cn/lessonapi/v0"
 }
 
 Config.dataSourceApiList = {
