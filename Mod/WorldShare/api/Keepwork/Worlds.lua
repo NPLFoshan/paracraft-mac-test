@@ -15,6 +15,18 @@ local KeepworkBaseApi = NPL.load('./BaseApi.lua')
 
 local KeepworkWorldsApi = NPL.export()
 
+-- url: /worlds
+-- method: GET
+-- params:
+--[[
+]]
+-- return: object
+function KeepworkWorldsApi:GetWorldList(success, error)
+    local url = '/worlds'
+
+    KeepworkBaseApi:Get(url, nil, nil, success, error)
+end
+
 -- url: /worlds?worldName=%s
 -- method: GET
 -- params:
@@ -25,4 +37,26 @@ function KeepworkWorldsApi:GetWorldByName(worldName, success, error)
     local url = format("/worlds?worldName=%s", Encoding.url_encode(worldName or ''))
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
+end
+
+-- url: /worlds/%s
+-- method: PUT
+-- return: object
+function KeepworkWorldsApi:UpdateWorldinfo(worldId, success, error)
+    if type(worldId) ~= 'number' then
+        return false
+    end
+
+    local url = format("/worlds/%s", worldId)
+
+    KeepworkBaseApi:Get(url, nil, nil, success, error)
+end
+
+-- url: /projects/%d
+-- method: DELTE
+-- return: object
+function KeepworkWorldsApi:DeleteWorld()
+    local url = format("/projects/%d", kpProjectId)
+
+    
 end

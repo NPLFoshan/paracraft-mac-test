@@ -9,56 +9,45 @@ local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkServic
 ------------------------------------------------------------
 ]]
 
+local KeepworkService = NPL.load('../KeepworkService.lua')
+local KeepworkWorldsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Worlds.lua")
+
 local KeepworkServiceWorld = NPL.export()
 
 -- get world list
 function KeepworkServiceWorld:GetWorldsList(callback)
-    if not self:IsSignedIn() then
+    if not KeepworkService:IsSignedIn() then
         return false
     end
 
-    local headers = self:GetHeaders()
-
-    self:Request("/worlds", 'GET', {}, headers, callback)
+    KeepworkWorldsApi:GetWorldList(callback)
 end
 
 -- get world by worldname
 function KeepworkServiceWorld:GetWorld(worldName, callback)
-    if (type(worldName) ~= 'string' or not self:IsSignedIn()) then
+    if type(worldName) ~= 'string' or not KeepworkService:IsSignedIn() then
         return false
     end
 
-    local headers = self:GetHeaders()
-
-    self:Request(
-        format("/worlds?worldName=%s", worldName or ''),
-        "GET",
-        nil,
-        headers,
-        function(data, err)
-            if type(callback) ~= 'function' then
-                return false
-            end
-
-            if err ~= 200 or #data == 0 then
-                return false
-            end
-
-            callback(data[1])
+    KeepworkWorldsApi:GetWorldByName(worldName, function(data, err)
+        if type(callback) ~= 'function' or not data or not data[1] then
+            return false
         end
-    )
+
+        callback(data[1])
+    end)
 end
 
 -- updat world info
 function KeepworkServiceWorld:PushWorld(params, callback)
-    if type(params) ~= 'table' or not self:IsSignedIn() then
+    if type(params) ~= 'table' or
+       not params.worldName or
+       not KeepworkService:IsSignedIn() then
         return false
     end
 
-    local headers = self:GetHeaders()
-
     self:GetWorld(
-        Encoding.url_encode(params.worldName or ''),
+        params.worldName or '',
         function(world)
             local worldId = world and world.id or false
 
@@ -66,13 +55,7 @@ function KeepworkServiceWorld:PushWorld(params, callback)
                 return false
             end
 
-            self:Request(
-                format("/worlds/%s", worldId),
-                "PUT",
-                params,
-                headers,
-                callback
-            )
+            KeepworkWorldsApi:UpdateWorldinfo(worldId, params, callback)
         end
     )
 end
@@ -88,7 +71,6 @@ function KeepworkServiceWorld:DeleteWorld(kpProjectId, callback)
     end
 
     local url = format("/projects/%d", kpProjectId)
-    local headers = self:GetHeaders()
 
     self:Request(url, "DELETE", {}, headers, callback)
 end
@@ -99,7 +81,6 @@ function KeepworkServiceWorld:GetWorldByProjectId(pid, callback)
         return false
     end
 
-    local headers = self:GetHeaders()
 
     self:Request(
         format("/projects/%d/detail", pid),
