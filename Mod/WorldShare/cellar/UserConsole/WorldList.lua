@@ -26,6 +26,7 @@ local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
@@ -399,8 +400,8 @@ function WorldList:SyncWorldsList(callback)
             end
         end
 
-        Store:Set("world/remoteWorldsList", remoteWorldsList)
-        Store:Set("world/compareWorldList", compareWorldList)
+        Mod.WorldShare.Store:Set("world/remoteWorldsList", remoteWorldsList)
+        Mod.WorldSHare.Store:Set("world/compareWorldList", compareWorldList)
 
         UserConsole:Refresh()
 
@@ -409,7 +410,7 @@ function WorldList:SyncWorldsList(callback)
         end
     end
 
-    KeepworkService:GetWorldsList(HandleWorldList)
+    KeepworkServiceWorld:GetWorldsList(HandleWorldList)
 end
 
 function WorldList:UnifiedTimestampFormat(data)

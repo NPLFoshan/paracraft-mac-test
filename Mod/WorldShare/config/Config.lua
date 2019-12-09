@@ -20,6 +20,7 @@ Config.env = {
 }
 
 Config.defaultEnv = (ParaEngine.GetAppCommandLineByParam("worldshareenv", nil) or Config.env.ONLINE)
+Config.defaultGit = "KEEPWORK"
 
 Config.keepworkList = {
   ONLINE = "https://keepwork.com",

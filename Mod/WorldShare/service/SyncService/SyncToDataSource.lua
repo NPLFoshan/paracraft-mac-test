@@ -13,6 +13,7 @@ local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local KeepworkGen = NPL.load("(gl)Mod/WorldShare/helper/KeepworkGen.lua")
@@ -45,7 +46,7 @@ function SyncToDataSource:Init(callback)
         function(beExisted)
             if beExisted then
                 -- update world
-                KeepworkService:GetProjectIdByWorldName(self.foldername.utf8, function()
+                KeepworkServiceProject:GetProjectIdByWorldName(self.foldername.utf8, function()
                     currentWorld = Mod.WorldShare.Store:Get('world/currentWorld') 
 
                     if currentWorld and currentWorld.kpProjectId then
@@ -60,7 +61,7 @@ function SyncToDataSource:Init(callback)
                     self:SyncToDataSource()
                 end)
             else
-                KeepworkService:CreateProject(
+                KeepworkServiceProject:CreateProject(
                     self.foldername.utf8,
                     function(data, err)
                         if err ~= 200 or not data or not data.id then

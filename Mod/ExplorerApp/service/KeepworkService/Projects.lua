@@ -9,6 +9,7 @@ local KeepworkServiceProjects = NPL.load("(gl)Mod/ExplorerApp/service/KeepworkSe
 ------------------------------------------------------------
 ]]
 local KeepworkService = NPL.load('(gl)Mod/WorldShare/service/KeepworkService.lua')
+local KeepworkServiceProject = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Project.lua')
 local KeepworkProjectsApi = NPL.load('(gl)Mod/WorldShare/api/Keepwork/Projects.lua')
 
 local Projects = NPL.export()
@@ -102,7 +103,7 @@ end
 -- param: classifyTags-like string
 -- return object
 function Projects:GetProjectDetailById(projectId, callback, noTryStatus)
-    KeepworkService:GetProject(projectId, callback, noTryStatus)
+    KeepworkServiceProject:GetProject(projectId, callback, noTryStatus)
 end
 
 function Projects:GetAllTags(callback)

@@ -8,8 +8,6 @@ use the lib:
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 ------------------------------------------------------------
 ]]
-local Store = NPL.load('(gl)Mod/WorldShare/store/Store.lua')
-
 local GitlabService = NPL.load('./GitlabService.lua')
 local GithubService = NPL.load('./GithubService.lua')
 
@@ -17,9 +15,10 @@ local GitService = NPL.export()
 
 local GITLAB = "GITLAB"
 local GITHUB = "GITHUB"
+local KEEPWORK = "KEEPWORK"
 
 function GitService:GetDataSourceInfo()
-    return Store:Get("user/dataSourceInfo")
+    return Mod.WorldShare.Store:Get("user/dataSourceInfo")
 end
 
 function GitService:GetDataSourceType()

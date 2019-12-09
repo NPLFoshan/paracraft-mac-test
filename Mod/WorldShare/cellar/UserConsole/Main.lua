@@ -28,6 +28,7 @@ local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local BrowseRemoteWorlds = NPL.load("(gl)Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local CacheProjectId = NPL.load("(gl)Mod/WorldShare/database/CacheProjectId.lua")
@@ -478,7 +479,7 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
                 extra.worldTagName = tempModifyWorldname
 
                 -- local world not exist
-                KeepworkService:UpdateProject(
+                KeepworkServiceProject:UpdateProject(
                     currentWorld.kpProjectId,
                     {
                         extra = extra

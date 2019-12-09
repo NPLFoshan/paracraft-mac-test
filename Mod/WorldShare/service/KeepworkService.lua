@@ -8,7 +8,6 @@ use the lib:
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 ------------------------------------------------------------
 ]]
-local WorldShare = commonlib.gettable("Mod.WorldShare")
 local Encoding = commonlib.gettable("commonlib.Encoding")
 
 local HttpRequest = NPL.load("./HttpRequest.lua")
@@ -19,8 +18,8 @@ local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
+local KeepworkServiceProject = NPL.load('./KeepworkService/Project.lua')
 local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
-local KeepworkUsersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Users.lua")
 
 local KeepworkService = NPL.export()
 
@@ -113,206 +112,6 @@ function KeepworkService:GetToken()
     local token = Mod.WorldShare.Store:Get('user/token')
 
     return token or ''
-end
-
--- This api will create a keepwork paracraft project and associated with paracraft world.
-function KeepworkService:CreateProject(worldName, callback)
-    if not self:IsSignedIn() or not worldName then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    local params = {
-        name = worldName,
-        siteId = 1,
-        visibility = 0,
-        privilege = 165,
-        type = 1,
-        description = "no desc",
-        tags = "paracraft",
-        extra = {}
-    }
-
-    self:Request("/projects", "POST", params, headers, callback)
-end
-
-function KeepworkService:UpdateProject(pid, params, callback)
-    if not self:IsSignedIn() or
-       not pid or
-       type(pid) ~= 'number' or
-       type(params) ~= 'table' then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    self:Request(format("/projects/%d", pid), "PUT", params, headers, callback)
-end
-
-function KeepworkService:GetProject(pid, callback, noTryStatus)
-    if type(pid) ~= 'number' or pid == 0 then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    self:Request(
-        format("/projects/%d/detail", pid),
-        "GET",
-        nil,
-        headers,
-        function(data, err)
-            if type(callback) ~= 'function' then
-                return false
-            end
-
-            if err ~= 200 or not data or not data.world then
-                callback()
-                return false
-            end
-
-            callback(data, err)
-        end,
-        noTryStatus
-    )
-end
-
-function KeepworkService:GetWorldsList(callback)
-    if (not self:IsSignedIn()) then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    self:Request("/worlds", 'GET', {}, headers, callback)
-end
-
-function KeepworkService:GetProjectIdByWorldName(worldName, callback)
-    if not self:IsSignedIn() then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    self:Request(
-        format("/worlds?worldName=%s", Encoding.url_encode(worldName or '')),
-        'GET',
-        nil,
-        headers,
-        function(data)
-            if not data or #data ~= 1 or type(data[1]) ~= 'table' or not data[1].projectId then
-                if type(callback) == 'function' then
-                    callback()
-                end
-
-                return false
-            end
-
-            local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-            currentWorld.kpProjectId = data[1].projectId
-            Mod.WorldShare.Store:Set('world/currentWorld', currentWorld)
-
-            if type(callback) == 'function' then
-                callback(data[1].projectId)
-            end
-        end
-    )
-end
-
-function KeepworkService:GetWorldByProjectId(pid, callback)
-    if type(pid) ~= 'number' or pid == 0 then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    self:Request(
-        format("/projects/%d/detail", pid),
-        "GET",
-        nil,
-        headers,
-        function(data, err)
-            if type(callback) ~= 'function' then
-                return false
-            end
-
-            if err ~= 200 or not data or not data.world then
-                callback(nil, err)
-                return false
-            end
-
-            callback(data.world, err)
-        end
-    )
-end
-
-function KeepworkService:GetWorld(worldName, callback)
-    if (type(worldName) ~= 'string' or not self:IsSignedIn()) then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    self:Request(
-        format("/worlds?worldName=%s", worldName or ''),
-        "GET",
-        nil,
-        headers,
-        function(data, err)
-            if type(callback) ~= 'function' then
-                return false
-            end
-
-            if err ~= 200 or #data == 0 then
-                return false
-            end
-
-            callback(data[1])
-        end
-    )
-end
-
-function KeepworkService:PushWorld(params, callback)
-    if type(params) ~= 'table' or not self:IsSignedIn() then
-        return false
-    end
-
-    local headers = self:GetHeaders()
-
-    self:GetWorld(
-        Encoding.url_encode(params.worldName or ''),
-        function(world)
-            local worldId = world and world.id or false
-
-            if not worldId then
-                return false
-            end
-
-            self:Request(
-                format("/worlds/%s", worldId),
-                "PUT",
-                params,
-                headers,
-                callback
-            )
-        end
-    )
-end
-
-function KeepworkService:DeleteWorld(kpProjectId, callback)
-    if not kpProjectId then
-        return false
-    end
-
-    if not self:IsSignedIn() then
-        return false
-    end
-
-    local url = format("/projects/%d", kpProjectId)
-    local headers = self:GetHeaders()
-
-    self:Request(url, "DELETE", {}, headers, callback)
 end
 
 -- get keepwork project url
@@ -433,7 +232,7 @@ function KeepworkService:UpdateRecord(callback)
                 end
             )
 
-            self:GetProject(
+            KeepworkServiceProject:GetProject(
                 currentWorld.kpProjectId,
                 function(data)
                     local extra = data and data.extra or {}
@@ -445,7 +244,7 @@ function KeepworkService:UpdateRecord(callback)
                         extra.imageUrl = preview
                         extra.worldTagName = currentWorld.local_tagname
 
-                        self:UpdateProject(
+                        KeepworkServiceProject:UpdateProject(
                             currentWorld.kpProjectId,
                             {
                                 extra = extra
@@ -454,7 +253,7 @@ function KeepworkService:UpdateRecord(callback)
                     elseif Mod.WorldShare.Store:Get('world/isPreviewUpdated') then
                         extra.imageUrl = preview
 
-                        self:UpdateProject(
+                        KeepworkServiceProject:UpdateProject(
                             currentWorld.kpProjectId,
                             {
                                 extra = extra
@@ -464,7 +263,7 @@ function KeepworkService:UpdateRecord(callback)
                            currentWorld.local_tagname ~= foldername.utf8 then
                         extra.worldTagName = currentWorld.local_tagname
 
-                        self:UpdateProject(
+                        KeepworkServiceProject:UpdateProject(
                             currentWorld.kpProjectId,
                             {
                                 extra = extra
@@ -492,7 +291,7 @@ function KeepworkService:SetCurrentCommidId(commitId)
 
     local saveUrl = currentWorld.worldpath
 
-    WorldShare:SetWorldData("revision", {id = commitId}, saveUrl)
+    Mod.WorldShare:SetWorldData("revision", {id = commitId}, saveUrl)
     ParaIO.CreateDirectory(saveUrl)
-    WorldShare:SaveWorldData(saveUrl)
+    Mod.WorldShare:SaveWorldData(saveUrl)
 end

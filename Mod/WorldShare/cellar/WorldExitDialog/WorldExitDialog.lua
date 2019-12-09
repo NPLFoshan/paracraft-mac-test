@@ -16,6 +16,7 @@ local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
@@ -76,7 +77,7 @@ function WorldExitDialog.ShowPage(callback)
                 local currentWorld = Store:Get('world/currentWorld')
     
                 if currentWorld and currentWorld.kpProjectId then
-                    KeepworkService:GetProject(tonumber(currentWorld.kpProjectId), function(data)
+                    KeepworkServiceProject:GetProject(tonumber(currentWorld.kpProjectId), function(data)
                         if data and data.world and data.world.worldName then
                             self.currentWorldKeepworkInfo = data
                         end
@@ -169,7 +170,7 @@ function WorldExitDialog:CanSetStart()
             local currentWorld = Store:Get('world/currentWorld')
 
             if currentWorld and currentWorld.kpProjectId then
-                KeepworkService:GetProject(tonumber(currentWorld.kpProjectId), function(data)
+                KeepworkServiceProject:GetProject(tonumber(currentWorld.kpProjectId), function(data)
                     if data and data.world and data.world.worldName then
                         self.currentWorldKeepworkInfo = data
                     end

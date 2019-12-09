@@ -22,6 +22,7 @@ local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 
 local ShareWorld = NPL.export()
 
@@ -40,7 +41,7 @@ function ShareWorld:Init()
 
     if not KeepworkService:IsSignedIn() then
         function Handle()
-            KeepworkService:GetProjectIdByWorldName(
+            KeepworkServiceProject:GetProjectIdByWorldName(
                 currentWorld.foldername,
                 function()
                     WorldList:RefreshCurrentServerList(function()

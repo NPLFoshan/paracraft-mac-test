@@ -11,7 +11,78 @@ local KeepworkProjectsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Projects.l
 
 local KeepworkBaseApi = NPL.load('./BaseApi.lua')
 
-local Projects = NPL.export()
+local KeepworkProjectsApi = NPL.export()
+
+-- url: /projects
+-- method: POST
+-- params:
+--[[
+]]
+-- return: object
+function KeepworkProjectsApi:CreateProject(worldName, success, error)
+    local url = '/projects'
+
+    local params = {
+        name = worldName,
+        siteId = 1,
+        visibility = 0,
+        privilege = 165,
+        type = 1,
+        description = "no desc",
+        tags = "paracraft",
+        extra = {}
+    }
+
+    KeepworkBaseApi:Post(url, params, nil, success, error)
+end
+
+-- url: /projects/%d
+-- method: PUT
+-- params:
+--[[
+]]
+-- return: object
+function KeepworkProjectsApi:UpdateProject(pid, params, success, error)
+    if type(pid) ~= 'number' or type(params) ~= 'table' then
+        return false
+    end
+
+    local url = format("/projects/%d", pid)
+
+    KeepworkBaseApi:Put(url, params, nil, success, error)
+end
+
+-- url: /projects/%d/detail
+-- method: GET
+-- params:
+--[[
+]]
+-- return: object
+function KeepworkProjectsApi:GetProject(pid, success, error, noTryStatus)
+    if type(pid) ~= 'number' or pid == 0 then
+        return false
+    end
+
+    local url = format("/projects/%d/detail", pid)
+
+    KeepworkBaseApi:Get(url, nil, nil, success, error, noTryStatus)
+end
+
+-- url: /projects/%d/visit
+-- method: GET
+-- params:
+--[[
+]]
+-- return: object
+function KeepworkProjectsApi:Visit(pid, callback)
+    if type(pid) ~= 'number' or pid == 0 then
+        return false
+    end
+
+    local url = format("/projects/%d/visit", pid)
+
+    KeepworkBaseApi:Get(url, nil, nil, callback)
+end
 
 -- url: /projects/searchForParacraft
 -- method: POST
@@ -23,7 +94,7 @@ local Projects = NPL.export()
     projectId	integer	非必须 要搜索的项目ID
 ]]
 -- return: object
-function Projects:SearchForParacraft(xPerPage, xPage, params, callback, error)
+function KeepworkProjectsApi:SearchForParacraft(xPerPage, xPage, params, success, error)
     local url = '/projects/searchForParacraft'
 
     if type(xPerPage) == 'number' then
@@ -34,5 +105,5 @@ function Projects:SearchForParacraft(xPerPage, xPage, params, callback, error)
         end
     end
 
-    KeepworkBaseApi:Post(url, params, nil, callback, error)
+    KeepworkBaseApi:Post(url, params, nil, success, error)
 end
