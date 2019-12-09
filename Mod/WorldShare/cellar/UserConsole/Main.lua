@@ -27,6 +27,7 @@ local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local BrowseRemoteWorlds = NPL.load("(gl)Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local CacheProjectId = NPL.load("(gl)Mod/WorldShare/database/CacheProjectId.lua")
@@ -53,7 +54,7 @@ function UserConsole:ShowPage()
         return false
     end
 
-    local params = Utils:ShowWindow(850, 470, "Mod/WorldShare/cellar/UserConsole/UserConsole.html", "UserConsole")
+    local params = Mod.WorldShare.Utils:ShowWindow(850, 470, "Mod/WorldShare/cellar/UserConsole/UserConsole.html", "UserConsole")
 
     params._page.OnClose = function()
         Mod.WorldShare.Store:Remove('page/UserConsole')
@@ -69,15 +70,15 @@ function UserConsole:ShowPage()
     else
         Mod.WorldShare.Store:Set('user/notFirstTimeShown', true)
 
-        KeepworkService:GetUserTokenFromUrlProtocol()
+        KeepworkServiceSession:GetUserTokenFromUrlProtocol()
 
         -- for restart game
-        if KeepworkService:GetCurrentUserToken() then
+        if KeepworkServiceSession:GetCurrentUserToken() then
             UserInfo:LoginWithToken()
             return false
         end
 
-        local ignoreAutoLogin = Store:Get('user/ignoreAutoLogin')
+        local ignoreAutoLogin = Mod.WorldShare.Store:Get('user/ignoreAutoLogin')
 
         if (not ignoreAutoLogin) then
             -- auto sign in here
@@ -89,31 +90,31 @@ function UserConsole:ShowPage()
 end
 
 function UserConsole:ClosePage()
-    if (UserConsole.IsMCVersion()) then
+    if UserConsole.IsMCVersion() then
         InternetLoadWorld.ReturnLastStep()
     end
 
-    local UserConsolePage = Store:Get('page/UserConsole')
+    local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
 
-    if (UserConsolePage) then
+    if UserConsolePage then
         UserConsolePage:CloseWindow()
     end
 
-    if Store:Get('world/isEnterWorld') then
+    if Mod.WorldShare.Store:Get('world/isEnterWorld') then
         SyncMain:GetCurrentWorldInfo()
     end
 end
 
 function UserConsole:Refresh(time)
-    UserConsolePage = Store:Get('page/UserConsole')
+    UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
 
-    if (UserConsolePage) then
+    if UserConsolePage then
         UserConsolePage:Refresh(time or 0.01)
     end
 end
 
 function UserConsole:IsShowUserConsole()
-    if(Store:Get('page/UserConsole')) then
+    if Mod.WorldShare.Store:Get('page/UserConsole') then
         return true
     else
         return false
@@ -123,15 +124,15 @@ end
 function UserConsole.InputSearchContent()
     InternetLoadWorld.isSearching = true
 
-    local UserConsolePage = Store:Get('page/UserConsole')
+    local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
 
-    if (UserConsolePage) then
+    if UserConsolePage then
         UserConsolePage:Refresh(0.1)
     end
 end
 
 function UserConsole.IsMCVersion()
-    if(System.options.mc) then
+    if System.options.mc then
         return true;
     else
         return false;
@@ -148,7 +149,7 @@ function UserConsole.OnClickOfficialWorlds(callback)
         return true
     end
 
-    Store:Set("world/personalMode", true)
+    Mod.WorldShare.Store:Set("world/personalMode", true)
 
     if ExplorerApp then
         ExplorerApp:Init(callback)
@@ -332,7 +333,7 @@ function UserConsole:HandleWorldId(pid)
                                 function(bSucceed, localWorldPath)
                                     DownloadWorld.Close()
                                 end
-                            );
+                            )
                         end
                     }
                 );
@@ -340,7 +341,7 @@ function UserConsole:HandleWorldId(pid)
                 -- prevent recursive calls.
                 mytimer:Change(1,nil);
             else
-                _guihelper.MessageBox(L"无效的世界文件");
+                _guihelper.MessageBox(L"无效的世界文件")
             end
         end
 
@@ -464,7 +465,7 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
                 end
             end
 
-            Store:Set('world/currentRevision', currentWorld.revision)
+            Mod.WorldShare.Store:Set('world/currentRevision', currentWorld.revision)
 
             SyncMain:SyncToDataSource()
         else

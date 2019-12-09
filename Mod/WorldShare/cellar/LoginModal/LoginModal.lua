@@ -12,6 +12,7 @@ LoginModal:ShowPage()
 ]]
 
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
@@ -30,11 +31,11 @@ function LoginModal:Init(callbackFunc)
 end
 
 function LoginModal:ShowPage()
-    if KeepworkService:GetCurrentUserToken() then
+    if KeepworkServiceSession:GetCurrentUserToken() then
         return false
     end
 
-    local params = Utils:ShowWindow(320, 470, "Mod/WorldShare/cellar/LoginModal/LoginModal.html", "LoginModal", nil, nil, nil, nil)
+    local params = Mod.WorldShare.Utils:ShowWindow(320, 470, "Mod/WorldShare/cellar/LoginModal/LoginModal.html", "LoginModal", nil, nil, nil, nil)
 
     local LoginModalPage = Mod.WorldShare.Store:Get('page/LoginModal')
 
@@ -42,7 +43,7 @@ function LoginModal:ShowPage()
         return false
     end
 
-    local PWDInfo = KeepworkService:LoadSigninInfo()
+    local PWDInfo = KeepworkServiceSession:LoadSigninInfo()
 
     if PWDInfo then
         LoginModalPage:SetValue('autoLogin', PWDInfo.autoLogin or false)
@@ -52,12 +53,6 @@ function LoginModal:ShowPage()
         self.loginServer = PWDInfo.loginServer
         self.account = PWDInfo.account
     end
-
-    -- local forgotUrl = format("%s/u/set", KeepworkService:GetKeepworkUrl())
-    -- local registerUrl = format("%s/u/r/register", KeepworkService:GetKeepworkUrl())
-
-    -- LoginModalPage:GetNode('forgot'):SetAttribute('href', forgotUrl)
-    -- LoginModalPage:GetNode('register'):SetAttribute('onclick', registerUrl)
 
     self:Refresh(0.01)
 end
@@ -128,7 +123,7 @@ function LoginModal:LoginAction()
 
         local token = Mod.WorldShare.Store:Get("user/token") or ""
 
-        KeepworkService:SaveSigninInfo(
+        KeepworkServiceSession:SaveSigninInfo(
             {
                 account = account,
                 password = password,
@@ -153,7 +148,7 @@ function LoginModal:LoginAction()
         end
     end
 
-    KeepworkService:Login(
+    KeepworkServiceSession:Login(
         account,
         password,
         function(response, err)
@@ -162,7 +157,7 @@ function LoginModal:LoginAction()
                 return false
             end
 
-            KeepworkService:LoginResponse(response, err, HandleLogined)
+            KeepworkServiceSession:LoginResponse(response, err, HandleLogined)
         end
     )
 end

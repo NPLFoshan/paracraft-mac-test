@@ -10,10 +10,104 @@ local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 ]]
 
 local KeepworkService = NPL.load("../KeepworkService.lua")
+local KeepworkUsersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Users.lua")
+local LessonOrganizationsApi = NPL.load("(gl)Mod/WorldShare/api/Lesson/LessonOrganizations.lua")
+local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
+local GitGatewayService = NPL.load("../GitGatewayService.lua")
+local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
+local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
+
+local Encoding = commonlib.gettable("commonlib.Encoding")
 
 local KeepworkServiceSession = NPL.export()
 
 KeepworkServiceSession.captchaKey = ''
+
+function KeepworkServiceSession:Login(account, password, callback)
+    KeepworkUsersApi:Login(account, password, callback, callback)
+end
+
+function KeepworkServiceSession:LoginResponse(response, err, callback)
+    if err == 400 then
+        Mod.WorldShare.MsgBox:Close()
+        GameLogic.AddBBS(nil, L"用户名或者密码错误", 3000, "255 0 0")
+        return false
+    end
+
+    if type(response) ~= "table" then
+        Mod.WorldShare.MsgBox:Close()
+        GameLogic.AddBBS(nil, L"服务器连接失败", 3000, "255 0 0")
+        return false
+    end
+
+    local token = response["token"] or ""
+    local userId = response["id"] or 0
+    local username = response["username"] or ""
+    local nickname = response["nickname"] or ""
+
+    local SetUserinfo = Mod.WorldShare.Store:Action("user/SetUserinfo")
+    SetUserinfo(token, userId, username, nickname)
+
+    if not response.cellphone and not response.email then
+        Mod.WorldShare.Store:Set("user/isVerified", false)
+    else
+        Mod.WorldShare.Store:Set("user/isVerified", true)
+    end
+
+    if response.vip and response.vip == 1 then
+        Mod.WorldShare.Store:Set("user/userType", 'vip')
+    elseif response.tLevel and response.tLevel > 0 then
+        Mod.WorldShare.Store:Set("user/userType", 'teacher')
+        Mod.WorldShare.Store:Set("user/tLevel", response.tLevel)
+    else
+        Mod.WorldShare.Store:Set("user/userType", 'plain')
+    end
+
+    local function HandleGetDataSource(data, err)
+        if data and data.token then
+            local dataSourceType = 'gitlab'
+            local env = KeepworkService:GetEnv()
+    
+            local dataSourceInfo = {
+                dataSourceToken = data.token, -- 数据源Token
+                dataSourceUsername = data.git_username, -- 数据源用户名
+                dataSourceType = dataSourceType, -- 数据源类型
+                apiBaseUrl = Config.dataSourceApiList[dataSourceType][env], -- 数据源api
+                rawBaseUrl = Config.dataSourceRawList[dataSourceType][env] -- 数据源raw
+            }
+    
+            Mod.WorldShare.Store:Set("user/dataSourceInfo", dataSourceInfo)
+        end
+
+        LessonOrganizationsApi:GetUserAllOrgs(
+            function(data, err)
+                if err == 200 then
+                    if data and data.data and type(data.data.allOrgs) == 'table' and type(data.data.showOrgId) == 'number' then
+                        for key, item in ipairs(data.data.allOrgs) do
+                            if item.id == data.data.showOrgId then
+                                Mod.WorldShare.Store:Set('user/myOrg', item)
+                            end
+                        end
+                    end
+                end
+
+                if type(callback) == "function" then
+                    callback(data, err)
+                end
+            end
+        )
+    end
+
+    GitGatewayService:Accounts(HandleGetDataSource)
+end
+
+function KeepworkServiceSession:Logout()
+    if self:IsSignedIn() then
+        local Logout = Mod.WorldShare.Store:Action("user/Logout")
+        Logout()
+        WorldList:RefreshCurrentServerList()
+    end
+end
 
 function KeepworkServiceSession:Register(username, password, captcha, cellphone, cellphoneCaptcha, callback)
     if not username or not password or not captcha then
@@ -43,7 +137,7 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         nil,
         function (registerData, err)
             if err == 200 and registerData.id then
-                KeepworkService:Login(
+                self:Login(
                     username,
                     password,
                     function(loginData, err)
@@ -58,13 +152,13 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
                             return false
                         end
 
-                        KeepworkService:LoginResponse(loginData, err, function()
-                            KeepworkService:SaveSigninInfo(
+                        self:LoginResponse(loginData, err, function()
+                            self:SaveSigninInfo(
                                 {
                                     account = username,
                                     password = password,
                                     token = loginData["token"] or "",
-                                    loginServer = KeepworkService:GetEnv(), -- Mod.WorldShare.Store:Get('user/env'),
+                                    loginServer = KeepworkService:GetEnv(),
                                     autoLogin = false,
                                     rememberMe = false
                                 }
@@ -224,4 +318,59 @@ function KeepworkServiceSession:ResetPassword(key, password, captcha, callback)
         callback,
         { 400 }
     )
+end
+
+-- @param usertoken: keepwork user token
+function KeepworkServiceSession:Profile(callback, token)
+    KeepworkUsersApi:Profile(token, callback, callback)
+end
+
+function KeepworkServiceSession:GetCurrentUserToken()
+    if Mod.WorldShare.Store:Get("user/token") then
+        return Mod.WorldShare.Store:Get("user/token")
+    else
+        return System.User and System.User.keepworktoken
+    end
+end
+
+-- @param info: if nil, we will delete the login info.
+function KeepworkServiceSession:SaveSigninInfo(info)
+    if not info then
+        return false
+    end
+
+    if not info.rememberMe then
+        info.password = nil
+    end
+
+    SessionsData:SaveSession(info)
+end
+
+-- @return nil if not found or {account, password, loginServer, autoLogin}
+function KeepworkServiceSession:LoadSigninInfo()
+    local sessionsData = SessionsData:GetSessions()
+
+    if sessionsData and sessionsData.selectedUser then
+        for key, item in ipairs(sessionsData.allUsers) do
+            if item.value == sessionsData.selectedUser then
+                return item.session
+            end
+        end
+    else
+        return nil
+    end
+end
+
+-- return nil or user token in url protocol
+function KeepworkServiceSession:GetUserTokenFromUrlProtocol()
+    local cmdline = ParaEngine.GetAppCommandLine()
+    local urlProtocol = string.match(cmdline or "", "paracraft://(.*)$")
+    urlProtocol = Encoding.url_decode(urlProtocol or "")
+
+    local usertoken = urlProtocol:match('usertoken="([%S]+)"')
+
+    if usertoken then
+        local SetToken = Mod.WorldShare.Store:Action("user/SetToken")
+        SetToken(usertoken)
+    end
 end

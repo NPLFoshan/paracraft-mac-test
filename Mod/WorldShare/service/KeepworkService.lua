@@ -20,7 +20,6 @@ local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
-local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
 local KeepworkUsersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Users.lua")
 
 local KeepworkService = NPL.export()
@@ -83,7 +82,7 @@ function KeepworkService:GetHeaders(selfDefined, notTokenRequest)
         headers = selfDefined
     end
 
-    local token = Store:Get("user/token")
+    local token = Mod.WorldShare.Store:Get("user/token")
 
     if (token and not notTokenRequest and not headers["Authorization"]) then
         headers["Authorization"] = format("Bearer %s", token)
@@ -104,88 +103,16 @@ function KeepworkService:Request(url, method, params, headers, callback, noTrySt
     HttpRequest:GetUrl(params, callback, noTryStatus)
 end
 
-function KeepworkService:LoginResponse(response, err, callback)
-    if err == 400 then
-        Mod.WorldShare.MsgBox:Close()
-        GameLogic.AddBBS(nil, L"用户名或者密码错误", 3000, "255 0 0")
-        return false
-    end
-
-    if type(response) ~= "table" then
-        Mod.WorldShare.MsgBox:Close()
-        GameLogic.AddBBS(nil, L"服务器连接失败", 3000, "255 0 0")
-        return false
-    end
-
-    local token = response["token"] or ""
-    local userId = response["id"] or 0
-    local username = response["username"] or ""
-    local nickname = response["nickname"] or ""
-
-    local SetUserinfo = Store:Action("user/SetUserinfo")
-    SetUserinfo(token, userId, username, nickname)
-
-    if not response.cellphone and not response.email then
-        Mod.WorldShare.Store:Set("user/isVerified", false)
-    else
-        Mod.WorldShare.Store:Set("user/isVerified", true)
-    end
-
-    if response.vip and response.vip == 1 then
-        Mod.WorldShare.Store:Set("user/userType", 'vip')
-    elseif response.tLevel and response.tLevel > 0 then
-        Mod.WorldShare.Store:Set("user/userType", 'teacher')
-        Mod.WorldShare.Store:Set("user/tLevel", response.tLevel)
-    else
-        Mod.WorldShare.Store:Set("user/userType", 'plain')
-    end
-
-    local function HandleGetDataSource(data, err)
-        if data and data.token then
-            local dataSourceType = 'gitlab'
-            local env = self:GetEnv()
-    
-            local dataSourceInfo = {
-                dataSourceToken = data.token, -- 数据源Token
-                dataSourceUsername = data.git_username, -- 数据源用户名
-                dataSourceType = dataSourceType, -- 数据源类型
-                apiBaseUrl = Config.dataSourceApiList[dataSourceType][env], -- 数据源api
-                rawBaseUrl = Config.dataSourceRawList[dataSourceType][env] -- 数据源raw
-            }
-    
-            Mod.WorldShare.Store:Set("user/dataSourceInfo", dataSourceInfo)
-        end
-
-        if type(callback) == "function" then
-            callback(data, err)
-        end
-    end
-
-    GitGatewayService:Accounts(HandleGetDataSource)
-end
-
 function KeepworkService:IsSignedIn()
-    local token = Store:Get("user/token")
+    local token = Mod.WorldShare.Store:Get("user/token")
 
     return token ~= nil
 end
 
 function KeepworkService:GetToken()
-    local token = Store:Get('user/token')
+    local token = Mod.WorldShare.Store:Get('user/token')
 
     return token or ''
-end
-
-function KeepworkService:Logout()
-    if (self:IsSignedIn()) then
-        local Logout = Store:Action("user/Logout")
-        Logout()
-        WorldList:RefreshCurrentServerList()
-    end
-end
-
-function KeepworkService:Login(account, password, callback)
-    KeepworkUsersApi:Login(account, password, callback, callback)
 end
 
 -- This api will create a keepwork paracraft project and associated with paracraft world.
@@ -249,13 +176,6 @@ function KeepworkService:GetProject(pid, callback, noTryStatus)
         end,
         noTryStatus
     )
-end
-
--- @param usertoken: keepwork user token
-function KeepworkService:Profile(callback, token)
-    local headers = self:GetHeaders()
-
-    KeepworkUsersApi:Profile(token, callback, callback)
 end
 
 function KeepworkService:GetWorldsList(callback)
@@ -398,79 +318,24 @@ end
 -- get keepwork project url
 function KeepworkService:GetShareUrl()
     local env = self:GetEnv()
-    local currentWorld = Store:Get("world/currentWorld")
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     if not currentWorld or not currentWorld.kpProjectId then
         return ''
     end
 
     local baseUrl = Config.keepworkList[env]
-    local foldername = Store:Get("world/foldername")
-    local username = Store:Get("user/username")
+    local foldername = Mod.WorldShare.Store:Get("world/foldername")
+    local username = Mod.WorldShare.Store:Get("user/username")
 
     return format("%s/pbl/project/%d/", baseUrl, currentWorld.kpProjectId)
 end
 
--- @return nil if not found or {account, password, loginServer, autoLogin}
-function KeepworkService:LoadSigninInfo()
-    local sessionsData = SessionsData:GetSessions()
-
-    if sessionsData and sessionsData.selectedUser then
-        for key, item in ipairs(sessionsData.allUsers) do
-            if item.value == sessionsData.selectedUser then
-                return item.session
-            end
-        end
-    else
-        return nil
-    end
-end
-
--- @param info: if nil, we will delete the login info.
-function KeepworkService:SaveSigninInfo(info)
-    if not info then
-        return false
-    end
-
-    if not info.rememberMe then
-        info.password = nil
-    end
-
-    SessionsData:SaveSession(info)
-end
-
--- return nil or user token in url protocol
-function KeepworkService:GetUserTokenFromUrlProtocol()
-    local cmdline = ParaEngine.GetAppCommandLine()
-    local urlProtocol = string.match(cmdline or "", "paracraft://(.*)$")
-    urlProtocol = Encoding.url_decode(urlProtocol or "")
-
-    -- local env = urlProtocol:match('env="([%S]+)"')
-    local usertoken = urlProtocol:match('usertoken="([%S]+)"')
-
-    -- if env then
-    --     Store:Set("user/env", env)
-    -- end
-    
-    if usertoken then
-        local SetToken = Store:Action("user/SetToken")
-        SetToken(usertoken)
-    end
-end
-
-function KeepworkService:GetCurrentUserToken()
-    if Mod.WorldShare.Store:Get("user/token") then
-        return Mod.WorldShare.Store:Get("user/token")
-    else
-        return System.User and System.User.keepworktoken
-    end
-end
-
 -- update world info
 function KeepworkService:UpdateRecord(callback)
-    local username = Store:Get("user/username")
-    local foldername = Store:Get("world/foldername")
-    local currentWorld = Store:Get('world/currentWorld')
+    local username = Mod.WorldShare.Store:Get("user/username")
+    local foldername = Mod.WorldShare.Store:Get("world/foldername")
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
     if not currentWorld then
         return false
@@ -491,12 +356,12 @@ function KeepworkService:UpdateRecord(callback)
             return false
         end
 
-        local dataSourceInfo = Store:Get("user/dataSourceInfo")
+        local dataSourceInfo = Mod.WorldShare.Store:Get("user/dataSourceInfo")
         local localFiles = LocalService:LoadFiles(currentWorld.worldpath)
 
         self:SetCurrentCommidId(lastCommitSha)
 
-        Store:Set("world/localFiles", localFiles)
+        Mod.WorldShare.Store:Set("world/localFiles", localFiles)
 
         local filesTotals = currentWorld.size or 0
 
@@ -515,14 +380,14 @@ function KeepworkService:UpdateRecord(callback)
 
             commitIds[#commitIds + 1] = {
                 commitId = lastCommitSha,
-                revision = Store:Get("world/currentRevision"),
+                revision = Mod.WorldShare.Store:Get("world/currentRevision"),
                 date = os.date("%Y%m%d", os.time())
             }
 
             local worldInfo = {}
     
             worldInfo.worldName = foldername.utf8
-            worldInfo.revision = Store:Get("world/currentRevision")
+            worldInfo.revision = Mod.WorldShare.Store:Get("world/currentRevision")
             worldInfo.fileSize = filesTotals
             worldInfo.commitId = lastCommitSha
             worldInfo.username = username
@@ -619,7 +484,7 @@ function KeepworkService:UpdateRecord(callback)
 end
 
 function KeepworkService:SetCurrentCommidId(commitId)
-    local currentWorld = Store:Get("world/currentWorld")
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     if not currentWorld or not currentWorld.worldpath then
         return false
