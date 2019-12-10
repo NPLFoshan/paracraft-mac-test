@@ -107,3 +107,16 @@ function KeepworkProjectsApi:SearchForParacraft(xPerPage, xPage, params, success
 
     KeepworkBaseApi:Post(url, params, nil, success, error)
 end
+
+-- url: /projects/%d
+-- method: DELTE
+-- return: object
+function KeepworkProjectsApi:RemoveProject(kpProjectId, success, error)
+    if type(kpProjectId) ~= 'number' then
+        return false
+    end
+
+    local url = format("/projects/%d", kpProjectId)
+
+    KeepworkBaseApi:Delete(url, nil, nil ,success, error)
+end

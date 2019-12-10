@@ -51,12 +51,3 @@ function KeepworkWorldsApi:UpdateWorldinfo(worldId, success, error)
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
-
--- url: /projects/%d
--- method: DELTE
--- return: object
-function KeepworkWorldsApi:DeleteWorld()
-    local url = format("/projects/%d", kpProjectId)
-
-    
-end

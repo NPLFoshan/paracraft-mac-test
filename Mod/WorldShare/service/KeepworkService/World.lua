@@ -11,6 +11,7 @@ local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkServic
 
 local KeepworkService = NPL.load('../KeepworkService.lua')
 local KeepworkWorldsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Worlds.lua")
+local KeepworkProjectsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Projects.lua")
 
 local KeepworkServiceWorld = NPL.export()
 
@@ -66,38 +67,29 @@ function KeepworkServiceWorld:DeleteWorld(kpProjectId, callback)
         return false
     end
 
-    if not self:IsSignedIn() then
+    if not KeepworkService:IsSignedIn() then
         return false
     end
 
-    local url = format("/projects/%d", kpProjectId)
-
-    self:Request(url, "DELETE", {}, headers, callback)
+    KeepworkProjectsApi:RemoveProject(kpProjectId, callback)
 end
 
 -- get world by project id
-function KeepworkServiceWorld:GetWorldByProjectId(pid, callback)
-    if type(pid) ~= 'number' or pid == 0 then
+function KeepworkServiceWorld:GetWorldByProjectId(kpProjectId, callback)
+    if type(kpProjectId) ~= 'number' or kpProjectId == 0 then
         return false
     end
 
-
-    self:Request(
-        format("/projects/%d/detail", pid),
-        "GET",
-        nil,
-        headers,
-        function(data, err)
-            if type(callback) ~= 'function' then
-                return false
-            end
-
-            if err ~= 200 or not data or not data.world then
-                callback(nil, err)
-                return false
-            end
-
-            callback(data.world, err)
+    KeepworkProjectsApi:GetProject(kpProjectId, function(data, err)
+        if type(callback) ~= 'function' then
+            return false
         end
-    )
+
+        if err ~= 200 or not data or not data.world then
+            callback(nil, err)
+            return false
+        end
+
+        callback(data.world, err)
+    end)
 end
