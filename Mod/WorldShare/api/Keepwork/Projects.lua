@@ -10,6 +10,7 @@ local KeepworkProjectsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Projects.l
 ]]
 
 local KeepworkBaseApi = NPL.load('./BaseApi.lua')
+local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
 
 local KeepworkProjectsApi = NPL.export()
 
@@ -23,7 +24,7 @@ function KeepworkProjectsApi:CreateProject(worldName, success, error)
     local url = '/projects'
 
     local params = {
-        name = worldName,
+        name = GitEncoding:Base32(worldName or ''),
         siteId = 1,
         visibility = 0,
         privilege = 165,

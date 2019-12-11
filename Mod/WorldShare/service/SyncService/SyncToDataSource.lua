@@ -9,7 +9,6 @@ local SyncToDataSource = NPL.load("(gl)Mod/WorldShare/cellar/Sync/SyncToDataSour
 ------------------------------------------------------------
 ]]
 local Progress = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Progress/Progress.lua")
-local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
@@ -27,16 +26,18 @@ local DELETE = "DELETE"
 function SyncToDataSource:Init(callback)
     self.foldername = Mod.WorldShare.Store:Get("world/foldername")
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+    self.currentWorld = currentWorld
 
     self.worldDir = currentWorld.worldpath
     self.callback = callback
 
-    if (not self.worldDir or self.worldDir == "") then
+    if not self.worldDir or self.worldDir == "" then
         _guihelper.MessageBox(L"上传失败，将使用离线模式，原因：上传目录为空")
         return false
     end
 
     -- 加载进度UI界面
+    -- // TODO: move to UI file
     Progress:Init(self)
 
     self:SetFinish(false)
@@ -46,7 +47,7 @@ function SyncToDataSource:Init(callback)
         function(beExisted)
             if beExisted then
                 -- update world
-                KeepworkServiceProject:GetProjectIdByWorldName(self.foldername.utf8, function()
+                KeepworkServiceProject:GetProjectIdByWorldName(self.currentWorld.foldername, function()
                     currentWorld = Mod.WorldShare.Store:Get('world/currentWorld') 
 
                     if currentWorld and currentWorld.kpProjectId then
@@ -58,21 +59,20 @@ function SyncToDataSource:Init(callback)
                         end
                     end
 
-                    self:SyncToDataSource()
+                    self:Start()
                 end)
             else
                 KeepworkServiceProject:CreateProject(
-                    self.foldername.utf8,
+                    self.currentWorld.foldername,
                     function(data, err)
                         if err ~= 200 or not data or not data.id then
-                            _guihelper.MessageBox(L"数据源创建失败")
                             Progress:ClosePage()
                             return false
                         end
 
                         currentWorld.kpProjectId = data.id
 
-                        if (currentWorld and currentWorld.kpProjectId) then
+                        if currentWorld and currentWorld.kpProjectId then
                             local tag = LocalService:GetTag(currentWorld.worldpath)
 
                             if type(tag) == 'table' then
@@ -82,8 +82,8 @@ function SyncToDataSource:Init(callback)
                             end
                         end
 
-                        Store:Set("world/currentWorld", currentWorld)
-                        self:SyncToDataSource()
+                        Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
+                        self:Start()
                     end
                 )
             end
@@ -92,8 +92,8 @@ function SyncToDataSource:Init(callback)
 end
 
 function SyncToDataSource:IsProjectExist(callback)
-    GitService:GetSingleProject(
-        self.foldername.base32,
+    KeepworkServiceProject:GetProjectByWorldName(
+        self.currentWorld.foldername,
         function(data, err)
             if type(callback) ~= "function" then
                 return false
@@ -108,7 +108,7 @@ function SyncToDataSource:IsProjectExist(callback)
     )
 end
 
-function SyncToDataSource:SyncToDataSource()
+function SyncToDataSource:Start()
     self.compareListIndex = 1
     self.compareListTotal = 0
 
@@ -119,7 +119,7 @@ function SyncToDataSource:SyncToDataSource()
         self.localFiles = commonlib.vector:new()
         self.localFiles:AddAll(LocalService:LoadFiles(self.worldDir)) --再次获取本地文件，保证上传的内容为最新
 
-        Store:Set('world/localFiles', self.localFiles)
+        Mod.WorldShare.Store:Set('world/localFiles', self.localFiles)
 
         self:IgnoreFiles()
         self:CheckReadmeFile()
@@ -135,11 +135,11 @@ function SyncToDataSource:SyncToDataSource()
 end
 
 function SyncToDataSource:IgnoreFiles()
-    local fileList = {"mod/"}
+    local fileList = { "mod/" }
 
     for LKey, LItem in ipairs(self.localFiles) do
         for FKey, FItem in ipairs(fileList) do
-            if(string.find(LItem.filename, FItem)) then
+            if string.find(LItem.filename, FItem) then
                 self.localFiles:remove(LKey)
             end
         end
@@ -240,7 +240,7 @@ function SyncToDataSource:RefreshList()
             Progress:SetFinish(true)
             Progress:Refresh()
 
-            Store:Set(
+            Mod.WorldShare.Store:Set(
                 "world/CloseProgress",
                 function()
                     if type(self.callback) == 'function' then

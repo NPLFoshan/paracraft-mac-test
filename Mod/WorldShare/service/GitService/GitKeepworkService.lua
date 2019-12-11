@@ -13,23 +13,19 @@ local KeepworkReposApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Repos.lua")
 
 local GitKeepworkService = NPL.export()
 
-function GitKeepworkService:GetSingleProject(...)
+function GitKeepworkService:Create(projectName, callback)
     
 end
 
-function GitKeepworkService:Create(...)
+function GitKeepworkService:GetContent(projectName, path, commitId, callback)
     
 end
 
-function GitKeepworkService:GetContent(...)
+function GitKeepworkService:GetContentWithRaw(foldername, path, commitId, callback)
     
 end
 
-function GitKeepworkService:GetContentWithRaw(...)
-    
-end
-
-function GitKeepworkService:Upload(...)
+function GitKeepworkService:Upload(projectName, path, content, callback)
     
 end
 
@@ -41,26 +37,26 @@ function GitKeepworkService:DeleteFile(projectName, path, sha, callback)
     
 end
 
-function GitKeepworkService:DownloadZIP(...)
+function GitKeepworkService:DownloadZIP(foldername, commitId, callback)
     
 end
 
-function GitKeepworkService:GetTree(...)
+function GitKeepworkService:GetTree(projectName, commitId, callback)
     
 end
 
-function GitKeepworkService:GetCommits(...)
+function GitKeepworkService:GetCommits(projectName, isGetAll, callback, commits, pageSize, commitPage)
     
 end
 
-function GitKeepworkService:GetWorldRevision(...)
+function GitKeepworkService:GetWorldRevision(projectId, isGetMine, callback)
     
 end
 
-function GitKeepworkService:GetProjectIdByName(...)
+function GitKeepworkService:GetProjectIdByName(name, callback)
     
 end
 
-function GitKeepworkService:DeleteResp(...)
+function GitKeepworkService:DeleteResp(foldername, authToken, callback)
     
 end

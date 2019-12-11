@@ -339,7 +339,8 @@
 
                 function has_org()
                     local url = org_img_url()
-                    if url and #url > 0 then
+
+                    if type(url) == 'string' and #url > 0 then
                         return true
                     else
                         return false

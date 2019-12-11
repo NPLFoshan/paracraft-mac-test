@@ -28,7 +28,7 @@ end
 
 -- update projectinfo
 function KeepworkServiceProject:UpdateProject(pid, params, callback)
-    if not KeepworkService:IsSignedIn() or
+    if not KeepworkService:IsSignedIn() then
         return false
     end
 
@@ -38,6 +38,26 @@ end
 -- get projectinfo
 function KeepworkServiceProject:GetProject(pid, callback, noTryStatus)
     KeepworkProjectsApi:GetProject(pid, callback, nil, noTryStatus)
+end
+
+function KeepworkServiceProject:GetProjectByWorldName(worldName, callback)
+    if not KeepworkService:IsSignedIn() then
+        return false
+    end
+
+    KeepworkWorldsApi:GetWorldByName(worldName, function(data, err)
+        if not data or #data ~= 1 or type(data[1]) ~= 'table' then
+            return false
+        end
+
+        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+        currentWorld.kpProjectId = data[1].projectId
+        Mod.WorldShare.Store:Set('world/currentWorld', currentWorld)
+
+        if type(callback) == 'function' then
+            callback(data[1])
+        end
+    end)
 end
 
 -- get project id by worldname

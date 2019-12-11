@@ -401,7 +401,7 @@ function WorldList:SyncWorldsList(callback)
         end
 
         Mod.WorldShare.Store:Set("world/remoteWorldsList", remoteWorldsList)
-        Mod.WorldSHare.Store:Set("world/compareWorldList", compareWorldList)
+        Mod.WorldShare.Store:Set("world/compareWorldList", compareWorldList)
 
         UserConsole:Refresh()
 

@@ -75,7 +75,7 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
                 apiBaseUrl = Config.dataSourceApiList[dataSourceType][env], -- 数据源api
                 rawBaseUrl = Config.dataSourceRawList[dataSourceType][env] -- 数据源raw
             }
-    
+
             Mod.WorldShare.Store:Set("user/dataSourceInfo", dataSourceInfo)
         end
 
@@ -102,7 +102,7 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
 end
 
 function KeepworkServiceSession:Logout()
-    if self:IsSignedIn() then
+    if KeepworkService:IsSignedIn() then
         local Logout = Mod.WorldShare.Store:Action("user/Logout")
         Logout()
         WorldList:RefreshCurrentServerList()
@@ -130,85 +130,78 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         channel = 3
     }
 
-    KeepworkService:Request(
-        '/users/register',
-        'POST',
-        params,
-        nil,
-        function (registerData, err)
-            if err == 200 and registerData.id then
-                self:Login(
-                    username,
-                    password,
-                    function(loginData, err)
-                        if err ~= 200 then
-                            registerData.message = '注册成功，登录失败，实名认证失败'
-                            registerData.code = 9
+    KeepworkUsersApi:Register(params, function(registerData, err)
+        if err == 200 and registerData.id then
+            self:Login(
+                username,
+                password,
+                function(loginData, err)
+                    if err ~= 200 then
+                        registerData.message = '注册成功，登录失败，实名认证失败'
+                        registerData.code = 9
 
-                            if type(callback) == 'function' then
-                                callback(registerData)
-                            end
-
-                            return false
+                        if type(callback) == 'function' then
+                            callback(registerData)
                         end
 
-                        self:LoginResponse(loginData, err, function()
-                            self:SaveSigninInfo(
+                        return false
+                    end
+
+                    self:LoginResponse(loginData, err, function()
+                        self:SaveSigninInfo(
+                            {
+                                account = username,
+                                password = password,
+                                token = loginData["token"] or "",
+                                loginServer = KeepworkService:GetEnv(),
+                                autoLogin = false,
+                                rememberMe = false
+                            }
+                        )
+
+                        if #cellphone == 11 then
+                            KeepworkService:Request(
+                                '/users/cellphone_captcha',
+                                'POST',
                                 {
-                                    account = username,
-                                    password = password,
-                                    token = loginData["token"] or "",
-                                    loginServer = KeepworkService:GetEnv(),
-                                    autoLogin = false,
-                                    rememberMe = false
-                                }
-                            )
-
-                            if #cellphone == 11 then
-                                KeepworkService:Request(
-                                    '/users/cellphone_captcha',
-                                    'POST',
-                                    {
-                                        cellphone = cellphone,
-                                        captcha = cellphoneCaptcha,
-                                        realname = true
-                                    },
-                                    KeepworkService:GetHeaders(),
-                                    function(validatedData, err)
-                                        if err == 200 then
-                                            if type(callback) == 'function' then
-                                                callback(registerData)
-                                            end
-                                            return true
-                                        end
-
-                                        registerData.message = '注册成功，实名认证失败'
-                                        registerData.code = 10
-
+                                    cellphone = cellphone,
+                                    captcha = cellphoneCaptcha,
+                                    realname = true
+                                },
+                                KeepworkService:GetHeaders(),
+                                function(validatedData, err)
+                                    if err == 200 then
                                         if type(callback) == 'function' then
                                             callback(registerData)
-                                        end 
-                                    end,
-                                    { 400 }
-                                )
-                            else
-                                if type(callback) == 'function' then
-                                    callback(registerData)
-                                end 
-                            end
-                        end)
-                    end
-                )
+                                        end
+                                        return true
+                                    end
 
-                return true
-            end
+                                    registerData.message = '注册成功，实名认证失败'
+                                    registerData.code = 10
 
-            if type(callback) == 'function' then
-                callback(registerData)
-            end
-        end,
-        { 400 }
-    )
+                                    if type(callback) == 'function' then
+                                        callback(registerData)
+                                    end 
+                                end,
+                                { 400 }
+                            )
+                        else
+                            if type(callback) == 'function' then
+                                callback(registerData)
+                            end 
+                        end
+                    end)
+                end
+            )
+
+            return true
+        end
+
+        if type(callback) == 'function' then
+            callback(registerData)
+        end
+    end, nil, { 400 })
 end
 
 function KeepworkServiceSession:FetchCaptcha(callback)
