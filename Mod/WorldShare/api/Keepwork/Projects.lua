@@ -121,3 +121,10 @@ function KeepworkProjectsApi:RemoveProject(kpProjectId, success, error)
 
     KeepworkBaseApi:Delete(url, nil, nil ,success, error)
 end
+
+-- url: /projects/search
+-- method: 
+-- return: 
+function KeepworkProjectsApi:Search()
+
+end

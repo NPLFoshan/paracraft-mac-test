@@ -74,10 +74,37 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:RealName(params, success, error)
-    
+function KeepworkUsersApi:RealName(params, success, error, noTryStatus)
+    KeepworkBaseApi:Post('/users/register', params, nil, success, error, noTryStatus)
+end
 
-    KeepworkBaseApi:Post('/users/register')
+-- url: /users/svg_captcha?png=true
+-- method: GET
+-- params:
+--[[
+    token string 必须 token
+]]
+-- return: object
+function KeepworkUsersApi:FetchCaptcha(success, error)
+    KeepworkBaseApi:Get('/users/svg_captcha?png=true', nil, { notTokenRequest = true }, success, error)
+end
+
+
+-- url: /users/cellphone_captcha
+-- method: GET
+-- params:
+--[[
+    token string 必须 token
+]]
+-- return: object
+function KeepworkUsersApi:CellphoneCaptcha(phone, success, error)
+    if type(phone) ~= 'string' then
+        return false
+    end
+
+    local url = '/users/cellphone_captcha?cellphone=' .. phone
+
+    KeepworkBaseApi:Get(url, nil, { notTokenRequest = true }, success, error)
 end
 
 -- url: /users/cellphone_captcha
@@ -87,17 +114,8 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:CellphoneCaptcha()
-end
-
--- url: /users/cellphone_captcha
--- method: POST
--- params:
---[[
-    token string 必须 token
-]]
--- return: object
-function KeepworkUsersApi:BindPhone()
+function KeepworkUsersApi:BindPhone(params, success, error)
+    KeepworkBaseApi:Post('/users/cellphone_captcha', params , { notTokenRequest = true }, success, error)
 end
 
 -- url: /users/email_captcha
@@ -107,7 +125,10 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:EmailCaptcha()
+function KeepworkUsersApi:EmailCaptcha(email, success, error)
+    local url = '/users/email_captcha?email=' .. email
+
+    KeepworkBaseApi:Get(url, nil, { notTokenRequest = true }, success, error)
 end
 
 -- url: /users/email_captcha
@@ -117,17 +138,8 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:BindEmail()
-end
-
--- url: /users/email_captcha
--- method: POST
--- params:
---[[
-    token string 必须 token
-]]
--- return: object
-function KeepworkUsersApi:BindEmail()
+function KeepworkUsersApi:BindEmail(params, success, error)
+    KeepworkBaseApi:Post('/users/reset_password', params, { notTokenRequest = true }, success, error)
 end
 
 -- url: /users/reset_password
@@ -137,6 +149,7 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:ResetPassword()
+function KeepworkUsersApi:ResetPassword(params, success, error, noTryStatus)
+    KeepworkBaseApi:Post('/users/reset_password', params, { notTokenRequest = true }, success, error, noTryStatus)
 end
 
