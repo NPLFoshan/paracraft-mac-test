@@ -17,6 +17,6 @@ local KeepworkParacraftDevicesApi = NPL.export()
 -- method: GET
 -- params: [[]]
 -- return: object
-function KeepworkParacraftDevicesApi:PwdVerify()
-    KeepworkBaseApi:Get('/paracraftDevices/pwdVerify')
+function KeepworkParacraftDevicesApi:PwdVerify(params, success, error)
+    KeepworkBaseApi:Get('/paracraftDevices/pwdVerify', params, nil, success, error)
 end
