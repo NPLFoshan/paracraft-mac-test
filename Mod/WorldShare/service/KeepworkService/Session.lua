@@ -160,6 +160,7 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
                         )
 
                         if #cellphone == 11 then
+                            KeepworkUsersApi:
                             KeepworkService:Request(
                                 '/users/cellphone_captcha',
                                 'POST',
