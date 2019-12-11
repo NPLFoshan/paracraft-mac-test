@@ -18,12 +18,12 @@ local KeepworkWorldsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Worlds.lua")
 local KeepworkServiceProject = NPL.export()
 
 -- This api will create a keepwork paracraft project and associated with paracraft world.
-function KeepworkServiceProject:CreateProject(worldName, callback)
-    if not KeepworkService:IsSignedIn() or not worldName then
+function KeepworkServiceProject:CreateProject(foldername, callback)
+    if not KeepworkService:IsSignedIn() or not foldername then
         return false
     end
 
-    KeepworkProjectsApi:CreateProject(worldName, callback)
+    KeepworkProjectsApi:CreateProject(foldername, callback, callback)
 end
 
 -- update projectinfo
@@ -40,33 +40,33 @@ function KeepworkServiceProject:GetProject(pid, callback, noTryStatus)
     KeepworkProjectsApi:GetProject(pid, callback, nil, noTryStatus)
 end
 
-function KeepworkServiceProject:GetProjectByWorldName(worldName, callback)
+function KeepworkServiceProject:GetProjectByWorldName(foldername, callback)
     if not KeepworkService:IsSignedIn() then
         return false
     end
 
-    KeepworkWorldsApi:GetWorldByName(worldName, function(data, err)
-        if not data or #data ~= 1 or type(data[1]) ~= 'table' then
-            return false
+    KeepworkProjectsApi:GetProjectByWorldName(
+        foldername,
+        function(data, err)
+            if type(callback) == 'function' then
+                callback(data)
+            end
+        end,
+        function()
+            if type(callback) == 'function' then
+                callback()
+            end
         end
-
-        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-        currentWorld.kpProjectId = data[1].projectId
-        Mod.WorldShare.Store:Set('world/currentWorld', currentWorld)
-
-        if type(callback) == 'function' then
-            callback(data[1])
-        end
-    end)
+    )
 end
 
 -- get project id by worldname
-function KeepworkServiceProject:GetProjectIdByWorldName(worldName, callback)
+function KeepworkServiceProject:GetProjectIdByWorldName(foldername, callback)
     if not KeepworkService:IsSignedIn() then
         return false
     end
 
-    KeepworkWorldsApi:GetWorldByName(worldName, function(data, err)
+    KeepworkWorldsApi:GetWorldByName(foldername, function(data, err)
         if not data or #data ~= 1 or type(data[1]) ~= 'table' or not data[1].projectId then
             if type(callback) == 'function' then
                 callback()

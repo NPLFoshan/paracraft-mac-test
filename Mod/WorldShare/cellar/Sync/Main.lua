@@ -8,7 +8,6 @@ use the lib:
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 ------------------------------------------------------------
 ]]
-local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
@@ -46,7 +45,7 @@ function SyncMain:GetCurrentWorldInfo(callback)
 
     Mod.WorldShare.Store:Set("world/foldername", foldername)
 
-    local currentWorld = Store:Get("world/currentWorld")
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     if GameLogic.IsReadOnly() then
         local originWorldPath = ParaWorld.GetWorldDirectory()
@@ -76,7 +75,7 @@ function SyncMain:GetCurrentWorldInfo(callback)
         })
         Mod.WorldShare.Store:Set("world/currentRevision", GameLogic.options:GetRevision())
     else
-        local compareWorldList = Store:Get("world/compareWorldList")
+        local compareWorldList = Mod.WorldShare.Store:Get("world/compareWorldList")
 
         if compareWorldList then
             local searchCurrentWorld = nil
@@ -93,8 +92,8 @@ function SyncMain:GetCurrentWorldInfo(callback)
     
                 local worldTag = LocalService:GetTag(currentWorld.worldpath)
     
-                Store:Set("world/worldTag", worldTag)
-                Store:Set("world/currentWorld", currentWorld)
+                Mod.WorldShare.Store:Set("world/worldTag", worldTag)
+                Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
             end
         end
     end
@@ -103,8 +102,8 @@ function SyncMain:GetCurrentWorldInfo(callback)
         local originWorldPath = ParaWorld.GetWorldDirectory()
         local worldTag = WorldCommon.GetWorldInfo() or {}
 
-        Store:Set("world/worldTag", worldTag)
-        Store:Set("world/currentWorld", {
+        Mod.WorldShare.Store:Set("world/worldTag", worldTag)
+        Mod.WorldShare.Store:Set("world/currentWorld", {
             IsFolder = true,
             is_zip = false,
             Title = worldTag.name,
@@ -162,16 +161,16 @@ function SyncMain:ShowStartSyncPage(callback, useOffline)
     local params = SyncMain:ShowDialog("Mod/WorldShare/cellar/Sync/Templates/StartSync.html?useOffline=" .. (useOffline and "true" or "false"), "StartSync")
 
     params._page.OnClose = function()
-        Store:Remove('page/StartSync')
+        Mod.WorldShare.Store:Remove('page/StartSync')
     end
 end
 
 function SyncMain:SetStartSyncPage()
-    Store:Set('page/StartSync', document:GetPageCtrl())
+    Mod.WorldShare.Store:Set('page/StartSync', document:GetPageCtrl())
 end
 
 function SyncMain:CloseStartSyncPage()
-    local StartSyncPage = Store:Get('page/StartSync')
+    local StartSyncPage = Mod.WorldShare.Store:Get('page/StartSync')
 
     if StartSyncPage then
         StartSyncPage:CloseWindow()
@@ -183,11 +182,11 @@ function SyncMain:ShowBeyondVolume()
 end
 
 function SyncMain:SetBeyondVolumePage()
-    Store:Set('page/BeyondVolume', document:GetPageCtrl())
+    Mod.WorldShare.Store:Set('page/BeyondVolume', document:GetPageCtrl())
 end
 
 function SyncMain:CloseBeyondVolumePage()
-    local BeyondVolumePage = Store:Get('page/BeyondVolume')
+    local BeyondVolumePage = Mod.WorldShare.Store:Get('page/BeyondVolume')
 
     if (BeyondVolumePage) then
         BeyondVolumePage:CloseWindow()
@@ -198,18 +197,18 @@ function SyncMain:ShowStartSyncUseLocalPage()
     local params = SyncMain:ShowDialog("Mod/WorldShare/cellar/Sync/Templates/UseLocal.html", "StartSyncUseLocal")
 
     params._page.OnClose = function()
-        Store:Remove('page/StartSyncUseLocal')
+        Mod.WorldShare.Store:Remove('page/StartSyncUseLocal')
     end
 end
 
 function SyncMain:SetStartSyncUseLocalPage()
-    Store:Set('page/StartSyncUseLocal', document.GetPageCtrl())
+    Mod.WorldShare.Store:Set('page/StartSyncUseLocal', document.GetPageCtrl())
 end
 
 function SyncMain:CloseStartSyncUseLocalPage()
-    local StartSyncUseLocalPage = Store:Get('page/StartSyncUseLocal')
+    local StartSyncUseLocalPage = Mod.WorldShare.Store:Get('page/StartSyncUseLocal')
 
-    if (StartSyncUseLocalPage) then
+    if StartSyncUseLocalPage then
         StartSyncUseLocalPage:CloseWindow()
     end
 end
@@ -223,11 +222,11 @@ function SyncMain:ShowStartSyncUseDataSourcePage()
 end
 
 function SyncMain:SetStartSyncUseDataSourcePage()
-    Store:Set('page/StartSyncUseDataSource', document.GetPageCtrl())
+    Mod.WorldShare.Store:Set('page/StartSyncUseDataSource', document.GetPageCtrl())
 end
 
 function SyncMain:CloseStartSyncUseDataSourcePage()
-    local StartSyncUseDataSourcePage = Store:Get('page/StartSyncUseDataSource')
+    local StartSyncUseDataSourcePage = Mod.WorldShare.Store:Get('page/StartSyncUseDataSource')
 
     if (StartSyncUseDataSourcePage) then
         StartSyncUseDataSourcePage:CloseWindow()
@@ -250,7 +249,7 @@ function SyncMain:SyncToLocal(callback)
         self.callback = nil
     end
 
-    if (self:CheckWorldSize()) then
+    if self:CheckWorldSize() then
         return false
     end
 
@@ -265,7 +264,25 @@ function SyncMain:SyncToDataSource()
     -- close the notice
     Mod.WorldShare.MsgBox:Close()
 
-    SyncToDataSource:Init(self.callback)
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+
+    if not currentWorld.worldpath or currentWorld.worldpath == "" then
+        
+        return false
+    end
+
+    local callback = self.callback
+
+    SyncToDataSource:Init(function(result, msg, innerCallback)
+        if result == false then
+            GameLogic.AddBBS(nil, msg, 3000, "255 0 0")
+        end
+
+        if type(callback) == 'function' then
+            callback(result, msg, innerCallback)
+        end
+    end)
+
     self.callback = nil
 end
 
@@ -311,23 +328,23 @@ function SyncMain:CheckTagName(callback)
 end
 
 function SyncMain.GetCurrentRevision()
-    return tonumber(Store:Get("world/currentRevision")) or 0
+    return tonumber(Mod.WorldShare.Store:Get("world/currentRevision")) or 0
 end
 
 function SyncMain.GetRemoteRevision()
-    return tonumber(Store:Get("world/remoteRevision")) or 0
+    return tonumber(Mod.WorldShare.Store:Get("world/remoteRevision")) or 0
 end
 
 function SyncMain:GetCurrentRevisionInfo()
     WorldShare.worldData = nil
-    local currentWorld = Store:Get("world/currentWorld")
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     return WorldShare:GetWorldData("revision", currentWorld and currentWorld.worldpath .. '/')
 end
 
 function SyncMain:CheckWorldSize()
-    local currentWorld = Store:Get("world/currentWorld")
-    local userType = Store:Get("user/userType")
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
+    local userType = Mod.WorldShare.Store:Get("user/userType")
 
     if not currentWorld or not currentWorld.worldpath  or #currentWorld.worldpath == 0 then
         return false

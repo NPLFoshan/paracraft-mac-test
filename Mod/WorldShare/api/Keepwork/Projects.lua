@@ -8,6 +8,7 @@ use the lib:
 local KeepworkProjectsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Projects.lua")
 ------------------------------------------------------------
 ]]
+local Encoding = commonlib.gettable("commonlib.Encoding")
 
 local KeepworkBaseApi = NPL.load('./BaseApi.lua')
 local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
@@ -20,18 +21,12 @@ local KeepworkProjectsApi = NPL.export()
 --[[
 ]]
 -- return: object
-function KeepworkProjectsApi:CreateProject(worldName, success, error)
+function KeepworkProjectsApi:CreateProject(foldername, success, error)
     local url = '/projects'
 
     local params = {
-        name = GitEncoding:Base32(worldName or ''),
-        siteId = 1,
-        visibility = 0,
-        privilege = 165,
-        type = 1,
-        description = "no desc",
-        tags = "paracraft",
-        extra = {}
+        name = foldername or '',
+        type = 1
     }
 
     KeepworkBaseApi:Post(url, params, nil, success, error)
@@ -43,12 +38,12 @@ end
 --[[
 ]]
 -- return: object
-function KeepworkProjectsApi:UpdateProject(pid, params, success, error)
-    if type(pid) ~= 'number' or type(params) ~= 'table' then
+function KeepworkProjectsApi:UpdateProject(kpProjectId, params, success, error)
+    if type(kpProjectId) ~= 'number' or type(params) ~= 'table' then
         return false
     end
 
-    local url = format("/projects/%d", pid)
+    local url = format("/projects/%d", kpProjectId)
 
     KeepworkBaseApi:Put(url, params, nil, success, error)
 end
@@ -59,14 +54,42 @@ end
 --[[
 ]]
 -- return: object
-function KeepworkProjectsApi:GetProject(pid, success, error, noTryStatus)
-    if type(pid) ~= 'number' or pid == 0 then
+function KeepworkProjectsApi:GetProject(kpProjectId, success, error, noTryStatus)
+    kpProjectId = tonumber(kpProjectId)
+    if type(kpProjectId) ~= 'number' or kpProjectId == 0 then
         return false
     end
 
-    local url = format("/projects/%d/detail", pid)
+    local url = format("/projects/%d/detail", kpProjectId)
 
     KeepworkBaseApi:Get(url, nil, nil, success, error, noTryStatus)
+end
+
+-- url: 
+function KeepworkProjectsApi:GetProjectByWorldName(foldername, success, error)
+    if type(foldername) ~= 'string' then
+        return false
+    end
+
+    local url = format("/worlds?worldName=%s", Encoding.url_encode(foldername or ''))
+
+    KeepworkBaseApi:Get(
+        url,
+        nil,
+        nil,
+        function(data, err)
+            if type(data) == 'table' and #data == 1 then
+                if type(success) == 'function' then
+                    success(data, err)
+                end
+            else
+                if type(error) == 'function' then
+                    error()
+                end
+            end
+        end,
+        error
+    )
 end
 
 -- url: /projects/%d/visit
@@ -75,12 +98,12 @@ end
 --[[
 ]]
 -- return: object
-function KeepworkProjectsApi:Visit(pid, callback)
-    if type(pid) ~= 'number' or pid == 0 then
+function KeepworkProjectsApi:Visit(kpProjectId, callback)
+    if type(kpProjectId) ~= 'number' or kpProjectId == 0 then
         return false
     end
 
-    local url = format("/projects/%d/visit", pid)
+    local url = format("/projects/%d/visit", kpProjectId)
 
     KeepworkBaseApi:Get(url, nil, nil, callback)
 end
@@ -120,11 +143,4 @@ function KeepworkProjectsApi:RemoveProject(kpProjectId, success, error)
     local url = format("/projects/%d", kpProjectId)
 
     KeepworkBaseApi:Delete(url, nil, nil ,success, error)
-end
-
--- url: /projects/search
--- method: 
--- return: 
-function KeepworkProjectsApi:Search()
-
 end

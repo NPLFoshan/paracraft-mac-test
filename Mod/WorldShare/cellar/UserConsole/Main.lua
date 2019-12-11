@@ -422,7 +422,7 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
     end
 
     if currentWorld.is_zip then
-        _guihelper.MessageBox(L"暂不支持重命名zip世界")
+        GameLogic.AddBBS(nil, L"暂不支持重命名zip世界", 3000, "255 0 0")
         return false
     end
 
@@ -456,7 +456,7 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
         if tag then
             -- update sync world
             -- local world exist
-            SyncMain.callback = function(innerCallback)
+            SyncMain.callback = function(result, msg, innerCallback)
                 if type(innerCallback) == 'function' then
                     innerCallback(true)
                 end

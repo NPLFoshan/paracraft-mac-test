@@ -9,14 +9,26 @@ local KeepworkReposApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Repos.lua")
 ------------------------------------------------------------
 ]]
 
+local KeepworkBaseApi = NPL.load('./BaseApi.lua')
+
 local KeepworkReposApi = NPL.export()
+
+function KeepworkReposApi:GetRepoPath(foldername)
+    local username = Mod.WorldShare.Store:Get('user/username')
+
+    if type(username) ~= 'string' or type(foldername) ~= 'string' then
+        return ''
+    else
+        return username .. '/' .. foldername
+    end
+end
 
 -- url: /repos/:repoPath/download
 -- method: GET
 -- params:
 --[[
     repoPath string 必须 仓库路径	
-    ref string 必须 commid
+    ref string 必须 commitId
 ]]
 -- return: object
 function KeepworkReposApi:Download()
@@ -27,10 +39,17 @@ end
 -- params:
 --[[
     repoPath string 必须 仓库路径	
-    ref string 必须 commid
+    ref string 必须 commitId
 ]]
 -- return: object
-function KeepworkReposApi:Tree()
+function KeepworkReposApi:Tree(foldername, commitId, success, error)
+    if type(commitId) ~= 'string' then
+        commitId = 'master'
+    end
+
+    local url = '/repos/' .. self:GetRepoPath(foldername) .. '/tree?ref=' .. commitId
+
+    KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
 
 -- url: /repos/:repoPath/files/:filePath/info
@@ -52,7 +71,18 @@ end
     filePath string 必须 文件路径
 ]]
 -- return: object
-function KeepworkReposApi:Raw()
+function KeepworkReposApi:Raw(foldername, filePath, commitId, success, error)
+    if type(filePath) ~= 'string' then
+        return false
+    end
+
+    if type(commitId) ~= 'string' then
+        commitId = 'master'
+    end
+
+    local url = '/repos/' .. self:GetRepoPath(foldername) .. '/files/' .. filePath .. '/raw?commitId=' .. commitId
+
+    KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
 
 -- url: /repos/:repoPath/files/:filePath/history

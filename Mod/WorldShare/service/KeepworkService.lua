@@ -10,12 +10,9 @@ local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua
 ]]
 local Encoding = commonlib.gettable("commonlib.Encoding")
 
-local HttpRequest = NPL.load("./HttpRequest.lua")
 local GitService = NPL.load("./GitService.lua")
 local GitGatewayService = NPL.load("./GitGatewayService.lua")
 local LocalService = NPL.load("./LocalService.lua")
-local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
-local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local KeepworkServiceProject = NPL.load('./KeepworkService/Project.lua')
@@ -64,42 +61,6 @@ function KeepworkService:GetServerList()
             {value = Config.env.ONLINE, name = Config.env.ONLINE, text = L"使用KEEPWORK登录", selected = true}
         }
     end
-end
-
-function KeepworkService:GetApi(url)
-    if type(url) ~= "string" then
-        return ""
-    end
-
-    return format("%s%s", self:GetCoreApi(), url)
-end
-
-function KeepworkService:GetHeaders(selfDefined, notTokenRequest)
-    local headers = {}
-
-    if type(selfDefined) == "table" then
-        headers = selfDefined
-    end
-
-    local token = Mod.WorldShare.Store:Get("user/token")
-
-    if (token and not notTokenRequest and not headers["Authorization"]) then
-        headers["Authorization"] = format("Bearer %s", token)
-    end
-
-    return headers
-end
-
-function KeepworkService:Request(url, method, params, headers, callback, noTryStatus)
-    local params = {
-        method = method or "GET",
-        url = self:GetApi(url),
-        json = true,
-        headers = headers or {},
-        form = params or {}
-    }
-
-    HttpRequest:GetUrl(params, callback, noTryStatus)
 end
 
 function KeepworkService:IsSignedIn()

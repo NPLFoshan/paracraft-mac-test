@@ -38,7 +38,7 @@ function Compare:Init(callback)
 
     self:GetCompareResult(
         function(result)
-            if (isEnterWorld and not isShowUserConsolePage) then
+            if isEnterWorld and not isShowUserConsolePage then
                 if type(callback) == 'function' then
                     callback()
                     Mod.WorldShare.MsgBox:Close()
@@ -97,6 +97,13 @@ function Compare:GetCompareResult(callback)
     if not currentWorld then
         Mod.WorldShare.MsgBox:Close()
         return false
+    end
+
+    if currentWorld.status == 1 then
+        if type(callback) == "function" then
+            callback(JUSTLOCAL)
+            return true
+        end
     end
 
     if currentWorld.status == 2 then
@@ -161,7 +168,7 @@ function Compare:CompareRevision(callback)
 
             self:SetFinish(true)
 
-            if (type(callback) == "function") then
+            if type(callback) == "function" then
                 callback(CompareRevision(currentRevision, remoteRevision))
             end
 
@@ -177,7 +184,7 @@ function Compare:CompareRevision(callback)
             currentRevision = tonumber(currentRevision) or 0
             remoteRevision = tonumber(data) or 0
 
-            self:UpdateSelectWorldInRemoteWorldsList(foldername.utf8, remoteRevision)
+            self:UpdateSelectWorldInRemoteWorldsList(currentWorld.foldername, remoteRevision)
 
             Mod.WorldShare.Store:Set("world/currentRevision", currentRevision)
             Mod.WorldShare.Store:Set("world/remoteRevision", remoteRevision)
@@ -186,7 +193,7 @@ function Compare:CompareRevision(callback)
 
             self:SetFinish(true)
 
-            if (type(callback) == "function") then
+            if type(callback) == "function" then
                 callback(result)
             end
         end

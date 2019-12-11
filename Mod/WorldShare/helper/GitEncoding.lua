@@ -15,7 +15,7 @@ local Encoding = commonlib.gettable("System.Encoding.basexx")
 local GitEncoding = NPL.export()
 
 function GitEncoding.Base32(text)
-    if (text) then
+    if type(text) == 'string' then
         local notLetter = string.find(text, "[^a-zA-Z]")
 
         if (notLetter) then
@@ -33,7 +33,7 @@ function GitEncoding.Base32(text)
 end
 
 function GitEncoding.Unbase32(text)
-    if (text) then
+    if type(text) == 'string' then
         local notLetter = string.find(text, "world_base32_")
 
         if (notLetter) then
