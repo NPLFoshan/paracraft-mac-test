@@ -64,7 +64,7 @@ end
 ]]
 -- return: object
 function KeepworkUsersApi:Register(params, success, error, noTryStatus)
-    KeepworkBaseApi:Post('/users/register', nil, { notTokenRequest = true }, success, error, noTryStatus)
+    KeepworkBaseApi:Post('/users/register', params, { notTokenRequest = true }, success, error, noTryStatus)
 end
 
 -- url: /users/cellphone_captcha

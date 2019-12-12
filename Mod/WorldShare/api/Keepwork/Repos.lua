@@ -142,7 +142,14 @@ end
     filePath string 必须 文件路径
 ]]
 -- return: object
-function KeepworkReposApi:RemoveFile()
+function KeepworkReposApi:RemoveFile(foldername, filePath, success, error)
+    if type(foldername) ~= 'string' or type(filePath) ~= 'string' then
+        return false
+    end
+
+    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
+
+    KeepworkBaseApi:Delete(url, nil, nil, success, error)
 end
 
 -- url: /repos/:repoPath/files/:filePath

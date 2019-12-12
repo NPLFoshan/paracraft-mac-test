@@ -5,7 +5,7 @@ Date:  2019.01.25
 Place: Foshan
 use the lib:
 ------------------------------------------------------------
-local KeepworkServiceProjects = NPL.load("(gl)Mod/ExplorerApp/service/KeepworkService/Projects.lua")
+local KeepworkServiceProject = NPL.load("(gl)Mod/ExplorerApp/service/KeepworkService/Project.lua")
 ------------------------------------------------------------
 ]]
 local WorldShareKeepworkServiceProject = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Project.lua')

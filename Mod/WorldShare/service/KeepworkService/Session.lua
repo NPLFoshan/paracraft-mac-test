@@ -64,42 +64,23 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
         Mod.WorldShare.Store:Set("user/userType", 'plain')
     end
 
-    local function HandleGetDataSource(data, err)
-        if data and data.token then
-            local dataSourceType = 'gitlab'
-            local env = KeepworkService:GetEnv()
-    
-            local dataSourceInfo = {
-                dataSourceToken = data.token, -- 数据源Token
-                dataSourceUsername = data.git_username, -- 数据源用户名
-                dataSourceType = dataSourceType, -- 数据源类型
-                apiBaseUrl = Config.dataSourceApiList[dataSourceType][env], -- 数据源api
-                rawBaseUrl = Config.dataSourceRawList[dataSourceType][env] -- 数据源raw
-            }
-
-            Mod.WorldShare.Store:Set("user/dataSourceInfo", dataSourceInfo)
-        end
-
-        LessonOrganizationsApi:GetUserAllOrgs(
-            function(data, err)
-                if err == 200 then
-                    if data and data.data and type(data.data.allOrgs) == 'table' and type(data.data.showOrgId) == 'number' then
-                        for key, item in ipairs(data.data.allOrgs) do
-                            if item.id == data.data.showOrgId then
-                                Mod.WorldShare.Store:Set('user/myOrg', item)
-                            end
+    LessonOrganizationsApi:GetUserAllOrgs(
+        function(data, err)
+            if err == 200 then
+                if data and data.data and type(data.data.allOrgs) == 'table' and type(data.data.showOrgId) == 'number' then
+                    for key, item in ipairs(data.data.allOrgs) do
+                        if item.id == data.data.showOrgId then
+                            Mod.WorldShare.Store:Set('user/myOrg', item)
                         end
                     end
                 end
-
-                if type(callback) == "function" then
-                    callback(data, err)
-                end
             end
-        )
-    end
 
-    GitGatewayService:Accounts(HandleGetDataSource)
+            if type(callback) == "function" then
+                callback(data, err)
+            end
+        end
+    )
 end
 
 function KeepworkServiceSession:Logout()
@@ -138,7 +119,7 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
                 password,
                 function(loginData, err)
                     if err ~= 200 then
-                        registerData.message = '注册成功，登录失败，实名认证失败'
+                        registerData.message = L'注册成功，登录失败，实名认证失败'
                         registerData.code = 9
 
                         if type(callback) == 'function' then

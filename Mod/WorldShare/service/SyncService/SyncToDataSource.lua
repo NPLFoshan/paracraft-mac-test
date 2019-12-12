@@ -451,8 +451,8 @@ function SyncToDataSource:DeleteOne(file, callback)
         self.currentWorld.foldername,
         currentRemoteItem.path,
         function(bIsDelete)
-            if (bIsDelete) then
-                if (type(callback) == "function") then
+            if bIsDelete then
+                if type(callback) == "function" then
                     callback()
                 end
             else

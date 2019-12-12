@@ -62,8 +62,21 @@ function GitKeepworkService:Update(foldername, path, content, callback)
     )
 end
 
-function GitKeepworkService:DeleteFile(foldername, path, sha, callback)
-    
+function GitKeepworkService:DeleteFile(foldername, path, callback)
+    KeepworkReposApi:RemoveFile(
+        foldername,
+        path,
+        function()
+            if type(callback) == 'function' then
+                callback(true)
+            end
+        end,
+        function()
+            if type(callback) == 'function' then
+                callback(false)
+            end
+        end
+    )
 end
 
 function GitKeepworkService:DownloadZIP(foldername, commitId, callback)
@@ -71,7 +84,23 @@ function GitKeepworkService:DownloadZIP(foldername, commitId, callback)
 end
 
 function GitKeepworkService:GetTree(foldername, commitId, callback)
-    KeepworkReposApi:Tree(foldername, commitId, callback)
+    KeepworkReposApi:Tree(foldername, commitId, function(data, err)
+        if type(data) ~= 'table' then
+            return false
+        end
+
+        local _data = {}
+
+        for key, item in ipairs(data) do
+            if item.isBlob then
+                _data[#_data + 1] = item
+            end
+        end
+
+        if type(callback) == 'function' then
+            callback(_data, err)
+        end
+    end)
 end
 
 function GitKeepworkService:GetCommits(foldername, isGetAll, callback, commits, pageSize, commitPage)
