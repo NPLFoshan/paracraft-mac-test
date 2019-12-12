@@ -87,13 +87,14 @@ end
 -- Returns true if our server_id_ still exists in the DB.
 function localserver:StillExistsInDB() 
 	assert(self.is_initialized_);
-    
+
 	-- This is an optimization to avoid hitting the database.
 	-- Once a store is removed, it can never come back with the same server id,
 	-- so we cache this value and if it goes to false we don't hit the db on subsequent calls.
-	if (self.store_might_exist_)  then 
+	if self.store_might_exist_  then 
 		self.store_might_exist_ = self:GetServer();
 	end
+
     return self.store_might_exist_;
 end
 
@@ -117,8 +118,9 @@ end
 
 -- Returns true if local serving of entries in this LocalServer is enabled
 function localserver:IsEnabled()
-	local server = self:GetServer();
-	if(server) then
+	local server = self:GetServer()
+
+	if server then
 		return server.enabled
 	end
 end
@@ -160,8 +162,9 @@ end
 -- @param server:  nil or a ServerInfo table. 
 -- @return: nil or the ServerInfo table is returned. 
 function localserver:GetServer(server)
-	if(not self.is_initialized_) then 	return false end
-	local web_db = self:GetDB();
+	if not self.is_initialized_ then return false end
+
+	local web_db = self:GetDB()
 	return web_db:FindServer(server_id_, server)
 end
 

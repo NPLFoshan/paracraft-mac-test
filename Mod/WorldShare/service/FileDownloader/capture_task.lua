@@ -231,7 +231,7 @@ function System.localserver.ProcessFile_result(request_id, index)
     --log(request_id..", "..index..commonlib.serialize(msg))
 
     local task = TaskManager:GetTask(request_id)
-    if (not task) then
+    if not task then
         log(string.format("warning: task request_id : %d not found in task manager.\n", request_id))
         return nil
     end
@@ -352,10 +352,13 @@ function CaptureTask:new(store, request)
 
     local o = {}
     setmetatable(o, self)
+
     self.__index = self
-    if (not o:Init(store, request)) then
+
+    if not o:Init(store, request) then
         return
     end
+
     return o
 end
 
@@ -364,11 +367,12 @@ end
 -- @param store: the ResourceStore object
 -- @param request: type of CaptureRequest
 function CaptureTask:Init(store, request)
-    if (not store or not request or not request.id or TaskManager.tasks[request.id]) then
-        log("warning: request uintialized when calling CaptureTask:Init()\n")
+    if not store or not request or not request.id or TaskManager.tasks[request.id] then
+        LOG.std(nil, "info", "CaptureTask", "warning: request uintialized when calling CaptureTask:Init()\n")
         return
     end
-    if (not store:StillExistsInDB()) then
+
+    if not store:StillExistsInDB() then
         self.is_initialized_ = nil
         return
     end
@@ -395,19 +399,22 @@ end
 function CaptureTask:Run(index)
     local num_urls = self:GetUrlCount()
     local i = index or 1
-    if (i <= num_urls) then
+
+    if i <= num_urls then
         local url = self:GetUrl(i)
 
-        if (not self.capture_request_.type) then
-            if (System.localserver.UrlHelper.IsWebSerivce(url)) then
+        if not self.capture_request_.type then
+            if System.localserver.UrlHelper.IsWebSerivce(url) then
                 -- url is for web service
                 -- get rid of query string
                 local wsAddr = string.gsub(url, "%?.*$", "")
                 --log(url.." is registered and called\n")
+
                 NPL.RegisterWSCallBack(
                     wsAddr,
                     string.format("System.localserver.ProcessWS_result(%d, %d)", self.capture_request_.id, i)
                 )
+
                 NPL.CallWebservice(wsAddr, self.capture_request_.msg or {})
             else
                 -- url is for file and web pages.
@@ -415,10 +422,15 @@ function CaptureTask:Run(index)
                 -- we will first download to the temp folder.It may resume from last download
                 -- get rid of query string ? and separator section #
                 local file_url = url -- string.gsub(url, "[%?#].*$", "")
+
                 ParaIO.CreateDirectory("temp/tempdownloads/")
                 local filename = string.format("temp/tempdownloads/%d-%d.dat", self.capture_request_.id, i)
+
                 -- delete dest file to prevent multi-section download
                 ParaIO.DeleteFile(filename)
+
+                local token = Mod.WorldShare.Store:Get('user/token')
+
                 -- download to temp directory.
                 NPL.AsyncDownload(
                     file_url,
@@ -427,10 +439,12 @@ function CaptureTask:Run(index)
                     tostring(self.capture_request_.id)
                 )
             end
-        elseif (self.capture_request_.type == 1) then
+        elseif self.capture_request_.type == 1 then
+            local token = Mod.WorldShare.Store:Get('user/token')
+
             -- URL request
             NPL.AppendURLRequest(
-                url,
+                { url = url, headers = { Authorization = format("Bearer %s", token) } },
                 format(
                     "(%s)System.localserver.ProcessURLRequest_result(%d, %d)",
                     npl_thread_name,
@@ -440,11 +454,12 @@ function CaptureTask:Run(index)
                 nil,
                 "r"
             )
-        elseif (self.capture_request_.type == 2) then
+        elseif self.capture_request_.type == 2 then
         -- FILE download request
         end
     end
-    if (i > num_urls) then
+
+    if i > num_urls then
         -- finished all url request.
         -- call the task complete callback.
         self:NotifyTaskComplete(true)

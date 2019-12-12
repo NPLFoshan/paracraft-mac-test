@@ -13,6 +13,7 @@ NPL.load("./localserver.lua")
 NPL.load("./factory.lua")
 
 local localserver = commonlib.gettable("Mod.WorldShare.service.FileDownloader.localserver")
+local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper")
 
 local FileDownloader = commonlib.inherit(nil, commonlib.gettable("Mod.WorldShare.service.FileDownloader.FileDownloader"))
 
@@ -65,6 +66,8 @@ end
 
 -- start file downloading.
 function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
+    src = 'https://qd.myapp.com/myapp/qqteam/pcqq/PCQQ2019.exe'
+
     local function OnSucceeded(filename)
         self.isFetching = false
         if callbackFunc then
@@ -93,13 +96,11 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
 
     self.isFetching = true
 
-    local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper")
-
     local label_id = src or "userworlddownload"
     if self.text ~= "official_texture_package" then
         BroadcastHelper.PushLabel(
             {
-                id = "noWrap",
+                id = label_id,
                 label = format(L"%s: 正在下载中,请耐心等待", self.text),
                 max_duration = 20000,
                 color = "255 0 0",
@@ -114,26 +115,29 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
         localserver.CachePolicy:new(cachePolicy or "access plus 5 mins"),
         src,
         function(entry)
-            if (dest) then
-                if (ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then
-                    self.cached_filepath = entry.payload.cached_filepath
-                    if (self.bAutoDeleteCacheFile) then
-                        self:DeleteCacheFile()
-                    end
-                    --  download complete
-                    --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file from %s to %s", src, dest);
-                    OnSucceeded(dest)
-                else
-                    --LOG.std(nil, "info", "FileDownloader", "failed copy file from %s to %s", src, dest);
-                    OnFail(L"无法复制文件到指定目录")
-                end
-            else
-                --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file to %s", entry.payload.cached_filepath);
-                OnSucceeded(entry.payload.cached_filepath)
-            end
+            echo(entry, true)
+            -- //TODO: Next TODO
+            -- if (dest) then
+            --     if (ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then
+            --         self.cached_filepath = entry.payload.cached_filepath
+            --         if (self.bAutoDeleteCacheFile) then
+            --             self:DeleteCacheFile()
+            --         end
+            --         --  download complete
+            --         --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file from %s to %s", src, dest);
+            --         OnSucceeded(dest)
+            --     else
+            --         --LOG.std(nil, "info", "FileDownloader", "failed copy file from %s to %s", src, dest);
+            --         OnFail(L"无法复制文件到指定目录")
+            --     end
+            -- else
+            --     --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file to %s", entry.payload.cached_filepath);
+            --     OnSucceeded(entry.payload.cached_filepath)
+            -- end
         end,
         nil,
         function(msg, url)
+            echo(msg, true)
             local text
             self.DownloadState = self.DownloadState
             if (msg.DownloadState == "") then
