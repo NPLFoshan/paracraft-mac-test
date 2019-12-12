@@ -14,11 +14,11 @@ local KeepworkProjectsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Projects.l
 
 local GitKeepworkService = NPL.export()
 
-function GitKeepworkService:Create(projectName, callback)
+function GitKeepworkService:Create(foldername, callback)
     
 end
 
-function GitKeepworkService:GetContent(projectName, path, commitId, callback)
+function GitKeepworkService:GetContent(foldername, path, commitId, callback)
     
 end
 
@@ -26,15 +26,43 @@ function GitKeepworkService:GetContentWithRaw(foldername, path, commitId, callba
     
 end
 
-function GitKeepworkService:Upload(projectName, path, content, callback)
-    
+function GitKeepworkService:Upload(foldername, path, content, callback)
+    KeepworkReposApi:CreateFile(
+        foldername,
+        path,
+        content,
+        function()
+            if type(callback) == 'function' then
+                callback(true)
+            end
+        end,
+        function()
+            if type(callback) == 'function' then
+                callback(false)
+            end
+        end
+    )
 end
 
-function GitKeepworkService:Update(projectName, path, content, sha, callback)
-    
+function GitKeepworkService:Update(foldername, path, content, callback)
+    KeepworkReposApi:UpdateFile(
+        foldername,
+        path,
+        content,
+        function()
+            if type(callback) == 'function' then
+                callback(true)
+            end
+        end,
+        function()
+            if type(callback) == 'function' then
+                callback(false)
+            end
+        end
+    )
 end
 
-function GitKeepworkService:DeleteFile(projectName, path, sha, callback)
+function GitKeepworkService:DeleteFile(foldername, path, sha, callback)
     
 end
 
@@ -43,12 +71,10 @@ function GitKeepworkService:DownloadZIP(foldername, commitId, callback)
 end
 
 function GitKeepworkService:GetTree(foldername, commitId, callback)
-    KeepworkReposApi:Tree(foldername, commitId, function(data, err)
-        echo(data, true)
-    end)
+    KeepworkReposApi:Tree(foldername, commitId, callback)
 end
 
-function GitKeepworkService:GetCommits(projectName, isGetAll, callback, commits, pageSize, commitPage)
+function GitKeepworkService:GetCommits(foldername, isGetAll, callback, commits, pageSize, commitPage)
     
 end
 

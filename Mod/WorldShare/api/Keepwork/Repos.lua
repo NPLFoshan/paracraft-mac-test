@@ -10,6 +10,7 @@ local KeepworkReposApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Repos.lua")
 ]]
 
 local KeepworkBaseApi = NPL.load('./BaseApi.lua')
+local GitEncoding = NPL.load('(gl)Mod/WorldShare/helper/GitEncoding.lua')
 
 local KeepworkReposApi = NPL.export()
 
@@ -19,7 +20,7 @@ function KeepworkReposApi:GetRepoPath(foldername)
     if type(username) ~= 'string' or type(foldername) ~= 'string' then
         return ''
     else
-        return Mod.WorldShare.Utils.UrlEncode(username .. '/' .. foldername)
+        return Mod.WorldShare.Utils.UrlEncode(username .. '/' .. GitEncoding.Base32(foldername))
     end
 end
 
@@ -80,7 +81,7 @@ function KeepworkReposApi:Raw(foldername, filePath, commitId, success, error)
         commitId = 'master'
     end
 
-    local url = '/repos/' .. self:GetRepoPath(foldername) .. '/files/' .. filePath .. '/raw?commitId=' .. commitId
+    local url = format('/repos/%s/files/%s/raw?commitId=%s', self:GetRepoPath(foldername), filePath, commitId)
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
@@ -97,14 +98,21 @@ function KeepworkReposApi:History()
 end
 
 -- url: /repos/:repoPath/files/:filePath
--- method: GET
+-- method: PUT
 -- params:
 --[[
     repoPath string 必须 仓库路径	
     filePath string 必须 文件路径
 ]]
 -- return: object
-function KeepworkReposApi:UpdateFile()
+function KeepworkReposApi:UpdateFile(foldername, filePath, content, success, error)
+    if type(foldername) ~= 'string' or type(filePath) ~= 'string' then
+        return false
+    end
+
+    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
+
+    KeepworkBaseApi:Put(url, { content = content }, nil, success, error)
 end
 
 -- url: /repos/:repoPath/files/:filePath
@@ -113,9 +121,17 @@ end
 --[[
     repoPath string 必须 仓库路径	
     filePath string 必须 文件路径
+    content binary 必须 文件内容
 ]]
 -- return: object
-function KeepworkReposApi:CreateFile()
+function KeepworkReposApi:CreateFile(foldername, filePath, content, success, error)
+    if type(foldername) ~= 'string' or type(filePath) ~= 'string' then
+        return false
+    end
+
+    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
+
+    KeepworkBaseApi:Post(url, { content = content }, nil, success, error)
 end
 
 -- url: /repos/:repoPath/files/:filePath

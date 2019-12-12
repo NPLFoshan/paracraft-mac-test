@@ -9,8 +9,9 @@ local KeepworkKeepworksApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Keepworks
 ------------------------------------------------------------
 ]]
 
-local KeepworkKeepworksApi = NPL.export()
+local KeepworkBaseApi = NPL.load('(gl)Mod/WorldShare/api/Keepwork/BaseApi.lua')
 
+local KeepworkKeepworksApi = NPL.export()
 
 -- url: /keepworks/svg_captcha?png=true
 -- method: GET
@@ -18,5 +19,6 @@ local KeepworkKeepworksApi = NPL.export()
 --[[
 ]]
 -- return: object
-function KeepworkKeepworksApi:SvgCaptcha()
+function KeepworkKeepworksApi:FetchCaptcha(success, error)
+    KeepworkBaseApi:Get('/keepworks/svg_captcha?png=true', nil, { notTokenRequest = true }, success, error)
 end

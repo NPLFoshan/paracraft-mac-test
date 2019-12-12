@@ -119,11 +119,13 @@ function SyncToDataSource:Start()
     Progress:UpdateDataBar(0, 0, L"正在对比文件列表...")
 
     local function Handle(data, err)
+        if type(data) ~= 'table' then
+            return false
+        end
+
         self.dataSourceFiles = data
         self.localFiles = commonlib.vector:new()
         self.localFiles:AddAll(LocalService:LoadFiles(self.currentWorld.worldpath)) --再次获取本地文件，保证上传的内容为最新
-
-        Mod.WorldShare.Store:Set('world/localFiles', self.localFiles)
 
         self:IgnoreFiles()
         self:CheckReadmeFile()
@@ -131,11 +133,7 @@ function SyncToDataSource:Start()
         self:HandleCompareList()
     end
 
-    GitService:GetTree(
-        self.currentWorld.foldername,
-        nil, --commitId
-        Handle
-    )
+    GitService:GetTree(self.currentWorld.foldername, nil, Handle)
 end
 
 function SyncToDataSource:IgnoreFiles()
@@ -158,7 +156,7 @@ function SyncToDataSource:CheckReadmeFile()
     local hasReadme = false
 
     for key, value in ipairs(self.localFiles) do
-        if (string.upper(value.filename) == "README.MD") then
+        if string.upper(value.filename) == "README.MD" then
             if (value.filename == "README.md") then
                 hasReadme = true
             else
@@ -168,7 +166,7 @@ function SyncToDataSource:CheckReadmeFile()
         end
     end
 
-    if (not hasReadme) then
+    if not hasReadme then
         local filePath = format("%s/README.md", self.currentWorld.worldpath)
         local file = ParaIO.open(filePath, "w")
         local content = KeepworkGen:GetReadmeFile()
@@ -193,7 +191,7 @@ function SyncToDataSource:GetCompareList()
         local bIsExisted = false
 
         for IKey, IItem in ipairs(self.dataSourceFiles) do
-            if (LItem.filename == IItem.path) then
+            if LItem.filename == IItem.path then
                 bIsExisted = true
                 break
             end
@@ -211,13 +209,13 @@ function SyncToDataSource:GetCompareList()
         local bIsExisted = false
 
         for LKey, LItem in ipairs(self.localFiles) do
-            if (IItem.path == LItem.filename) then
+            if IItem.path == LItem.filename then
                 bIsExisted = true
                 break
             end
         end
 
-        if (not bIsExisted) then
+        if not bIsExisted then
             local currentItem = {
                 file = IItem.path,
                 status = DELETE
@@ -229,7 +227,7 @@ function SyncToDataSource:GetCompareList()
 
     -- handle revision in last
     for CKey, CItem in ipairs(self.compareList) do
-        if (string.lower(CItem.file) == "revision.xml") then
+        if string.lower(CItem.file) == "revision.xml" then
             self.compareList:push_back(CItem)
             self.compareList:remove(CKey)
         end
@@ -266,7 +264,7 @@ function SyncToDataSource:RefreshList()
 end
 
 function SyncToDataSource:HandleCompareList()
-    if (self.compareListTotal < self.compareListIndex) then
+    if self.compareListTotal < self.compareListIndex then
         -- sync finish
         self:SetFinish(true)
 
@@ -276,7 +274,7 @@ function SyncToDataSource:HandleCompareList()
         return false
     end
 
-    if (self.broke) then
+    if self.broke then
         self:SetFinish(true)
         LOG.std("SyncToDataSource", "debug", "SyncToDataSource", "上传被中断")
         return false
@@ -296,22 +294,22 @@ function SyncToDataSource:HandleCompareList()
         self:HandleCompareList()
     end
 
-    if (currentItem.status == UPDATE) then
+    if currentItem.status == UPDATE then
         self:UpdateOne(currentItem.file, Retry)
     end
 
-    if (currentItem.status == UPLOAD) then
+    if currentItem.status == UPLOAD then
         self:UploadOne(currentItem.file, Retry)
     end
 
-    if (currentItem.status == DELETE) then
+    if currentItem.status == DELETE then
         self:DeleteOne(currentItem.file, Retry)
     end
 end
 
 function SyncToDataSource:GetLocalFileByFilename(filename)
     for key, item in ipairs(self.localFiles) do
-        if (item.filename == filename) then
+        if item.filename == filename then
             return item
         end
     end
@@ -319,7 +317,7 @@ end
 
 function SyncToDataSource:GetRemoteFileByPath(path)
     for key, item in ipairs(self.dataSourceFiles) do
-        if (item.path == path) then
+        if item.path == path then
             return item
         end
     end
@@ -349,16 +347,16 @@ function SyncToDataSource:UploadOne(file, callback)
     )
 
     GitService:Upload(
-        self.foldername.base32,
+        self.currentWorld.foldername,
         currentLocalItem.filename,
         currentLocalItem.file_content_t,
-        function(bIsUpload, filename, data)
-            if (bIsUpload) then
-                if (type(callback) == "function") then
+        function(bIsUpload)
+            if bIsUpload then
+                if type(callback) == "function" then
                     callback()
                 end
             else
-                _guihelper.MessageBox(format("%s上传失败", currentLocalItem.filename))
+                self.callback(false, format(L"%s上传失败", currentLocalItem.filename))
                 self:SetBroke(true)
 
                 Progress:UpdateDataBar(
@@ -392,14 +390,14 @@ function SyncToDataSource:UpdateOne(file, callback)
     end
 
     if currentLocalItem.sha1 == currentRemoteItem.id and string.lower(currentLocalItem.filename) ~= "revision.xml" then
-        if (type(callback) == "function") then
+        if type(callback) == "function" then
             Progress:UpdateDataBar(
                 self.compareListIndex,
                 self.compareListTotal,
                 format(L"%s （%s） 文件一致，跳过", currentLocalItem.filename, Mod.WorldShare.Utils.FormatFileSize(currentLocalItem.filesize, "KB"))
             )
 
-            Utils.SetTimeOut(callback)
+            Mod.WorldShare.Utils.SetTimeOut(callback)
         end
 
         return false
@@ -412,17 +410,16 @@ function SyncToDataSource:UpdateOne(file, callback)
     )
 
     GitService:Update(
-        self.foldername.base32,
+        self.currentWorld.foldername,
         currentLocalItem.filename,
         currentLocalItem.file_content_t,
-        currentLocalItem.sha,
-        function(bIsUpdate, filename)
-            if (bIsUpdate) then
-                if (type(callback) == "function") then
+        function(bIsUpdate)
+            if bIsUpdate then
+                if type(callback) == "function" then
                     callback()
                 end
             else
-                _guihelper.MessageBox(L"更新失败")
+                self.callback(false, L"更新失败")
                 self:SetBroke(true)
 
                 Progress:UpdateDataBar(
@@ -451,16 +448,15 @@ function SyncToDataSource:DeleteOne(file, callback)
     )
 
     GitService:DeleteFile(
-        self.foldername.base32,
+        self.currentWorld.foldername,
         currentRemoteItem.path,
-        currentRemoteItem.sha,
         function(bIsDelete)
             if (bIsDelete) then
                 if (type(callback) == "function") then
                     callback()
                 end
             else
-                _guihelper.MessageBox(L"删除失败")
+                self.callback(false, L"删除失败")
                 self:SetBroke(true)
 
                 Progress:UpdateDataBar(

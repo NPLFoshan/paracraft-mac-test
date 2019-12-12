@@ -18,7 +18,7 @@ function GitEncoding.Base32(text)
     if type(text) == 'string' then
         local notLetter = string.find(text, "[^a-zA-Z]")
 
-        if (notLetter) then
+        if notLetter then
             text = Encoding.to_base32(text)
 
             text = "world_base32_" .. text
@@ -28,7 +28,7 @@ function GitEncoding.Base32(text)
 
         return text
     else
-        return nil
+        return ''
     end
 end
 
@@ -36,7 +36,7 @@ function GitEncoding.Unbase32(text)
     if type(text) == 'string' then
         local notLetter = string.find(text, "world_base32_")
 
-        if (notLetter) then
+        if notLetter then
             text = text:gsub("world_base32_", "")
 
             return Encoding.from_base32(text)
@@ -46,6 +46,6 @@ function GitEncoding.Unbase32(text)
             return text
         end
     else
-        return nil
+        return ''
     end
 end

@@ -11,6 +11,7 @@ local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 
 local KeepworkService = NPL.load("../KeepworkService.lua")
 local KeepworkUsersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Users.lua")
+local KeepworkKeepworksApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Keepworks.lua")
 local LessonOrganizationsApi = NPL.load("(gl)Mod/WorldShare/api/Lesson/LessonOrganizations.lua")
 local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
 local GitGatewayService = NPL.load("../GitGatewayService.lua")
@@ -198,7 +199,7 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
 end
 
 function KeepworkServiceSession:FetchCaptcha(callback)
-    KeepworkUsersApi:FetchCaptcha(function(data, err)
+    KeepworkKeepworksApi:FetchCaptcha(function(data, err)
         if err == 200 and type(data) == 'table' then
             self.captchaKey = data.key
 
