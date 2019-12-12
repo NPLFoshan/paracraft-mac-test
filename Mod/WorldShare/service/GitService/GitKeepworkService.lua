@@ -23,6 +23,7 @@ function GitKeepworkService:GetContent(foldername, path, commitId, callback)
 end
 
 function GitKeepworkService:GetContentWithRaw(foldername, path, commitId, callback)
+
     
 end
 
@@ -80,7 +81,7 @@ function GitKeepworkService:DeleteFile(foldername, path, callback)
 end
 
 function GitKeepworkService:DownloadZIP(foldername, commitId, callback)
-    
+    KeepworkReposApi:Download(foldername, commitId, callback, callback)
 end
 
 function GitKeepworkService:GetTree(foldername, commitId, callback)
@@ -125,7 +126,8 @@ function GitKeepworkService:GetWorldRevision(kpProjectId, isGetMine, callback)
             end
 
             KeepworkReposApi:Raw(
-                data.name, 'revision.xml', data.world.commitId,
+                data.name, 'revision.xml',
+                data.world.commitId,
                 function(data, err)
                     if type(callback) == 'function' then
                         callback(tonumber(data) or 0, err)
@@ -135,7 +137,8 @@ function GitKeepworkService:GetWorldRevision(kpProjectId, isGetMine, callback)
                     if type(callback) == 'function' then
                         callback(0, err)
                     end
-                end)
+                end
+            )
         end
     )
 end

@@ -18,142 +18,20 @@ local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local SyncToLocal = NPL.load("(gl)Mod/WorldShare/service/SyncService/SyncToLocal.lua")
 local SyncToDataSource = NPL.load("(gl)Mod/WorldShare/service/SyncService/SyncToDataSource.lua")
-local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
 
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local WorldShare = commonlib.gettable("Mod.WorldShare")
 local Encoding = commonlib.gettable("commonlib.Encoding")
-local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision")
 local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
 
 local SyncMain = NPL.export()
 
 function SyncMain:OnWorldLoad()
-    self:GetCurrentWorldInfo(function()
+    Compare:GetCurrentWorldInfo(function()
         CreateWorld:CheckRevision()
     end)
-end
-
-function SyncMain:GetCurrentWorldInfo(callback)
-    local folderDefauleName = self:GetWorldDefaultName()
-    local foldername = {
-        default = folderDefauleName,
-        utf8 = Encoding.DefaultToUtf8(folderDefauleName),
-        base32 = GitEncoding.Base32(Encoding.DefaultToUtf8(folderDefauleName))
-    }
-
-    Mod.WorldShare.Store:Set("world/foldername", foldername)
-
-    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
-
-    if GameLogic.IsReadOnly() then
-        local originWorldPath = ParaWorld.GetWorldDirectory()
-        local worldTag = WorldCommon.GetWorldInfo() or {}
-
-        Mod.WorldShare.Store:Set("world/worldTag", worldTag)
-        Mod.WorldShare.Store:Set("world/currentWorld", {
-            IsFolder = false,
-            is_zip = true,
-            Title = worldTag.name,
-            author = "None",
-            costTime = "0:0:0",
-            filesize = 0,
-            foldername = foldername.utf8,
-            grade = "primary",
-            icon = "Texture/3DMapSystem/common/page_world.png",
-            ip = "127.0.0.1",
-            mode = "survival",
-            modifyTime = 0,
-            nid = "",
-            order = 0,
-            preview = "",
-            progress = "0",
-            size = 0,
-            worldpath = originWorldPath,
-            kpProjectId = worldTag.kpProjectId
-        })
-        Mod.WorldShare.Store:Set("world/currentRevision", GameLogic.options:GetRevision())
-    else
-        local compareWorldList = Mod.WorldShare.Store:Get("world/compareWorldList")
-
-        if compareWorldList then
-            local searchCurrentWorld = nil
-    
-            for key, item in ipairs(compareWorldList) do
-                if item.foldername == foldername.utf8 and not item.is_zip then
-                    searchCurrentWorld = item
-                    break
-                end
-            end
-    
-            if searchCurrentWorld then
-                currentWorld = searchCurrentWorld
-    
-                local worldTag = LocalService:GetTag(currentWorld.worldpath)
-    
-                Mod.WorldShare.Store:Set("world/worldTag", worldTag)
-                Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
-            end
-        end
-    end
-
-    if not currentWorld then -- new world
-        local originWorldPath = ParaWorld.GetWorldDirectory()
-        local worldTag = WorldCommon.GetWorldInfo() or {}
-
-        Mod.WorldShare.Store:Set("world/worldTag", worldTag)
-        Mod.WorldShare.Store:Set("world/currentWorld", {
-            IsFolder = true,
-            is_zip = false,
-            Title = worldTag.name,
-            author = "None",
-            costTime = "0:0:0",
-            filesize = 0,
-            foldername = foldername.utf8,
-            grade = "primary",
-            icon = "Texture/3DMapSystem/common/page_world.png",
-            ip = "127.0.0.1",
-            mode = "survival",
-            modifyTime = 0,
-            nid = "",
-            order = 0,
-            preview = "",
-            progress = "0",
-            size = 0,
-            worldpath = originWorldPath, 
-            kpProjectId = worldTag.kpProjectId
-        })
-    end
-
-    if type(callback) == 'function' then
-        callback()
-    end
-end
-
-function SyncMain:GetWorldFolderFullPath()
-    return LocalLoadWorld.GetWorldFolderFullPath()
-end
-
-function SyncMain:GetWorldDefaultName()
-    local originWorldPath = ParaWorld.GetWorldDirectory()
-
-    world = string.match(originWorldPath, "worlds/DesignHouse/.+")
-
-    if(not world) then
-        world = string.match(originWorldPath, "worlds\\DesignHouse\\.+")
-    end
-
-    if(not world) then
-        return ''
-    end
-
-    world = string.gsub(world, "worlds/DesignHouse/", "")
-    world = string.gsub(world, "worlds\\DesignHouse\\", "")
-    world = string.gsub(world, "/", "")
-    world = string.gsub(world, "\\", "")
-
-    return world
 end
 
 function SyncMain:ShowStartSyncPage(callback, useOffline)
@@ -253,7 +131,23 @@ function SyncMain:SyncToLocal(callback)
         return false
     end
 
-    SyncToLocal:Init(callback)
+    SyncToLocal:Init(function(result, msg, innerCallback)
+        if result == false then
+            if msg == 'NEWWORLD' then
+                UserConsole:ClosePage()
+                GameLogic.AddBBS(nil, L"服务器未找到世界数据，请新建", 3000, "255 255 0")
+                local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+                CreateWorld:CreateNewWorld(currentWorld.foldername)
+                return false
+            end
+
+            GameLogic.AddBBS(nil, msg, 3000, "255 0 0")
+        end
+
+        if type(callback) == 'function' then
+            callback(result, msg, innerCallback)
+        end
+    end)
 end
 
 function SyncMain:SyncToDataSource()
@@ -267,7 +161,6 @@ function SyncMain:SyncToDataSource()
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
     if not currentWorld.worldpath or currentWorld.worldpath == "" then
-        
         return false
     end
 

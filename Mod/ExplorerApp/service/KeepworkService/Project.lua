@@ -47,8 +47,8 @@ end
 -- param: x-per-page number
 -- param: classifyTags-like string
 -- return object
-function KeepworkServiceProject:GetProjectDetailById(projectId, callback, noTryStatus)
-    WorldShareKeepworkServiceProject:GetProject(projectId, callback, noTryStatus)
+function KeepworkServiceProject:GetProjectDetailById(kpProjectId, callback, noTryStatus)
+    WorldShareKeepworkServiceProject:GetProject(kpProjectId, callback, noTryStatus)
 end
 
 function KeepworkServiceProject:GetAllTags(callback)

@@ -10,6 +10,7 @@ local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 ]]
 local Encoding = commonlib.gettable("commonlib.Encoding")
 local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision")
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
@@ -51,18 +52,22 @@ function Compare:Init(callback)
 
                 Mod.WorldShare.MsgBox:Close()
             else
-                if (result == JUSTLOCAL) then
+                if result == JUSTLOCAL then
                     SyncMain:SyncToDataSource()
                     Mod.WorldShare.MsgBox:Close()
                     return true
                 end
 
-                if (result == JUSTREMOTE) then
-                    SyncMain:SyncToLocal(callback)
+                if result == JUSTREMOTE then
+                    SyncMain:SyncToLocal(function(result, msg, innertCallback)
+                        if type(callback) == 'function' then
+                            callback(result, msg, innertCallback)
+                        end
+                    end)
                     return true
                 end
 
-                if (result == REMOTEBIGGER or result == LOCALBIGGER or result == EQUAL) then
+                if result == REMOTEBIGGER or result == LOCALBIGGER or result == EQUAL then
                     if type(callback) == 'function' then
                         callback(result, function(callback) SyncMain:ShowStartSyncPage(callback, true) end)
                     else
@@ -246,4 +251,91 @@ function Compare:HasRevision()
     end
 
     return hasRevision
+end
+
+function Compare:GetCurrentWorldInfo(callback)
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
+
+    if GameLogic.IsReadOnly() then
+        local originWorldPath = ParaWorld.GetWorldDirectory()
+        local worldTag = WorldCommon.GetWorldInfo() or {}
+
+        Mod.WorldShare.Store:Set("world/worldTag", worldTag)
+        Mod.WorldShare.Store:Set("world/currentWorld", {
+            IsFolder = false,
+            is_zip = true,
+            Title = worldTag.name,
+            author = "None",
+            costTime = "0:0:0",
+            filesize = 0,
+            foldername = Mod.WorldShare.Utils.GetFolderName(),
+            grade = "primary",
+            icon = "Texture/3DMapSystem/common/page_world.png",
+            ip = "127.0.0.1",
+            mode = "survival",
+            modifyTime = 0,
+            nid = "",
+            order = 0,
+            preview = "",
+            progress = "0",
+            size = 0,
+            worldpath = originWorldPath,
+            kpProjectId = worldTag.kpProjectId
+        })
+        Mod.WorldShare.Store:Set("world/currentRevision", GameLogic.options:GetRevision())
+    else
+        local compareWorldList = Mod.WorldShare.Store:Get("world/compareWorldList")
+
+        if compareWorldList then
+            local searchCurrentWorld = nil
+    
+            for key, item in ipairs(compareWorldList) do
+                if item.foldername == currentWorld.foldername and not item.is_zip then
+                    searchCurrentWorld = item
+                    break
+                end
+            end
+    
+            if searchCurrentWorld then
+                currentWorld = searchCurrentWorld
+    
+                local worldTag = LocalService:GetTag(currentWorld.worldpath)
+    
+                Mod.WorldShare.Store:Set("world/worldTag", worldTag)
+                Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
+            end
+        end
+    end
+
+    if not currentWorld then -- new world
+        local originWorldPath = ParaWorld.GetWorldDirectory()
+        local worldTag = WorldCommon.GetWorldInfo() or {}
+
+        Mod.WorldShare.Store:Set("world/worldTag", worldTag)
+        Mod.WorldShare.Store:Set("world/currentWorld", {
+            IsFolder = true,
+            is_zip = false,
+            Title = worldTag.name,
+            author = "None",
+            costTime = "0:0:0",
+            filesize = 0,
+            foldername = Mod.WorldShare.Utils.GetFolderName(),
+            grade = "primary",
+            icon = "Texture/3DMapSystem/common/page_world.png",
+            ip = "127.0.0.1",
+            mode = "survival",
+            modifyTime = 0,
+            nid = "",
+            order = 0,
+            preview = "",
+            progress = "0",
+            size = 0,
+            worldpath = originWorldPath, 
+            kpProjectId = worldTag.kpProjectId
+        })
+    end
+
+    if type(callback) == 'function' then
+        callback()
+    end
 end

@@ -67,34 +67,36 @@ end
 function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
     local function OnSucceeded(filename)
         self.isFetching = false
-        if (callbackFunc) then
+        if callbackFunc then
             callbackFunc(true, filename)
         end
     end
 
     local function OnFail(msg)
         self.isFetching = false
-        if (callbackFunc) then
+        if callbackFunc then
             callbackFunc(false, msg)
         end
     end
 
     local ls = localserver.CreateStore(nil, 1)
-    if (not ls) then
+
+    if not ls then
         OnFail(L"本地数据失败")
         return
     end
 
-    if (self.isFetching) then
+    if self.isFetching then
         OnFail(L"还在下载中...")
         return
     end
+
     self.isFetching = true
 
     local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper")
 
     local label_id = src or "userworlddownload"
-    if (self.text ~= "official_texture_package") then
+    if self.text ~= "official_texture_package" then
         BroadcastHelper.PushLabel(
             {
                 id = "noWrap",
@@ -107,8 +109,8 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
             }
         )
     end
-    local res =
-        ls:GetFile(
+
+    local res = ls:GetFile(
         localserver.CachePolicy:new(cachePolicy or "access plus 5 mins"),
         src,
         function(entry)
@@ -171,6 +173,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
             end
         end
     )
+
     if (not res) then
         OnFail(L"重复下载")
     end

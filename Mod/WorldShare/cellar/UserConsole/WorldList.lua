@@ -461,7 +461,10 @@ end
 
 function WorldList:Sync()
     CreateWorld:CheckRevision(function()
-        Compare:Init()
+        Compare:Init(function(result, msg, innertCallback)
+            self:RefreshCurrentServerList()
+            Mod.WorldShare.MsgBox:Close()
+        end)
     end)
 end
 

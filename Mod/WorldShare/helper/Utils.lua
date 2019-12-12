@@ -9,6 +9,7 @@ local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 ]]
 local Encoding = commonlib.gettable("commonlib.Encoding")
 local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
+local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 
 local Utils = NPL.export()
 
@@ -199,4 +200,30 @@ function Utils.IsEnglish()
     else
         return false
     end
+end
+
+function Utils.GetWorldFolderFullPath()
+    return LocalLoadWorld.GetWorldFolderFullPath()
+end
+
+function Utils:GetFolderName()
+    local originWorldPath = ParaWorld.GetWorldDirectory()
+
+    local foldername = string.match(originWorldPath, "worlds/DesignHouse/.+")
+
+    if not foldername then
+        foldername = string.match(originWorldPath, "worlds\\DesignHouse\\.+")
+    end
+
+    if not foldername then
+        return ''
+    end
+
+    foldername = string.gsub(foldername, "worlds/DesignHouse/", "")
+    foldername = string.gsub(foldername, "worlds\\DesignHouse\\", "")
+    foldername = string.gsub(foldername, "/", "")
+    foldername = string.gsub(foldername, "\\", "")
+    foldername = Encoding.DefaultToUtf8(foldername)
+
+    return foldername
 end

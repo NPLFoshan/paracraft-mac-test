@@ -127,7 +127,7 @@ function VersionChange:SelectVersion(index)
     Store:Set("world/commitId", commitId)
     KeepworkService:SetCurrentCommidId(commitId)
 
-    local targetDir = format("%s/%s/", SyncMain.GetWorldFolderFullPath(), foldername.default)
+    local targetDir = format("%s/%s/", Mod.WorldShare.Utils.GetWorldFolderFullPath(), foldername.default)
 
     commonlib.Files.DeleteFolder(targetDir)
 

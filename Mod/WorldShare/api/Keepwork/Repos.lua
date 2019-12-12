@@ -8,6 +8,8 @@ use the lib:
 local KeepworkReposApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Repos.lua")
 ------------------------------------------------------------
 ]]
+NPL.load("(gl)Mod/WorldShare/service/FileDownloader/FileDownloader.lua")
+local FileDownloader = commonlib.gettable("Mod.WorldShare.service.FileDownloader.FileDownloader")
 
 local KeepworkBaseApi = NPL.load('./BaseApi.lua')
 local GitEncoding = NPL.load('(gl)Mod/WorldShare/helper/GitEncoding.lua')
@@ -32,7 +34,30 @@ end
     ref string 必须 commitId
 ]]
 -- return: object
-function KeepworkReposApi:Download()
+function KeepworkReposApi:Download(foldername, commitId, success, error)
+    local url = format('%s/repos/%s/download?ref=%s', KeepworkBaseApi:GetApi(), self:GetRepoPath(foldername), commitId)
+
+    echo(url, true)
+
+    FileDownloader:new():Init(
+        nil,
+        url,
+        "temp/archive.zip",
+        function(bSuccess, downloadPath)
+            if bSuccess then
+                if type(success) == "function" then
+                    success(true, downloadPath)
+                end
+            else
+                if type(error) == "function" then
+                    error(false)
+                end
+            end
+
+        end,
+        "access plus 5 mins",
+        false
+    ) 
 end
 
 -- url: /repos/:repoPath/tree
@@ -77,11 +102,13 @@ function KeepworkReposApi:Raw(foldername, filePath, commitId, success, error)
         return false
     end
 
-    if type(commitId) ~= 'string' then
-        commitId = 'master'
+    local commitIdUrl = ''
+
+    if type(commitId) == 'string' and string.lower(commitId) ~= 'master'then
+        commitIdUrl = format('?commitId=%s', commitId)
     end
 
-    local url = format('/repos/%s/files/%s/raw?commitId=%s', self:GetRepoPath(foldername), filePath, commitId)
+    local url = format('/repos/%s/files/%s/raw%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath), commitIdUrl)
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end

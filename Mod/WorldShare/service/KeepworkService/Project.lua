@@ -27,17 +27,17 @@ function KeepworkServiceProject:CreateProject(foldername, callback)
 end
 
 -- update projectinfo
-function KeepworkServiceProject:UpdateProject(pid, params, callback)
+function KeepworkServiceProject:UpdateProject(kpProjectId, params, callback)
     if not KeepworkService:IsSignedIn() then
         return false
     end
 
-    KeepworkProjectsApi:UpdateProject(pid, params, callback)
+    KeepworkProjectsApi:UpdateProject(kpProjectId, params, callback)
 end
 
 -- get projectinfo
-function KeepworkServiceProject:GetProject(pid, callback, noTryStatus)
-    KeepworkProjectsApi:GetProject(pid, callback, nil, noTryStatus)
+function KeepworkServiceProject:GetProject(kpProjectId, callback, noTryStatus)
+    KeepworkProjectsApi:GetProject(kpProjectId, callback, nil, noTryStatus)
 end
 
 function KeepworkServiceProject:GetProjectByWorldName(foldername, callback)

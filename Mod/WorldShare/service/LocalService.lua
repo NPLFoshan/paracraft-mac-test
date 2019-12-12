@@ -15,13 +15,6 @@ local SystemEncoding = commonlib.gettable("System.Encoding")
 local CommonlibEncoding = commonlib.gettable("commonlib.Encoding")
 local FileDownloader = commonlib.gettable("Mod.WorldShare.service.FileDownloader.FileDownloader")
 
-local GitlabService = NPL.load("./GitlabService")
-local GithubService = NPL.load("./GithubService")
-local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
-local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
-local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
-local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
-
 local LocalService = NPL.export()
 
 LocalService.filter = "*"
@@ -45,7 +38,7 @@ function LocalService:LoadFiles(worldDir)
         item.filename = CommonlibEncoding.DefaultToUtf8(item.filename)
     end
 
-    Store:Set('world/localFiles', self.output)
+    Mod.WorldShare.Store:Set('world/localFiles', self.output)
 
     return self.output
 end
@@ -120,7 +113,14 @@ function LocalService:GetFileContent(filePath)
 end
 
 function LocalService:Write(foldername, path, content)
-    local root = SyncMain.GetWorldFolderFullPath()
+    if not foldername or not path then
+        return false
+    end
+
+    foldername = CommonlibEncoding.Utf8ToDefault(foldername)
+    path = CommonlibEncoding.Utf8ToDefault(path)
+
+    local root = Mod.WorldShare.Utils.GetWorldFolderFullPath()
     local allPath = {}
 
     for segmentation in string.gmatch(path, "[^/]+") do
@@ -150,7 +150,12 @@ function LocalService:Write(foldername, path, content)
 end
 
 function LocalService:Delete(foldername, filename)
-    local deletePath = format("%s/%s/%s", SyncMain.GetWorldFolderFullPath(), foldername, filename)
+    local deletePath = format(
+                        "%s/%s/%s",
+                        Mod.WorldShare.Utils.GetWorldFolderFullPath(),
+                        Encoding.Utf8ToDefault(foldername or ''),
+                        Encoding.Utf8ToDefault(filename or '')
+                       )
 
     ParaIO.DeleteFile(deletePath)
 end
@@ -183,18 +188,12 @@ function LocalService:MoveZipToFolder(path)
         return false
     end
 
-    local foldername = Store:Get("world/foldername")
-
-    if (not foldername) then
-        return false
-    end
-
     local parentDir = path:gsub("[^/\\]+$", "")
 
     local filesOut = {}
     commonlib.Files.Find(filesOut, "", 0, 10000, ":.", path) -- ":.", any regular expression after : is supported. `.` match to all strings.
 
-    local bashPath = format("%s/%s/", SyncMain.GetWorldFolderFullPath(), foldername.default)
+    local bashPath = format("%s/%s/", Mod.WorldShare.Utils.GetWorldFolderFullPath(), CommonEncoding.Utf8ToDefault(self.currentWorld.foldername))
 
     local folderCreate = ""
     local rootFolder = filesOut[1] and filesOut[1].filename
@@ -211,7 +210,7 @@ function LocalService:MoveZipToFolder(path)
                 path = path:sub(#rootFolder, #path)
 
                 if (path == "/revision.xml") then
-                    Store:Set('remoteRevision', binData)
+                    Mod.WorldShare.Store:Set('remoteRevision', binData)
                 end
 
                 for segmentation in string.gmatch(path, "[^/]+") do
@@ -354,7 +353,7 @@ function LocalService:SaveWorldInfo(ctx, node)
 
     node.attr.clientversion = self:GetClientVersion() or ctx.clientversion
 
-    local currentWorld = Store:Get('world/currentWorld')
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
     node.attr.kpProjectId = currentWorld and currentWorld.kpProjectId or ctx.kpProjectId
 end
 
@@ -374,7 +373,7 @@ function LocalService:GetClientVersion(node)
 end
 
 function LocalService:ClearUserWorlds()
-    local userworldsPath = format("%s/%s", SyncMain:GetWorldFolderFullPath(), "userworlds")
+    local userworldsPath = format("%s/%s", LocalLoadWorld.GetWorldFolderFullPath(), "userworlds")
 
     local fileLists = Files.Find(nil, userworldsPath, self.nMaxFileLevels, self.nMaxFilesNum, self.filter)
 

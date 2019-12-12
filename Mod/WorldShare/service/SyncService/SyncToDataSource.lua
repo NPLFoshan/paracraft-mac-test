@@ -27,12 +27,10 @@ function SyncToDataSource:Init(callback)
         return false
     end
 
-    self.foldername = Mod.WorldShare.Store:Get("world/foldername")
+    self.callback = callback
 
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
     self.currentWorld = currentWorld
-
-    self.callback = callback
 
     if not self.currentWorld.worldpath or self.currentWorld.worldpath == "" then
         callback(false, L"上传失败，将使用离线模式，原因：上传目录为空")
@@ -69,7 +67,7 @@ function SyncToDataSource:Init(callback)
                     self.currentWorld.foldername,
                     function(data, err)
                         if err ~= 200 or not data or not data.id then
-                            callback(false, L"创建仓库失败，请确认可分享世界的数量")
+                            callback(false, L"您创建的帕拉卡(Paracraft)在线项目数量过多。<br />请删除不需要的项目后再试。")
                             Progress:ClosePage()
                             return false
                         end
@@ -160,7 +158,7 @@ function SyncToDataSource:CheckReadmeFile()
             if (value.filename == "README.md") then
                 hasReadme = true
             else
-                LocalService:Delete(self.foldername.default, value.filename)
+                LocalService:Delete(self.currentWorld.foldername, value.filename)
                 hasReadme = false
             end
         end

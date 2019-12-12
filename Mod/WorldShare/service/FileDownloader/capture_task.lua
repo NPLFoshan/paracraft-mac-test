@@ -12,15 +12,15 @@ NPL.load("(gl)script/ide/System/localserver/WebCacheDB.lua")
 local WebCacheDB = commonlib.gettable("System.localserver.WebCacheDB")
 
 local npl_thread_name = __rts__:GetName()
-if (npl_thread_name == "main") then
+
+if npl_thread_name == "main" then
     npl_thread_name = ""
 end
 ------------------------------------------------------------------------------
 -- A CaptureRequest encapslates the parameters to a ResourceStore.capture() API call. Multiple urls can be specified in a single API call.
 -- Note: Use TaskManager:new_request() to create an instance of this class
 ------------------------------------------------------------------------------
-local CaptureRequest =
-    commonlib.createtable(
+local CaptureRequest = commonlib.createtable(
     "Mod.WorldShare.service.FileDownloader.localserver.CaptureRequest",
     {
         -- int: captureId assigned by ResourceStore for this request
@@ -47,8 +47,7 @@ local CaptureRequest =
 -- the task manager will only start a new task if there is no previous same task or the previous one times out.
 -- this is a singleton class.
 ------------------------------------------------------------------------------
-local TaskManager =
-    commonlib.createtable(
+local TaskManager = commonlib.createtable(
     "Mod.WorldShare.service.FilDownloader.TaskManager",
     {
         -- mapping from request id to their associated CaptureTask.
@@ -66,35 +65,41 @@ local TaskManager =
 -- @param requestType: nil if undetermined. 1 for url request, and 2 for file download request.
 -- if it is an array, when the function returns, urls that are being processed will be removed.
 function TaskManager:new_request(urls, requestType)
-    if (type(urls) == "string") then
-        if (self.urls[urls]) then
+    if type(urls) == "string" then
+        if self.urls[urls] then
             return
         else
             self.urls[urls] = true
         end
-    elseif (type(urls) == "table") then
+    elseif type(urls) == "table" then
         -- remove urls that is already being processed from the array.
         local i = 1
         local url = urls[i]
+
         while url do
-            if (self.urls[url]) then
+            if self.urls[url] then
                 commonlib.removeArrayItem(urls, i)
-                log("warning: duplicate url removed from capture task:" .. url .. "\n")
+                LOG.std(nil, "info", "WorldShare", "warning: duplicate url removed from capture task:" .. url .. "\n")
             else
                 self.urls[url] = true
                 i = i + 1
             end
+
             url = urls[i]
         end
-        if (table.getn(urls) == 0) then
+
+        if table.getn(urls) == 0 then
             return
         end
     end
+
     -- create a new request
-    local o = {id = self.next_request_id, urls = urls, type = requestType}
+    local o = { id = self.next_request_id, urls = urls, type = requestType }
     setmetatable(o, CaptureRequest)
+
     CaptureRequest.__index = CaptureRequest
     self.next_request_id = self.next_request_id + 1
+
     return o
 end
 
@@ -313,8 +318,7 @@ end
 -- A CaptureTask processes a CaptureRequest asynchronously in the background.
 -- Notification messages are sent to the listener as each url in the request is completed.
 ------------------------------------------------------------------------------
-local CaptureTask =
-    commonlib.createtable(
+local CaptureTask = commonlib.createtable(
     "Mod.WorldShare.service.FilDownloader.CaptureTask",
     {
         -- Notification message codes sent to listeners
@@ -342,7 +346,7 @@ local CaptureTask =
 -- @param store: the ResourceStore object
 -- @param request: type of CaptureRequest, usually from TaskManager:new_request(urls);
 function CaptureTask:new(store, request)
-    if (not store or not request or TaskManager.tasks[request.id]) then
+    if not store or not request or TaskManager.tasks[request.id] then
         return
     end
 
