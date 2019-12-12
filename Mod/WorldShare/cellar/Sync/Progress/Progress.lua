@@ -17,7 +17,7 @@ local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
 local Progress = NPL.export()
 
 function Progress:Init(instance)
-    local params = Utils:ShowWindow(0, 0, "Mod/WorldShare/cellar/Sync/Progress/Progress.html", "Progress", 0, 0, "_fi", false)
+    local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/Sync/Progress/Progress.html", "Progress", 0, 0, "_fi", false)
 
     params._page.OnClose = function()
         Store:Remove("page/Progress")

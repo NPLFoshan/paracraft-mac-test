@@ -66,8 +66,7 @@ function MainPage:ShowPage(callback)
         }
     )
 
-    local params =
-        Utils:ShowWindow(
+    local params = Mod.WorldShare.Utils.ShowWindow(
         0,
         0,
         "Mod/ExplorerApp/components/MainPage.html",

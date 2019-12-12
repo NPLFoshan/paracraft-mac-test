@@ -19,7 +19,7 @@ function KeepworkReposApi:GetRepoPath(foldername)
     if type(username) ~= 'string' or type(foldername) ~= 'string' then
         return ''
     else
-        return username .. '/' .. foldername
+        return Mod.WorldShare.Utils.UrlEncode(username .. '/' .. foldername)
     end
 end
 

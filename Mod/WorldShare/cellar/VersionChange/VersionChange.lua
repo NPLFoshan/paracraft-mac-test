@@ -63,7 +63,7 @@ function VersionChange:ClosePage()
 end
 
 function VersionChange:ShowPage()
-    local params = Utils:ShowWindow(0, 0, "Mod/WorldShare/cellar/VersionChange/VersionChange.html", "VersionChange", 0, 0, "_fi", false)
+    local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/VersionChange/VersionChange.html", "VersionChange", 0, 0, "_fi", false)
 
     params._page.OnClose = function()
         Store:Remove('page/VersionChange')

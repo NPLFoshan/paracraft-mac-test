@@ -234,7 +234,7 @@ function SyncMain:CloseStartSyncUseDataSourcePage()
 end
 
 function SyncMain:ShowDialog(url, name)
-    return Utils:ShowWindow(0, 0, url, name, 0, 0, "_fi", false)
+    return Mod.WorldShare.Utils.ShowWindow(0, 0, url, name, 0, 0, "_fi", false)
 end
 
 function SyncMain:BackupWorld()
@@ -291,7 +291,7 @@ function SyncMain:CheckTagName(callback)
 
     if currentWorld and currentWorld.remote_tagname and currentWorld.worldpath then
         if currentWorld.remote_tagname ~= currentWorld.local_tagname then
-            local params = Mod.WorldShare.Utils:ShowWindow(
+            local params = Mod.WorldShare.Utils.ShowWindow(
                 500,
                 190,
                 "Mod/WorldShare/cellar/Sync/Templates/CheckTagName.html?remote_tagname=" .. currentWorld.remote_tagname .. "&local_tagname=" .. currentWorld.local_tagname,

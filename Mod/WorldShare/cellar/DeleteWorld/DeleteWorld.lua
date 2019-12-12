@@ -22,8 +22,7 @@ local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local DeleteWorld = NPL.export()
 
 function DeleteWorld:ShowPage()
-    local params =
-        Utils:ShowWindow(0, 0, "Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.html", "DeleteWorld", 0, 0, "_fi", false)
+    local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.html", "DeleteWorld", 0, 0, "_fi", false)
 
     params._page.OnClose = function()
         Store:Remove("page/DeleteWorld")

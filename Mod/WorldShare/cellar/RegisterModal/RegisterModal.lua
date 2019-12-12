@@ -19,15 +19,15 @@ local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 local RegisterModal = NPL.export()
 
 function RegisterModal:ShowPage()
-    Mod.WorldShare.Utils:ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
+    Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
 end
 
 function RegisterModal:ShowUserAgreementPage()
-    Mod.WorldShare.Utils:ShowWindow(400, 580, "Mod/WorldShare/cellar/RegisterModal/UserAgreement.html", "UserAgreement")
+    Mod.WorldShare.Utils.ShowWindow(400, 580, "Mod/WorldShare/cellar/RegisterModal/UserAgreement.html", "UserAgreement")
 end
 
 function RegisterModal:ShowBindingPage()
-    Mod.WorldShare.Utils:ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/Binding.html", "Binding")
+    Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/Binding.html", "Binding")
 end
 
 function RegisterModal:GetServerList()

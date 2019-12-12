@@ -75,7 +75,7 @@ function ShareWorld:Init()
 end
 
 function ShareWorld:ShowPage()
-    local params = Utils:ShowWindow(640, 415, "Mod/WorldShare/cellar/ShareWorld/ShareWorld.html", "ShareWorld")
+    local params = Mod.WorldShare.Utils.ShowWindow(640, 415, "Mod/WorldShare/cellar/ShareWorld/ShareWorld.html", "ShareWorld")
 
     params._page.OnClose = function()
         Store:Remove('page/ShareWorld')

@@ -17,7 +17,7 @@ local MySchool = NPL.export()
 
 function MySchool:Show()
     local function showpage()
-        local params = Mod.WorldShare.Utils:ShowWindow(870, 650, "Mod/WorldShare/cellar/MySchool/MySchool.html", "MySchool")
+        local params = Mod.WorldShare.Utils.ShowWindow(870, 650, "Mod/WorldShare/cellar/MySchool/MySchool.html", "MySchool")
 
         params._page:CallMethod("nplbrowser_instance", "SetVisible", true)
     

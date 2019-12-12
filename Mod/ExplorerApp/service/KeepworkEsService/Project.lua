@@ -13,7 +13,7 @@ local EsProjectsApi = NPL.load('(gl)Mod/ExplorerApp/api/Es/Projects.lua')
 local KeepworkEsServiceProject = NPL.export()
 
 function KeepworkEsServiceProject:GetEsProjectsByFilter(filter, sort, pages, callback)
-    local sysTags = Mod.WorldShare.Utils:UrlEncode(Mod.WorldShare.Utils:Implode("|", filter))
+    local sysTags = Mod.WorldShare.Utils.UrlEncode(Mod.WorldShare.Utils.Implode("|", filter))
 
     local params = {
         ['sys_tags'] = sysTags,

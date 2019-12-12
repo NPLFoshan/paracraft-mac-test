@@ -55,7 +55,7 @@ function UserConsole:ShowPage()
         return false
     end
 
-    local params = Mod.WorldShare.Utils:ShowWindow(850, 470, "Mod/WorldShare/cellar/UserConsole/UserConsole.html", "UserConsole")
+    local params = Mod.WorldShare.Utils.ShowWindow(850, 470, "Mod/WorldShare/cellar/UserConsole/UserConsole.html", "UserConsole")
 
     params._page.OnClose = function()
         Mod.WorldShare.Store:Remove('page/UserConsole')
@@ -263,7 +263,7 @@ function UserConsole:HandleWorldId(pid)
                         worldName = worldInfo.worldName
                     end
 
-                    local params = Mod.WorldShare.Utils:ShowWindow(
+                    local params = Mod.WorldShare.Utils.ShowWindow(
                         0,
                         0,
                         "Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html?project_id=" 
@@ -346,7 +346,7 @@ function UserConsole:HandleWorldId(pid)
             end
         end
 
-        local params = Mod.WorldShare.Utils:ShowWindow(
+        local params = Mod.WorldShare.Utils.ShowWindow(
             0,
             0,
             "Mod/WorldShare/cellar/UserConsole/ProjectIdEnter.html?project_id=" 

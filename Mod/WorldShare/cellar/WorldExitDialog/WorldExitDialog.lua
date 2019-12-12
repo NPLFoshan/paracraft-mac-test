@@ -31,7 +31,7 @@ local self = WorldExitDialog
 function WorldExitDialog.ShowPage(callback)
     UserConsole:ClosePage()
     local function Handle()
-        local params = Utils:ShowWindow({
+        local params = Mod.WorldShare.Utils.ShowWindow({
             url = "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html",
             name = "WorldExitDialog",
             isShowTitleBar = false,

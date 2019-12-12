@@ -60,7 +60,7 @@ local WorldShare = commonlib.inherit(commonlib.gettable("Mod.ModBase"), commonli
 
 WorldShare:Property({"Name", "WorldShare", "GetName", "SetName", { auto = true }})
 WorldShare:Property({"Desc", "world share mod can share world to keepwork online", "GetDesc", "SetDesc", { auto = true }})
-WorldShare.version = '0.0.9'
+WorldShare.version = '0.0.10'
 
 -- register mod global variable
 WorldShare.Store = Store

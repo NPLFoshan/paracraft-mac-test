@@ -63,7 +63,7 @@ function BrowseRemoteWorlds.ShowPage(callbackFunc)
 
     BrowseRemoteWorlds.OnScreenSizeChange()
 
-    local params = Utils:ShowWindow(0, 0, "Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html", "BrowseRemoteWorlds", 0, 0, "_fi", false)
+    local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.html", "BrowseRemoteWorlds", 0, 0, "_fi", false)
 
     Screen:Connect("sizeChanged", BrowseRemoteWorlds, BrowseRemoteWorlds.OnScreenSizeChange, "UniqueConnection")
 

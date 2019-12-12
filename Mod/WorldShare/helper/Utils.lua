@@ -22,7 +22,7 @@ local Utils = NPL.export()
 -- @param allowDrag Is allow window drag
 -- @param window z-axis order
 -- @return table
-function Utils:ShowWindow(option, height, url, name, x, y, align, allowDrag, zorder)
+function Utils.ShowWindow(option, height, url, name, x, y, align, allowDrag, zorder)
     local params
  
     if type(option) == 'table' then
@@ -111,7 +111,7 @@ function Utils.FixCenter(width, height)
     return format("margin-left:%s;margin-top: %s", marginLeft - width / 2, marginTop - height / 2)
 end
 
-function Utils:GetFileData(url)
+function Utils.GetFileData(url)
     local file = ParaIO.open(url, "r")
     local fileContent = ""
 
@@ -151,7 +151,7 @@ function Utils:IsEquivalent(a, b)
     return true
 end
 
-function Utils:MergeTable(target, source)
+function Utils.MergeTable(target, source)
     if type(target) ~= "table" or type(source) ~= "table" then
         return false
     end
@@ -166,7 +166,7 @@ function Utils:MergeTable(target, source)
     return target
 end
 
-function Utils:Implode(glue, pieces)
+function Utils.Implode(glue, pieces)
     glue = glue or ""
 
     local k, v
@@ -183,7 +183,7 @@ function Utils:Implode(glue, pieces)
     return result
 end
 
-function Utils:UrlEncode(str)
+function Utils.UrlEncode(str)
     if (str) then
 		str = string.gsub(str, "\n", "\r\n")
 		str = string.gsub(str, "([^%w ])",
@@ -193,7 +193,7 @@ function Utils:UrlEncode(str)
 	return str
 end
 
-function Utils:IsEnglish()
+function Utils.IsEnglish()
     if Translation.GetCurrentLanguage() == 'enUS' then
         return true
     else
