@@ -27,27 +27,29 @@ local Item = {
 	payload = nil,
 }
 
-local localserver = commonlib.createtable("Mod.WorldShare.service.FileDownloader.localserver", {
-	-- the web database name. if nil, it will use the default database file at "Database/localserver.db"
-	-- otherwise, it will use "Database/[db_name].db"
-	db_name,
-	-- true
-	is_initialized_,
-	-- type of SecurityOrigin
-	security_origin_,
-	-- string: server store name
-	name_,
-	-- string: 
-	required_cookie_,
-	-- type of WebCacheDB.ServerType
-	server_type_ = WebCacheDB.ServerType.RESOURCE_STORE,
-	-- service id in database
-	server_id_,
-	-- boolean
-	store_might_exist_ = true,
-	-- Represents an item in the store
-	Item = Item,
-});
+local localserver = commonlib.createtable(
+	"Mod.WorldShare.service.FileDownloader.localserver", 
+	{
+		-- the web database name. if nil, it will use the default database file at "Database/localserver.db"
+		-- otherwise, it will use "Database/[db_name].db"
+		db_name,
+		-- true
+		is_initialized_,
+		-- type of SecurityOrigin
+		security_origin_,
+		-- string: server store name
+		name_,
+		-- string: 
+		required_cookie_,
+		-- type of WebCacheDB.ServerType
+		server_type_ = WebCacheDB.ServerType.RESOURCE_STORE,
+		-- service id in database
+		server_id_,
+		-- boolean
+		store_might_exist_ = true,
+		-- Represents an item in the store
+		Item = Item,
+	})
 
 -- default policy
 localserver.CachePolicy = System.localserver.CachePolicy

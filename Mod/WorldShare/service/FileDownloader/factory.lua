@@ -46,16 +46,19 @@ function localserver.CreateStore(name, serverType, db_name)
         if serverStore:CreateOrOpen("http://paraengine.com", name, "") then end
     elseif serverType == 2 then
         NPL.load("(gl)script/ide/System/localserver/WebserviceStore.lua")
+
         serverStore = localserver.WebserviceStore:new({db_name = db_name})
-        if (serverStore:CreateOrOpen("http://paraengine.com", name, "")) then end
-    elseif (serverType == 3) then
+        if serverStore:CreateOrOpen("http://paraengine.com", name, "") then end
+    elseif serverType == 3 then
         NPL.load("(gl)script/ide/System/localserver/URLResourceStore.lua")
+
         serverStore = localserver.URLResourceStore:new({db_name = db_name})
-        if (serverStore:CreateOrOpen("http://paraengine.com", name, "")) then end
-    elseif (serverType == 0) then
+        if serverStore:CreateOrOpen("http://paraengine.com", name, "") then end
+    elseif serverType == 0 then
         NPL.load("(gl)script/ide/System/localserver/ManagedResourceStore.lua")
+
         serverStore = localserver.ManagedResourceStore:new({db_name = db_name})
-        if (serverStore:CreateOrOpen("http://paraengine.com", name, "")) then end
+        if serverStore:CreateOrOpen("http://paraengine.com", name, "") then end
     end
 
     if serverStore and serverStore.is_initialized_ then

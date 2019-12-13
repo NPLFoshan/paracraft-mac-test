@@ -117,30 +117,36 @@ end
 -- process a finished url request
 -- @param request_id: request id
 -- @param index: url index in the request
-function System.localserver.ProcessURLRequest_result(request_id, index)
+function Mod.WorldShare.service.FileDownloader.localserver.ProcessURLRequest_result(request_id, index)
+    echo('from process url request result!!!!!', true)
     local task = TaskManager:GetTask(request_id)
-    if (not task) then
-        log(string.format("warning: task request_id : %d not found in task manager.\n", request_id))
+
+    if not task then
+        LOG.std(nil, "info", "ProcessURLRequest_result", string.format("warning: task request_id : %d not found in task manager.\n", request_id))
         return nil
     end
+
     local url = task:GetUrl(index)
     -- remove url from url that is being processed.
     TaskManager.urls[url] = nil
 
     local success
-    if (msg.code ~= 0 or msg.rcode ~= 200) then
-        commonlib.log("warning: cannot connect %s code=%s, rcode=%s.\n", url, tostring(msg.code), tostring(msg.rcode))
+
+    if msg.code ~= 0 or msg.rcode ~= 200 then
+        LOG.std(nil, "info", "ProcessURLRequest_result", "warning: cannot connect %s code=%s, rcode=%s.\n", url, tostring(msg.code), tostring(msg.rcode))
 
         -- if fetching failed, we will return the local server version (even if it is expired).
         -- if there is no local server version either, the HTTP msg is returned.
-        local ls = System.localserver.CreateStore(nil, 3)
-        if (ls) then
+        local ls = Mod.WorldShare.service.FileDownloader.localserver.CreateStore(nil, 3)
+
+        if ls then
             local entry = ls:GetItem(url)
-            if (entry) then
-                commonlib.log("however, a local version is found and returned\n")
-                msg = {data = entry.payload.data, header = entry.payload.headers, code = 0, rcode = 200}
+            if entry then
+                LOG.std(nil, "info", "ProcessURLRequest_result", "however, a local version is found and returned\n")
+                msg = { data = entry.payload.data, header = entry.payload.headers, code = 0, rcode = 200 }
             end
         end
+
         -- call the callback func per url.
         -- Use the local server
         task:NotifyUrlComplete(index, msg)
@@ -163,13 +169,13 @@ function System.localserver.ProcessURLRequest_result(request_id, index)
         }
 
         -- call the callback func per url.
-        if (task:NotifyUrlComplete(index, msg)) then
+        if task:NotifyUrlComplete(index, msg) then
             -- only save if url complete return true, meaning a valid message.
             success = task.store_:PutItem(new_item)
         end
     end
 
-    if (success) then
+    if success then
         task:AddProcessedUrl(url)
     end
 
@@ -180,20 +186,19 @@ end
 -- process a finished web service
 -- @param request_id: request id
 -- @param index: url index in the request
-function System.localserver.ProcessWS_result(request_id, index)
-    --log(request_id..", "..index..commonlib.serialize(msg))
-
+function Mod.WorldShare.service.FileDownloader.localserver.ProcessWS_result(request_id, index)
     local task = TaskManager:GetTask(request_id)
-    if (not task) then
+    if not task then
         log(string.format("warning: task request_id : %d not found in task manager.\n", request_id))
         return nil
     end
+
     local url = task:GetUrl(index)
     -- remove url from url that is being processed.
     TaskManager.urls[url] = nil
 
     local success
-    if (msg == nil) then
+    if msg == nil then
         log(url .. " returns an error msg: " .. tostring(msgerror) .. "\n")
     else
         local new_item = {
@@ -213,7 +218,7 @@ function System.localserver.ProcessWS_result(request_id, index)
         success = task.store_:PutItem(new_item)
     end
 
-    if (success) then
+    if success then
         task:AddProcessedUrl(url)
     end
 
@@ -227,40 +232,44 @@ end
 -- process a NPL.AsyncDownload result
 -- @param request_id: request id
 -- @param index: url index in the request
-function System.localserver.ProcessFile_result(request_id, index)
-    --log(request_id..", "..index..commonlib.serialize(msg))
-
+function Mod.WorldShare.service.FileDownloader.localserver.ProcessFile_result(request_id, index)
     local task = TaskManager:GetTask(request_id)
+
     if not task then
         log(string.format("warning: task request_id : %d not found in task manager.\n", request_id))
         return nil
     end
+
     local url = task:GetUrl(index)
 
-    if (url and msg ~= nil) then
+    if url and msg ~= nil then
         -- notify progress
         task:NotifyUrlProgress(index, msg)
     end
 
-    if (url and msg ~= nil and msg.DownloadState == "complete") then
+    if url and msg ~= nil and msg.DownloadState == "complete" then
         -- finished download
         TaskManager.urls[url] = nil
 
         local dataDir = task.store_:GetDataDir()
         local DestFile
-        if (dataDir) then
+
+        if dataDir then
             local tempfile = string.format("temp/tempdownloads/%d-%d.dat", request_id, index)
+
             -- overwrite the last file if exist.
             local entry = task.store_:GetItem(url)
-            if (entry) then
+            if entry then
                 DestFile = entry.payload.cached_filepath
             -- TODO: security check if dest folder is not in local server data dir?
             end
-            if (not DestFile or DestFile == "") then
+
+            if not DestFile or DestFile == "" then
                 local filename = string.gsub(url, ".*/", "")
                 filename = string.gsub(filename, "[%?#].*$", "")
                 DestFile = string.format("%s%s-%s", dataDir, ParaGlobal.GenerateUniqueID(), filename)
             end
+
             -- copy temp to local store's data directory.
             ParaIO.CopyFile(tempfile, DestFile, true)
             -- delete temp file
@@ -271,6 +280,7 @@ function System.localserver.ProcessFile_result(request_id, index)
             task:Release()
             return
         end
+
         local new_item = {
             entry = WebCacheDB.EntryInfo:new(
                 {
@@ -288,7 +298,7 @@ function System.localserver.ProcessFile_result(request_id, index)
             )
         }
 
-        if (msg.ContentType and string.find(msg.ContentType, "text/html")) then
+        if msg.ContentType and string.find(msg.ContentType, "text/html") then
             -- this is an HTTP web page. we will save the headers as well.
             new_item.payload.headers = msg.Headers
             -- new_item.payload.status_code = msg.StatusCode;
@@ -298,7 +308,7 @@ function System.localserver.ProcessFile_result(request_id, index)
 
         success = task.store_:PutItem(new_item)
 
-        if (success) then
+        if success then
             task:AddProcessedUrl(url)
         end
 
@@ -307,8 +317,8 @@ function System.localserver.ProcessFile_result(request_id, index)
 
         -- process the next item in the task.
         task:Run(index + 1)
-    elseif (msg and msg.DownloadState and msg.DownloadState ~= "") then
-        if (msg.DownloadState == "terminated") then
+    elseif msg and msg.DownloadState and msg.DownloadState ~= "" then
+        if msg.DownloadState == "terminated" then
             TaskManager.urls[url] = nil
         end
     end
@@ -412,7 +422,7 @@ function CaptureTask:Run(index)
 
                 NPL.RegisterWSCallBack(
                     wsAddr,
-                    string.format("System.localserver.ProcessWS_result(%d, %d)", self.capture_request_.id, i)
+                    string.format("Mod.WorldShare.service.FileDownloader.localserver.ProcessWS_result(%d, %d)", self.capture_request_.id, i)
                 )
 
                 NPL.CallWebservice(wsAddr, self.capture_request_.msg or {})
@@ -421,7 +431,7 @@ function CaptureTask:Run(index)
 
                 -- we will first download to the temp folder.It may resume from last download
                 -- get rid of query string ? and separator section #
-                local file_url = url -- string.gsub(url, "[%?#].*$", "")
+                -- local file_url = url -- string.gsub(url, "[%?#].*$", "")
 
                 ParaIO.CreateDirectory("temp/tempdownloads/")
                 local filename = string.format("temp/tempdownloads/%d-%d.dat", self.capture_request_.id, i)
@@ -433,9 +443,9 @@ function CaptureTask:Run(index)
 
                 -- download to temp directory.
                 NPL.AsyncDownload(
-                    file_url,
+                    { url = url, headers = { Authorization = format("Bearer %s", token) } },
                     filename,
-                    string.format("System.localserver.ProcessFile_result(%d, %d)", self.capture_request_.id, i),
+                    string.format("Mod.WorldShare.service.FileDownloader.localserver.ProcessFile_result(%d, %d)", self.capture_request_.id, i),
                     tostring(self.capture_request_.id)
                 )
             end
@@ -446,7 +456,7 @@ function CaptureTask:Run(index)
             NPL.AppendURLRequest(
                 { url = url, headers = { Authorization = format("Bearer %s", token) } },
                 format(
-                    "(%s)System.localserver.ProcessURLRequest_result(%d, %d)",
+                    "(%s)Mod.WorldShare.service.FileDownloader.localserver.ProcessURLRequest_result(%d, %d)",
                     npl_thread_name,
                     self.capture_request_.id,
                     i

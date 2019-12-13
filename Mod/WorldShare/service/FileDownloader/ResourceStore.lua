@@ -104,7 +104,7 @@ function ResourceStore:GetFile(Cache_policy, urls, callbackFunc, callbackContext
 	-- never retrieve from remote server if ExpireTime is over 1 year.
 	if Cache_policy.ExpireTime < 47959200 then
 		-- download and save the result to local server and invoke callback.
-		local request = TaskManager:new_request(urls, 1)
+		local request = TaskManager:new_request(urls)
 
 		if request then
 			-- add message

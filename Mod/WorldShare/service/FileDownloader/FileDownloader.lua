@@ -66,8 +66,6 @@ end
 
 -- start file downloading.
 function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
-    src = 'https://qd.myapp.com/myapp/qqteam/pcqq/PCQQ2019.exe'
-
     local function OnSucceeded(filename)
         self.isFetching = false
         if callbackFunc then
@@ -115,29 +113,26 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy)
         localserver.CachePolicy:new(cachePolicy or "access plus 5 mins"),
         src,
         function(entry)
-            echo(entry, true)
-            -- //TODO: Next TODO
-            -- if (dest) then
-            --     if (ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then
-            --         self.cached_filepath = entry.payload.cached_filepath
-            --         if (self.bAutoDeleteCacheFile) then
-            --             self:DeleteCacheFile()
-            --         end
-            --         --  download complete
-            --         --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file from %s to %s", src, dest);
-            --         OnSucceeded(dest)
-            --     else
-            --         --LOG.std(nil, "info", "FileDownloader", "failed copy file from %s to %s", src, dest);
-            --         OnFail(L"无法复制文件到指定目录")
-            --     end
-            -- else
-            --     --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file to %s", entry.payload.cached_filepath);
-            --     OnSucceeded(entry.payload.cached_filepath)
-            -- end
+            if dest then
+                if (ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then
+                    self.cached_filepath = entry.payload.cached_filepath
+                    if (self.bAutoDeleteCacheFile) then
+                        self:DeleteCacheFile()
+                    end
+                    --  download complete
+                    --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file from %s to %s", src, dest);
+                    OnSucceeded(dest)
+                else
+                    --LOG.std(nil, "info", "FileDownloader", "failed copy file from %s to %s", src, dest);
+                    OnFail(L"无法复制文件到指定目录")
+                end
+            else
+                --LOG.std(nil, "info", "FileDownloader", "successfully downloaded file to %s", entry.payload.cached_filepath);
+                OnSucceeded(entry.payload.cached_filepath)
+            end
         end,
         nil,
         function(msg, url)
-            echo(msg, true)
             local text
             self.DownloadState = self.DownloadState
             if (msg.DownloadState == "") then
