@@ -470,6 +470,7 @@ function SyncToDataSource:UpdateRecord(callback)
     local function Handle(data, err)
         if type(data) ~= "table" or #data == 0 then
             self.callback(false, L"获取Commit列表失败")
+            Progress:ClosePage()
             return false
         end
 
@@ -482,7 +483,6 @@ function SyncToDataSource:UpdateRecord(callback)
             return false
         end
 
-        local dataSourceInfo = Mod.WorldShare.Store:Get("user/dataSourceInfo")
         local localFiles = LocalService:LoadFiles(currentWorld.worldpath)
 
         self:SetCurrentCommidId(lastCommitSha)

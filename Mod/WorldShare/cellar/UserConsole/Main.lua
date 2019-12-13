@@ -452,18 +452,13 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
         if tag then
             -- update sync world
             -- local world exist
-            SyncMain.callback = function(result, msg, innerCallback)
-                if type(innerCallback) == 'function' then
-                    innerCallback(true)
-                end
+            Mod.WorldShare.Store:Set('world/currentRevision', currentWorld.revision)
 
+            SyncMain.callback = function(result, msg)
                 if type(callback) == 'function' then
                     callback()
                 end
             end
-
-            Mod.WorldShare.Store:Set('world/currentRevision', currentWorld.revision)
-
             SyncMain:SyncToDataSource()
         else
             local foldername = Mod.WorldShare.Store:Get('world/foldername')

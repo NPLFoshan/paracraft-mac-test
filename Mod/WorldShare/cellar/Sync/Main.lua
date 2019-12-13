@@ -131,7 +131,7 @@ function SyncMain:SyncToLocal(callback)
         return false
     end
 
-    SyncToLocal:Init(function(result, msg, innerCallback)
+    SyncToLocal:Init(function(result, msg)
         if result == false then
             if msg == 'NEWWORLD' then
                 UserConsole:ClosePage()
@@ -145,7 +145,7 @@ function SyncMain:SyncToLocal(callback)
         end
 
         if type(callback) == 'function' then
-            callback(result, msg, innerCallback)
+            callback(result, msg)
         end
     end)
 end
@@ -166,14 +166,16 @@ function SyncMain:SyncToDataSource()
 
     local callback = self.callback
 
-    SyncToDataSource:Init(function(result, msg, innerCallback)
+    SyncToDataSource:Init(function(result, msg)
         if result == false then
             GameLogic.AddBBS(nil, msg, 3000, "255 0 0")
         end
 
         if type(callback) == 'function' then
-            callback(result, msg, innerCallback)
+            callback(result, msg)
         end
+
+        WorldList:RefreshCurrentServerList()
     end)
 
     self.callback = nil
