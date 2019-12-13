@@ -25,12 +25,12 @@ function KeepworkServiceWorld:GetWorldsList(callback)
 end
 
 -- get world by worldname
-function KeepworkServiceWorld:GetWorld(worldName, callback)
-    if type(worldName) ~= 'string' or not KeepworkService:IsSignedIn() then
+function KeepworkServiceWorld:GetWorld(foldername, callback)
+    if type(foldername) ~= 'string' or not KeepworkService:IsSignedIn() then
         return false
     end
 
-    KeepworkWorldsApi:GetWorldByName(worldName, function(data, err)
+    KeepworkWorldsApi:GetWorldByName(foldername, function(data, err)
         if type(callback) ~= 'function' or not data or not data[1] then
             return false
         end

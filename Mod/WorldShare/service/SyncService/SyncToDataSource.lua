@@ -9,12 +9,14 @@ local SyncToDataSource = NPL.load("(gl)Mod/WorldShare/cellar/Sync/SyncToDataSour
 ------------------------------------------------------------
 ]]
 local Progress = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Progress/Progress.lua")
-local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
-local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
-local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
-local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
+local GitService = NPL.load("../GitService.lua")
+local LocalService = NPL.load("../LocalService.lua")
+local KeepworkService = NPL.load("../KeepworkService.lua")
+local KeepworkServiceProject = NPL.load("../KeepworkService/Project.lua")
+local KeepworkServiceWorld = NPL.load("../KeepworkService/World.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local KeepworkGen = NPL.load("(gl)Mod/WorldShare/helper/KeepworkGen.lua")
+local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
 
 local SyncToDataSource = NPL.export()
 
@@ -235,7 +237,7 @@ function SyncToDataSource:GetCompareList()
 end
 
 function SyncToDataSource:RefreshList()
-    KeepworkService:UpdateRecord(
+    self:UpdateRecord(
         function()
             Progress:SetFinish(true)
             Progress:Refresh()
@@ -243,18 +245,8 @@ function SyncToDataSource:RefreshList()
             Mod.WorldShare.Store:Set(
                 "world/CloseProgress",
                 function()
-                    if type(self.callback) == 'function' then
-                        self.callback(true, nil, function(noRefresh)
-                            if not noRefresh then
-                                WorldList:RefreshCurrentServerList()
-                            end
-                        end)
-                        self.callback = nil
-
-                        return false
-                    end
-
-                    WorldList:RefreshCurrentServerList()
+                    self.callback(true, 'success')
+                    self.callback = nil
                 end
             )
         end
@@ -465,4 +457,140 @@ function SyncToDataSource:DeleteOne(file, callback)
             end
         end
     )
+end
+
+-- update world info
+function SyncToDataSource:UpdateRecord(callback)
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+
+    if not currentWorld then
+        return false
+    end
+
+    local function Handle(data, err)
+        if type(data) ~= "table" or #data == 0 then
+            self.callback(false, L"获取Commit列表失败")
+            return false
+        end
+
+        local lastCommits = data[1]
+        local lastCommitFile = lastCommits.title:gsub("paracraft commit: ", "")
+        local lastCommitSha = lastCommits.id
+
+        if string.lower(lastCommitFile) ~= "revision.xml" then
+            self.callback(false, L"上一次同步到数据源同步失败，请重新同步世界到数据源")
+            return false
+        end
+
+        local dataSourceInfo = Mod.WorldShare.Store:Get("user/dataSourceInfo")
+        local localFiles = LocalService:LoadFiles(currentWorld.worldpath)
+
+        self:SetCurrentCommidId(lastCommitSha)
+
+        local filesTotals = currentWorld.size or 0
+
+        local function HandleGetWorld(data)
+            local oldWorldInfo = data or false
+
+            if not oldWorldInfo then
+                return false
+            end
+
+            local commitIds = {}
+
+            if oldWorldInfo.extra and oldWorldInfo.extra.commitIds then
+                commitIds = oldWorldInfo.extra.commitIds
+            end
+
+            commitIds[#commitIds + 1] = {
+                commitId = lastCommitSha,
+                revision = Mod.WorldShare.Store:Get("world/currentRevision"),
+                date = os.date("%Y%m%d", os.time())
+            }
+
+            local worldInfo = {}
+            local username = Mod.WorldShare.Store:Get("user/username")
+            local base32Foldername = GitEncoding.Base32(currentWorld.foldername or '')
+            local repoPath = Mod.WorldShare.Utils.UrlEncode(username .. '/' .. base32Foldername)
+
+            worldInfo.worldName = currentWorld.foldername
+            worldInfo.revision = Mod.WorldShare.Store:Get("world/currentRevision")
+            worldInfo.fileSize = filesTotals
+            worldInfo.commitId = lastCommitSha
+            worldInfo.username = username
+            worldInfo.archiveUrl = format('%s/repos/%s/download?ref=%s', KeepworkService:GetCoreApi(), repoPath, lastCommitSha)
+
+            local preview = format('%s/repos/%s/files/%s/raw?commitId=%s', KeepworkService:GetCoreApi(), repoPath, Mod.WorldShare.Utils.UrlEncode('preview.jpg'), lastCommitSha)
+
+            worldInfo.extra = {
+                coverUrl = preview,
+                commitIds = commitIds
+            }
+
+            if currentWorld.local_tagname and currentWorld.local_tagname ~= foldername.utf8 then
+                worldInfo.extra.worldTagName = currentWorld.local_tagname
+            end
+
+            KeepworkServiceWorld:PushWorld(
+                worldInfo,
+                function(data, err)
+                    if (err ~= 200) then
+                        self.callback(false, L"更新服务器列表失败")
+                        return false
+                    end
+    
+                    if type(callback) == 'function' then
+                        callback()
+                    end
+                end
+            )
+
+            KeepworkServiceProject:GetProject(
+                currentWorld.kpProjectId,
+                function(data)
+                    local extra = data and data.extra or {}
+
+                    if Mod.WorldShare.Store:Get('world/isPreviewUpdated') and
+                        currentWorld.local_tagname and
+                        currentWorld.local_tagname ~= foldername.utf8 then
+
+                        extra.imageUrl = preview
+                        extra.worldTagName = currentWorld.local_tagname
+
+                        KeepworkServiceProject:UpdateProject(
+                            currentWorld.kpProjectId,
+                            {
+                                extra = extra
+                            }
+                        )
+                    elseif Mod.WorldShare.Store:Get('world/isPreviewUpdated') then
+                        extra.imageUrl = preview
+
+                        KeepworkServiceProject:UpdateProject(
+                            currentWorld.kpProjectId,
+                            {
+                                extra = extra
+                            }
+                        )
+                    elseif currentWorld.local_tagname and
+                           currentWorld.local_tagname ~= foldername.utf8 then
+                        extra.worldTagName = currentWorld.local_tagname
+
+                        KeepworkServiceProject:UpdateProject(
+                            currentWorld.kpProjectId,
+                            {
+                                extra = extra
+                            }
+                        )
+                    end
+
+                    Mod.WorldShare.Store:Remove('world/isPreviewUpdated')
+                end
+            )
+        end
+
+        KeepworkServiceWorld:GetWorld(currentWorld.foldername, HandleGetWorld)
+    end
+
+    GitService:GetCommits(currentWorld.foldername, Handle)
 end

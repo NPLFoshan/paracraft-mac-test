@@ -104,8 +104,8 @@ function GitKeepworkService:GetTree(foldername, commitId, callback)
     end)
 end
 
-function GitKeepworkService:GetCommits(foldername, isGetAll, callback, commits, pageSize, commitPage)
-    
+function GitKeepworkService:GetCommits(foldername, callback)
+    KeepworkReposApi:CommitInfo(foldername, callback)
 end
 
 function GitKeepworkService:GetWorldRevision(kpProjectId, isGetMine, callback)

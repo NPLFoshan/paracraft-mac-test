@@ -34,8 +34,8 @@ end
 --[[
 ]]
 -- return: object
-function KeepworkWorldsApi:GetWorldByName(worldName, success, error)
-    local url = format("/worlds?worldName=%s", GitEncoding.Base32(Encoding.url_encode(worldName or '')))
+function KeepworkWorldsApi:GetWorldByName(foldername, success, error)
+    local url = format("/worlds?worldName=%s", Encoding.url_encode(worldName or ''))
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
