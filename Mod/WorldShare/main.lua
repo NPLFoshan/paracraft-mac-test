@@ -190,5 +190,4 @@ end
 
 function WorldShare:OnLeaveWorld()
     Store:Remove("world/currentWorld")
-    Store:Remove("world/foldername")
 end

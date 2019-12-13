@@ -126,7 +126,8 @@ function GitKeepworkService:GetWorldRevision(kpProjectId, isGetMine, callback)
             end
 
             KeepworkReposApi:Raw(
-                data.name, 'revision.xml',
+                data.name,
+                'revision.xml',
                 data.world.commitId,
                 function(data, err)
                     if type(callback) == 'function' then

@@ -121,8 +121,6 @@ function KeepworkService:UpdateRecord(callback)
 
         self:SetCurrentCommidId(lastCommitSha)
 
-        Mod.WorldShare.Store:Set("world/localFiles", localFiles)
-
         local filesTotals = currentWorld.size or 0
 
         local function HandleGetWorld(data)

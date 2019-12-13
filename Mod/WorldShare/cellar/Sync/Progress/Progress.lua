@@ -113,11 +113,11 @@ function Progress:Cancel(callback)
 end
 
 function Progress:Retry()
-    self:Cancel(
-        function()
-            Compare:Init()
-        end
-    )
+    self:Cancel(function()
+        Compare:Init(function(result)
+            -- TODO:// Show progress again
+        end)
+    end)
 end
 
 function Progress:UpdateDataBar(current, total, msg, finish)

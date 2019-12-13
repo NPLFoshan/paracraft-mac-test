@@ -460,9 +460,28 @@ function WorldList:UnifiedTimestampFormat(data)
 end
 
 function WorldList:Sync()
+    Mod.WorldShare.MsgBox:Show(L"请稍后...")
+
     CreateWorld:CheckRevision(function()
-        Compare:Init(function(result, msg, innertCallback)
-            self:RefreshCurrentServerList()
+        Compare:Init(function(result)
+            if not result then
+                GameLogic.AddBBS(nil, L"同步失败", 3000, "255 0 0")
+                Mod.WorldShare.MsgBox:Close()
+                return false
+            end
+
+            if result == Compare.JUSTLOCAL then
+                SyncMain:SyncToDataSource()
+            end
+
+            if result == Compare.JUSTREMOTE then
+                SyncMain:SyncToLocal()
+            end
+
+            if result == Compare.REMOTEBIGGER or result == Compare.LOCALBIGGER or result == Compare.EQUAL then
+                SyncMain:ShowStartSyncPage()
+            end
+
             Mod.WorldShare.MsgBox:Close()
         end)
     end)
@@ -548,7 +567,8 @@ end
 function WorldList:EnterWorld(index)
     self:OnSwitchWorld(index)
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-
+    echo('from world list enter world!!!!', true)
+    echo(currentWorld, true)
     if not currentWorld then
         return false
     end
@@ -578,7 +598,7 @@ function WorldList:EnterWorld(index)
     
             self.zipDownloadFinished = false
     
-            Compare:Init(function(result, callback)
+            Compare:Init(function(result)
                 InternetLoadWorld.EnterWorld()
                 self.zipDownloadFinished = true
             end)
@@ -589,31 +609,25 @@ function WorldList:EnterWorld(index)
                 return true
             end
     
-            Compare:Init(function(result, callback)
-                if result == 'REMOTEBIGGER' then
-                    if type(callback) == 'function' then	
-                        callback(function()	
-                            InternetLoadWorld.EnterWorld()	
-                            UserConsole:ClosePage()	
-                        end)
-                    end	
+            Compare:Init(function(result)
+                if result == Compare.REMOTEBIGGER then
+                    SyncMain:ShowStartSyncPage()
+                    UserConsole:ClosePage()	
                 else	
                     InternetLoadWorld.EnterWorld()	
                     UserConsole:ClosePage()	
                 end	
             end)
         end
-    
-        Store:Set("explorer/mode", "mine")
+
+        Mod.WorldShare.Store:Set("explorer/mode", "mine")
     end
 
     if not KeepworkService:IsSignedIn() and currentWorld.kpProjectId then
         LoginModal:Init(function(result)
-            self:RefreshCurrentServerList(
-                function()
-                    Handle(result)
-                end
-            )
+            self:RefreshCurrentServerList(function()
+                Handle(result)
+            end)
         end)
     else
         Handle()

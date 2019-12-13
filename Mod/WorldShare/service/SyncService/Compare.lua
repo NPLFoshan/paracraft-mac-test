@@ -31,114 +31,71 @@ local JUSTREMOTE = "JUSTREMOTE"
 local LOCALBIGGER = "LOCALBIGGER"
 local EQUAL = "EQUAL"
 
+Compare.REMOTEBIGGER = REMOTEBIGGER
+Compare.JUSTLOCAL = JUSTLOCAL
+Compare.JUSTREMOTE = JUSTREMOTE
+Compare.LOCALBIGGER = LOCALBIGGER
+Compare.EQUAL = EQUAL
+Compare.compareFinish = true
+
 function Compare:Init(callback)
-    local isEnterWorld = Mod.WorldShare.Store:Get("world/isEnterWorld")
-    local isShowUserConsolePage = UserConsole:IsShowUserConsole()
+    if type(callback) ~= 'function' then
+        return false
+    end
+
+    self.callback = callback
+
+    if not self:IsCompareFinish() then
+        return false
+    end
 
     self:SetFinish(false)
-
-    self:GetCompareResult(
-        function(result)
-            if isEnterWorld and not isShowUserConsolePage then
-                if type(callback) == 'function' then
-                    callback()
-                    Mod.WorldShare.MsgBox:Close()
-                    return false
-                end
-
-                -- if (result == REMOTEBIGGER) then
-                --     SyncMain:ShowStartSyncPage()
-                -- end
-
-                Mod.WorldShare.MsgBox:Close()
-            else
-                if result == JUSTLOCAL then
-                    SyncMain:SyncToDataSource()
-                    Mod.WorldShare.MsgBox:Close()
-                    return true
-                end
-
-                if result == JUSTREMOTE then
-                    SyncMain:SyncToLocal(function(result, msg, innertCallback)
-                        if type(callback) == 'function' then
-                            callback(result, msg, innertCallback)
-                        end
-                    end)
-                    return true
-                end
-
-                if result == REMOTEBIGGER or result == LOCALBIGGER or result == EQUAL then
-                    if type(callback) == 'function' then
-                        callback(result, function(callback) SyncMain:ShowStartSyncPage(callback, true) end)
-                    else
-                        SyncMain:ShowStartSyncPage()
-                    end
-
-                    Mod.WorldShare.MsgBox:Close()
-                    return true
-                end
-            end
-        end
-    )
+    self:GetCompareResult()
 end
 
 function Compare:IsCompareFinish()
-    local compareFinish = Mod.WorldShare.Store:Get('world/compareFinish')
-
-    return compareFinish == true
+    return self.compareFinish == true
 end
 
 function Compare:SetFinish(value)
-    Mod.WorldShare.Store:Set('world/compareFinish', value)
+    self.compareFinish = value
 end
 
-function Compare:GetCompareResult(callback)
-    if not self:IsCompareFinish() then
-        Mod.WorldShare.MsgBox:Show(L"请稍后...")
-    end
-
+function Compare:GetCompareResult()
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
-    if not currentWorld then
-        Mod.WorldShare.MsgBox:Close()
+    if not currentWorld or currentWorld.is_zip then
+        self:SetFinish(true)
+        self.callback(false)
         return false
     end
 
     if currentWorld.status == 1 then
-        if type(callback) == "function" then
-            callback(JUSTLOCAL)
-            return true
-        end
+        self.callback(JUSTLOCAL)
+        return true
     end
 
     if currentWorld.status == 2 then
-        if type(callback) == "function" then
-            callback(JUSTREMOTE)
-            return true
-        end
+        self.callback(JUSTREMOTE)
+        return true
     end
 
-    if currentWorld.is_zip then
-        self:SetFinish(true)
-        Mod.WorldShare.MsgBox:Close()
-        return false
-    end
-
-    self:CompareRevision(callback)
+    self:CompareRevision()
 end
 
 -- create revision try times
 Compare.createRevisionTimes = 0
 
-function Compare:CompareRevision(callback)
-    local foldername = Mod.WorldShare.Store:Get("world/foldername")
+function Compare:CompareRevision()
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
-    if not foldername or not currentWorld or not currentWorld.worldpath then
+    if not currentWorld or not currentWorld.worldpath then
+        self:SetFinish(true)
+        self.callback(false)
         return false
     end
 
-    local remoteWorldsList = Mod.WorldShare.Store:Get("world/remoteWorldsList")
+    local currentRevision = WorldRevision:new():init(currentWorld.worldpath):Checkout()
     local remoteRevision = 0
 
     if self:HasRevision() then
@@ -162,27 +119,16 @@ function Compare:CompareRevision(callback)
             end
         end
 
-        local currentRevision = WorldRevision:new():init(currentWorld.worldpath):Checkout()
-
         if currentWorld and not currentWorld.kpProjectId then
-            currentRevision = tonumber(currentRevision) or 0
-            remoteRevision = tonumber(data) or 0
-
-            Mod.WorldShare.Store:Set("world/currentRevision", currentRevision)
-            Mod.WorldShare.Store:Set("world/remoteRevision", remoteRevision)
-
             self:SetFinish(true)
-
-            if type(callback) == "function" then
-                callback(CompareRevision(currentRevision, remoteRevision))
-            end
-
+            self.callback(false)
             return true
         end
 
         local function HandleRevision(data, err)
             if err == 0 or err == 502 then
-                _guihelper.MessageBox(L"网络错误")
+                self:SetFinish(true)
+                self.callback(false)
                 return false
             end
 
@@ -197,10 +143,7 @@ function Compare:CompareRevision(callback)
             local result = CompareRevision(currentRevision, remoteRevision)
 
             self:SetFinish(true)
-
-            if type(callback) == "function" then
-                callback(result)
-            end
+            self.callback(result)
         end
 
         GitService:GetWorldRevision(currentWorld.kpProjectId, true, HandleRevision)
@@ -209,7 +152,6 @@ function Compare:CompareRevision(callback)
 
         if self.createRevisionTimes > 3 then
             self.createRevisionTimes = 0
-            _guihelper.MessageBox(L'创建版本信息失败')
             return false
         end
 
@@ -241,10 +183,8 @@ function Compare:HasRevision()
     local localFiles = LocalService:LoadFiles(currentWorld and currentWorld.worldpath)
     local hasRevision = false
 
-    Mod.WorldShare.Store:Set("world/localFiles", localFiles)
-
     for key, file in ipairs(localFiles) do
-        if (string.lower(file.filename) == "revision.xml") then
+        if string.lower(file.filename) == "revision.xml" then
             hasRevision = true
             break
         end
@@ -254,7 +194,8 @@ function Compare:HasRevision()
 end
 
 function Compare:GetCurrentWorldInfo(callback)
-    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
+    local foldername = Mod.WorldShare.Utils:GetFolderName() or ''
+    local currentWorld
 
     if GameLogic.IsReadOnly() then
         local originWorldPath = ParaWorld.GetWorldDirectory()
@@ -285,12 +226,12 @@ function Compare:GetCurrentWorldInfo(callback)
         Mod.WorldShare.Store:Set("world/currentRevision", GameLogic.options:GetRevision())
     else
         local compareWorldList = Mod.WorldShare.Store:Get("world/compareWorldList")
-
+    
         if compareWorldList then
             local searchCurrentWorld = nil
     
             for key, item in ipairs(compareWorldList) do
-                if item.foldername == currentWorld.foldername and not item.is_zip then
+                if item.foldername == foldername and not item.is_zip then
                     searchCurrentWorld = item
                     break
                 end

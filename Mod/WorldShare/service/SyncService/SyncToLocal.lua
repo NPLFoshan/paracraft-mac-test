@@ -86,8 +86,6 @@ function SyncToLocal:SyncToLocal()
         self.localFiles = LocalService:LoadFiles(self.currentWorld.worldpath)
         self.dataSourceFiles = data
 
-        Mod.WorldShare.Store:Set("world/localFiles", localFiles)
-
         self:GetCompareList()
         self:HandleCompareList()
     end
@@ -309,7 +307,7 @@ function SyncToLocal:DownloadZIP()
             self.currentWorld.foldername,
             commitId,
             function(bSuccess, downloadPath)
-                LocalService:MoveZipToFolder(downloadPath)
+                LocalService:MoveZipToFolder(self.currentWorld.foldername, downloadPath)
 
                 if type(self.callback) == 'function' then
                     self.callback(true, 'success')

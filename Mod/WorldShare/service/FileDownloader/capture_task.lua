@@ -118,7 +118,6 @@ end
 -- @param request_id: request id
 -- @param index: url index in the request
 function Mod.WorldShare.service.FileDownloader.localserver.ProcessURLRequest_result(request_id, index)
-    echo('from process url request result!!!!!', true)
     local task = TaskManager:GetTask(request_id)
 
     if not task then

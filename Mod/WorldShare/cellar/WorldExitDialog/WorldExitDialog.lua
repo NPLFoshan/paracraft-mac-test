@@ -73,7 +73,11 @@ function WorldExitDialog.ShowPage(callback)
         end
     else
         if KeepworkService:IsSignedIn() then
-            Compare:Init(function()
+            Compare:Init(function(result)
+                if not result then
+                    return false
+                end
+
                 local currentWorld = Store:Get('world/currentWorld')
     
                 if currentWorld and currentWorld.kpProjectId then

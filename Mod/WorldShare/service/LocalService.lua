@@ -38,8 +38,6 @@ function LocalService:LoadFiles(worldDir)
         item.filename = CommonlibEncoding.DefaultToUtf8(item.filename)
     end
 
-    Mod.WorldShare.Store:Set('world/localFiles', self.output)
-
     return self.output
 end
 
@@ -183,80 +181,76 @@ function LocalService:IsZip(path)
     end
 end
 
-function LocalService:MoveZipToFolder(path)
-    if (not ParaAsset.OpenArchive(path, true)) then
+function LocalService:MoveZipToFolder(foldername, zipPath)
+    if not ParaAsset.OpenArchive(zipPath, true) then
         return false
     end
 
-    local parentDir = path:gsub("[^/\\]+$", "")
+    local parentDir = zipPath:gsub("[^/\\]+$", "")
 
-    local filesOut = {}
-    commonlib.Files.Find(filesOut, "", 0, 10000, ":.", path) -- ":.", any regular expression after : is supported. `.` match to all strings.
+    local fileList = {}
+    -- ":.", any regular expression after : is supported. `.` match to all strings.
+    commonlib.Files.Find(fileList, "", 0, 10000, ":.", zipPath)
 
-    local bashPath = format("%s/%s/", Mod.WorldShare.Utils.GetWorldFolderFullPath(), CommonEncoding.Utf8ToDefault(self.currentWorld.foldername))
+    local worldpath = format("%s/%s", Mod.WorldShare.Utils.GetWorldFolderFullPath(), CommonlibEncoding.Utf8ToDefault(foldername))
 
-    local folderCreate = ""
-    local rootFolder = filesOut[1] and filesOut[1].filename
-
-    for _, item in ipairs(filesOut) do
-        if (item.filesize > 0) then
+    for _, item in ipairs(fileList) do
+        if item.filesize > 0 then
             local file = ParaIO.open(format("%s%s", parentDir, item.filename), "r")
 
-            if (file:IsValid()) then
-                local binData = file:GetText(0, -1)
-                local pathArray = {}
-                local path = commonlib.copy(item.filename)
+            if file:IsValid() then
+                local folderArray = {}
+                local content = file:GetText(0, -1)
+                local filename = item.filename
 
-                path = path:sub(#rootFolder, #path)
-
-                if (path == "/revision.xml") then
-                    Mod.WorldShare.Store:Set('remoteRevision', binData)
-                end
-
-                for segmentation in string.gmatch(path, "[^/]+") do
-                    if (segmentation ~= rootFolder) then
-                        pathArray[#pathArray + 1] = segmentation
-                    end
-                end
-
-                folderCreate = commonlib.copy(bashPath)
-
-                for i = 1, #pathArray - 1, 1 do
-                    folderCreate = folderCreate .. pathArray[i] .. "/"
-                    ParaIO.CreateDirectory(folderCreate)
-                end
-                
                 -- tricky: we do not know which encoding the filename in the zip archive is,
 				-- so we will assume it is utf8, we will convert it to default and then back to utf8.
 				-- if the file does not change, it might be utf8. 
-				local dest_path;
-				local defaultEncodingFilename = commonlib.Encoding.Utf8ToDefault(path)
-				if(defaultEncodingFilename == path) then
-					dest_path = bashPath..path;
+				local trueFilename = ''
+                local defaultEncodingFilename = CommonlibEncoding.Utf8ToDefault(filename)
+
+				if defaultEncodingFilename == filename then
+					trueFilename = filename
 				else
-					if(commonlib.Encoding.DefaultToUtf8(defaultEncodingFilename) == path) then
-						dest_path = bashPath..defaultEncodingFilename;
+					if CommonlibEncoding.DefaultToUtf8(defaultEncodingFilename) == filename then
+						trueFilename = defaultEncodingFilename
 					else
-						dest_path = bashPath..path;
+						trueFilename = filename
 					end
                 end
 
-                local writeFile = ParaIO.open(dest_path, "w")
-                if(writeFile:IsValid()) then
-                    writeFile:write(binData, #binData)
+                if trueFilename == "revision.xml" then
+                    Mod.WorldShare.Store:Set('remoteRevision', content)
+                end
+
+                for segmentation in string.gmatch(trueFilename, "[^/]+") do
+                    folderArray[#folderArray + 1] = segmentation
+                end
+
+                -- remove file path
+                folderArray[#folderArray] = nil
+
+                -- create folder
+                for _, folderItem in pairs(folderArray) do
+                    ParaIO.CreateDirectory(format('%s/%s', worldpath, folderItem))
+                end
+
+                -- create file
+                local writeFile = ParaIO.open(format("%s/%s", worldpath, trueFilename), "w")
+
+                if writeFile:IsValid() then
+                    writeFile:write(content, #content)
                     writeFile:close()
                 else
-                    LOG.std(nil, "info", "LocalService", "failed to write to %s", dest_path);
+                    LOG.std(nil, "info", "LocalService", "failed to write to %s", format("%s/%s", worldpath, trueFilename));
                 end
 
                 file:close()
             end
-        else
-            -- this is a folder
         end
     end
 
-    ParaAsset.CloseArchive(path)
+    ParaAsset.CloseArchive(zipPath)
 end
 
 -- get all world total files size

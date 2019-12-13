@@ -100,10 +100,6 @@ function UserConsole:ClosePage()
     if UserConsolePage then
         UserConsolePage:CloseWindow()
     end
-
-    if Mod.WorldShare.Store:Get('world/isEnterWorld') then
-        SyncMain:GetCurrentWorldInfo()
-    end
 end
 
 function UserConsole:Refresh(time)

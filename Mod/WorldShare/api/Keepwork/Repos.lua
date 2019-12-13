@@ -37,8 +37,6 @@ end
 function KeepworkReposApi:Download(foldername, commitId, success, error)
     local url = format('%s/repos/%s/download?ref=%s', KeepworkBaseApi:GetApi(), self:GetRepoPath(foldername), commitId)
 
-    echo(url, true)
-
     FileDownloader:new():Init(
         nil,
         url,
