@@ -666,9 +666,9 @@ function WorldList:SetRefreshing(status)
 end
 
 function WorldList:IsRefreshing()
-    UserConsolePage = Store:Get('page/UserConsole')
+    UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
 
-    if (UserConsolePage and UserConsolePage.refreshing) then
+    if UserConsolePage and UserConsolePage.refreshing then
         return true
     else
         return false
@@ -680,7 +680,7 @@ function WorldList:OpenProject(index)
         return false
     end
 
-    local compareWorldList = Store:Get("world/compareWorldList")
+    local compareWorldList = Mod.WorldShare.Store:Get("world/compareWorldList")
 
     if not compareWorldList or type(compareWorldList[index]) ~= 'table' then
         return false

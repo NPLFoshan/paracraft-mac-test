@@ -23,12 +23,11 @@ local WorldList = NPL.load("./WorldList.lua")
 local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 local HistoryManager = NPL.load("(gl)Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua")
-local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
-local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local BrowseRemoteWorlds = NPL.load("(gl)Mod/WorldShare/cellar/BrowseRemoteWorlds/BrowseRemoteWorlds.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
+local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local CacheProjectId = NPL.load("(gl)Mod/WorldShare/database/CacheProjectId.lua")
@@ -460,8 +459,6 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
                 end
             end)
         else
-            local foldername = Mod.WorldShare.Store:Get('world/foldername')
-
             -- just remote world exist
             KeepworkServiceWorld:GetWorld(currentWorld.foldername, function(data)
                 local extra = data and data.extra or {}
@@ -476,7 +473,7 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
                     },
                     function()
                         -- update world info
-                        KeepworkService:PushWorld(
+                        KeepworkServiceWorld:PushWorld(
                             {
                                 worldName = currentWorld.foldername,
                                 extra = extra
