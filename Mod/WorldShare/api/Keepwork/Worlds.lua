@@ -50,5 +50,5 @@ function KeepworkWorldsApi:UpdateWorldinfo(worldId, params, success, error)
 
     local url = format("/worlds/%s", worldId)
 
-    KeepworkBaseApi:Get(url, params, nil, success, error)
+    KeepworkBaseApi:Put(url, params, nil, success, error)
 end

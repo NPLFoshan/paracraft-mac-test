@@ -122,11 +122,6 @@ function SyncMain:BackupWorld()
 end
 
 function SyncMain:SyncToLocal(callback)
-    if type(callback) ~= 'function' then
-        callback = self.callback
-        self.callback = nil
-    end
-
     if self:CheckWorldSize() then
         return false
     end
@@ -147,10 +142,12 @@ function SyncMain:SyncToLocal(callback)
         if type(callback) == 'function' then
             callback(result, msg)
         end
+
+        WorldList:RefreshCurrentServerList()
     end)
 end
 
-function SyncMain:SyncToDataSource()
+function SyncMain:SyncToDataSource(callback)
     if self:CheckWorldSize() then
         return false
     end
@@ -164,8 +161,6 @@ function SyncMain:SyncToDataSource()
         return false
     end
 
-    local callback = self.callback
-
     SyncToDataSource:Init(function(result, msg)
         if result == false then
             GameLogic.AddBBS(nil, msg, 3000, "255 0 0")
@@ -177,8 +172,6 @@ function SyncMain:SyncToDataSource()
 
         WorldList:RefreshCurrentServerList()
     end)
-
-    self.callback = nil
 end
 
 function SyncMain:CheckTagName(callback)

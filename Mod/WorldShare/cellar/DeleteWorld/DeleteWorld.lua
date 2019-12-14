@@ -120,24 +120,19 @@ function DeleteWorld:DeleteLocal(callback)
 end
 
 function DeleteWorld:DeleteRemote()
-    local dataSourceInfo = Store:Get("user/dataSourceInfo")
-    local foldername = Store:Get("world/foldername")
-
-    if (not dataSourceInfo) then
-        return false
-    end
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
     _guihelper.MessageBox(
-        format(L"确定删除远程世界:%s?", foldername.utf8 or ""),
+        format(L"确定删除远程世界:%s?", currentWorld.foldername or ""),
         function(res)
-            if (res and res == 6) then
-                if (dataSourceInfo.dataSourceType == "github") then
-                    self:DeleteGithub()
-                elseif (dataSourceInfo.dataSourceType == "gitlab") then
-                    self:ClosePage()
-                    WorldList:SetRefreshing(true)
-                    self:DeleteRecord()
-                end
+            if res and res == 6 then
+                -- if (dataSourceInfo.dataSourceType == "github") then
+                --     self:DeleteGithub()
+                -- elseif (dataSourceInfo.dataSourceType == "gitlab") then
+                --     self:ClosePage()
+                --     WorldList:SetRefreshing(true)
+                --     self:DeleteRecord()
+                -- end
             end
         end
     )

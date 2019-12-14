@@ -572,7 +572,7 @@ function SyncToDataSource:UpdateRecord(callback)
                             }
                         )
                     elseif self.currentWorld.local_tagname and
-                           self.currentWorld.local_tagname ~= foldername.utf8 then
+                           self.currentWorld.local_tagname ~= self.currentWorld.foldername then
                         extra.worldTagName = self.currentWorld.local_tagname
 
                         KeepworkServiceProject:UpdateProject(

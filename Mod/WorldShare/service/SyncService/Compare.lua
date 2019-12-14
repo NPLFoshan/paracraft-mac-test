@@ -71,11 +71,13 @@ function Compare:GetCompareResult()
     end
 
     if currentWorld.status == 1 then
+        self:SetFinish(true)
         self.callback(JUSTLOCAL)
         return true
     end
 
     if currentWorld.status == 2 then
+        self:SetFinish(true)
         self.callback(JUSTREMOTE)
         return true
     end

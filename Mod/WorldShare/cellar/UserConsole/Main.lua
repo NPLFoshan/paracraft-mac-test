@@ -454,17 +454,16 @@ function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback
             -- local world exist
             Mod.WorldShare.Store:Set('world/currentRevision', currentWorld.revision)
 
-            SyncMain.callback = function(result, msg)
+            SyncMain:SyncToDataSource(function(result, msg)
                 if type(callback) == 'function' then
                     callback()
                 end
-            end
-            SyncMain:SyncToDataSource()
+            end)
         else
             local foldername = Mod.WorldShare.Store:Get('world/foldername')
 
             -- just remote world exist
-            KeepworkService:GetWorld(Encoding.url_encode(foldername.utf8 or ''), function(data)
+            KeepworkServiceWorld:GetWorld(currentWorld.foldername, function(data)
                 local extra = data and data.extra or {}
 
                 extra.worldTagName = tempModifyWorldname

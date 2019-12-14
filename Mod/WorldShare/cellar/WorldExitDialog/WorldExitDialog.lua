@@ -31,6 +31,12 @@ local self = WorldExitDialog
 function WorldExitDialog.ShowPage(callback)
     UserConsole:ClosePage()
 
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+
+    if not currentWorld then
+        return false
+    end
+
     local function Handle()
         local params = Mod.WorldShare.Utils.ShowWindow({
             url = "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html",
@@ -66,7 +72,7 @@ function WorldExitDialog.ShowPage(callback)
 
     if GameLogic.IsReadOnly() then
         if KeepworkService:IsSignedIn() then
-            Grade:IsRated(function(isRated)
+            Grade:IsRated(currentWorld.kpProjectId, function(isRated)
                 self.isRated = isRated
                 Handle()
             end)
@@ -80,15 +86,13 @@ function WorldExitDialog.ShowPage(callback)
                     return false
                 end
 
-                local currentWorld = Mod.WorlShare.Store:Get('world/currentWorld')
-
                 if currentWorld and currentWorld.kpProjectId then
-                    KeepworkServiceProject:GetProject(tonumber(currentWorld.kpProjectId), function(data)
+                    KeepworkServiceProject:GetProject(currentWorld.kpProjectId, function(data)
                         if data and data.world and data.world.worldName then
                             self.currentWorldKeepworkInfo = data
                         end
 
-                        Grade:IsRated(function(isRated)
+                        Grade:IsRated(currentWorld.kpProjectId, function(isRated)
                             self.isRated = isRated
                             Handle()
                         end)
@@ -107,8 +111,8 @@ function WorldExitDialog.ShowPage(callback)
 end
 
 function WorldExitDialog:IsUserWorld()
-    local currentWorld = Store:Get('world/currentWorld')
-    local userId = Store:Get('user/userId')
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+    local userId = Mod.WorldShare.Store:Get('user/userId')
 
     if currentWorld and currentWorld.kpProjectId and userId then
         if self.currentWorldKeepworkInfo and self.currentWorldKeepworkInfo.userId and self.currentWorldKeepworkInfo.userId == userId then
@@ -126,7 +130,7 @@ function WorldExitDialog.GetPreviewImagePath()
 end
 
 function WorldExitDialog:OnInit()
-    Store:Set('page/WorldExitDialog', document:GetPageCtrl())
+    Mod.WorldShare.Store:Set('page/WorldExitDialog', document:GetPageCtrl())
 
     document:GetPageCtrl():SetNodeValue("ShareWorldImage", self.GetPreviewImagePath())
 end
@@ -158,13 +162,14 @@ function WorldExitDialog.Snapshot()
 end
 
 function WorldExitDialog.UpdateImage(bRefreshAsset)
-    local WorldExitDialogPage = Store:Get('page/WorldExitDialog')
+    local WorldExitDialogPage = Mod.WorldShare.Store:Get('page/WorldExitDialog')
 
-    if (WorldExitDialogPage) then
+    if WorldExitDialogPage then
         local filepath = ShareWorldPage.GetPreviewImagePath()
+        echo(filepath, true)
         WorldExitDialogPage:SetUIValue("ShareWorldImage", filepath)
 
-        if (bRefreshAsset) then
+        if bRefreshAsset then
             ParaAsset.LoadTexture("", filepath, 1):UnloadAsset()
         end
     end
@@ -173,7 +178,7 @@ end
 function WorldExitDialog:CanSetStart()
     if not KeepworkService:IsSignedIn() then
         LoginModal:Init(function()
-            local currentWorld = Store:Get('world/currentWorld')
+            local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
             if currentWorld and currentWorld.kpProjectId then
                 KeepworkServiceProject:GetProject(tonumber(currentWorld.kpProjectId), function(data)
@@ -181,7 +186,7 @@ function WorldExitDialog:CanSetStart()
                         self.currentWorldKeepworkInfo = data
                     end
 
-                    Grade:IsRated(function(isRated)
+                    Grade:IsRated(currentWorld.kpProjectId, function(isRated)
                         self.isRated = isRated
                         self:Refresh()
                     end)

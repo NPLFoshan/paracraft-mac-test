@@ -242,9 +242,9 @@ function SyncToLocal:UpdateOne(file, callback)
     local currentLocalItem = self:GetLocalFileByFilename(file)
     local currentRemoteItem = self:GetRemoteFileByPath(file)
 
-    if (currentLocalItem.sha1 == currentRemoteItem.id) then
-        if (type(callback) == "function") then
-            Utils.SetTimeOut(callback)
+    if currentLocalItem.sha1 == currentRemoteItem.id then
+        if type(callback) == "function" then
+            Mod.WorldShare.Utils.SetTimeOut(callback)
         end
 
         return false
@@ -259,7 +259,7 @@ function SyncToLocal:UpdateOne(file, callback)
 
         LocalService:Write(self.currentWorld.foldername, Encoding.Utf8ToDefault(currentRemoteItem.path), content)
 
-        if (type(callback) == "function") then
+        if type(callback) == "function" then
             callback()
         end
     end

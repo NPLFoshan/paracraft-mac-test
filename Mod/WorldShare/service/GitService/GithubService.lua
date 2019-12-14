@@ -189,5 +189,5 @@ function GithubService:getAllresponse(_callback)
 end
 
 function GithubService:getWorldRevison()
-	local contentUrl = format("%s/%s/%s/master/revision.xml", UserConsole.rawBaseUrl, UserConsole.dataSourceUsername, foldername.base32)
+	local contentUrl = format("%s/%s/%s/master/revision.xml", UserConsole.rawBaseUrl, UserConsole.dataSourceUsername, foldername)
 end

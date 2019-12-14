@@ -278,7 +278,7 @@ function WorldList:SyncWorldsList(callback)
             return false
         end
 
-        local localWorlds = Store:Get("world/localWorlds") or {}
+        local localWorlds = Mod.WorldShare.Store:Get("world/localWorlds") or {}
         local remoteWorldsList = data
         local compareWorldList = commonlib.vector:new()
 
@@ -293,13 +293,13 @@ function WorldList:SyncWorldsList(callback)
 
             for LKey, LItem in ipairs(localWorlds) do
                 if DItem["worldName"] == LItem["foldername"] and not LItem.is_zip then
-                    if (tonumber(LItem["revision"] or 0) == tonumber(DItem["revision"] or 0)) then
+                    if tonumber(LItem["revision"] or 0) == tonumber(DItem["revision"] or 0) then
                         status = 3 --本地网络一致
                         revision = LItem['revision']
-                    elseif (tonumber(LItem["revision"] or 0) > tonumber(DItem["revision"] or 0)) then
+                    elseif tonumber(LItem["revision"] or 0) > tonumber(DItem["revision"] or 0) then
                         status = 4 --网络更新
                         revision = LItem['revision']
-                    elseif (tonumber(LItem["revision"] or 0) < tonumber(DItem["revision"] or 0)) then
+                    elseif tonumber(LItem["revision"] or 0) < tonumber(DItem["revision"] or 0) then
                         status = 5 --本地更新
                         revision = LItem['revision'] or 0
                     end
