@@ -8,6 +8,14 @@ use the lib:
 ------------------------------------------------------------
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 ------------------------------------------------------------
+
+status代码含义:
+1:仅本地
+2:仅网络
+3:本地网络一致
+4:网络更新
+5:本地更新
+
 ]]
 local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
 local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
@@ -261,14 +269,6 @@ function WorldList:SelectVersion(index)
     VersionChange:Init(selectedWorld and selectedWorld.foldername)
 end
 
---[[
-status代码含义:
-1:仅本地
-2:仅网络
-3:本地网络一致
-4:网络更新
-5:本地更新
-]]
 function WorldList:SyncWorldsList(callback)
     local function HandleWorldList(data, err)
         if type(data) ~= "table" then
@@ -488,8 +488,6 @@ function WorldList:Sync()
 end
 
 function WorldList:DeleteWorld(index)
-    local compareWorldList = Store:Get('world/compareWorldList')
-
     local selectedWorld = self:GetSelectWorld(index)
 
     DeleteWorld:DeleteWorld(selectedWorld)
@@ -511,7 +509,7 @@ end
 function WorldList:UpdateWorldInfo(worldIndex)
     self.worldIndex = worldIndex
     local currentWorld = self:GetSelectWorld(worldIndex)
-    local compareWorldList = Store:Get("world/compareWorldList")
+    local compareWorldList = Mod.WorldShare.Store:Get("world/compareWorldList")
 
     if currentWorld and currentWorld.status ~= 2 then
 
@@ -522,7 +520,7 @@ function WorldList:UpdateWorldInfo(worldIndex)
             worldTag.size = filesize
             LocalService:SetTag(currentWorld.worldpath, worldTag)
 
-            Store:Set("world/worldTag", worldTag)
+            Mod.WorldShare.Store:Set("world/worldTag", worldTag)
 
             compareWorldList[worldIndex].size = filesize
         else
@@ -535,15 +533,8 @@ function WorldList:UpdateWorldInfo(worldIndex)
         return false
     end
 
-    local foldername = {
-        default = Encoding.Utf8ToDefault(currentWorld.foldername),
-        utf8 = currentWorld.foldername,
-        base32 = GitEncoding.Base32(currentWorld.foldername),
-    }
-
-    Store:Set("world/foldername", foldername)
-    Store:Set("world/currentWorld", currentWorld)
-    Store:Set("world/compareWorldList", compareWorldList)
+    Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
+    Mod.WorldShare.Store:Set("world/compareWorldList", compareWorldList)
 
     UserConsole:Refresh()
 end
@@ -567,8 +558,7 @@ end
 function WorldList:EnterWorld(index)
     self:OnSwitchWorld(index)
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-    echo('from world list enter world!!!!', true)
-    echo(currentWorld, true)
+
     if not currentWorld then
         return false
     end
@@ -592,15 +582,21 @@ function WorldList:EnterWorld(index)
         local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
         if currentWorld.status == 2 then
-            if not self.zipDownloadFinished then
-                return false
-            end
-    
-            self.zipDownloadFinished = false
-    
+            Mod.WorldShare.MsgBox:Show(L"请稍后...")
+
             Compare:Init(function(result)
-                InternetLoadWorld.EnterWorld()
-                self.zipDownloadFinished = true
+                if result ~= Compare.JUSTREMOTE then
+                    return false
+                end
+
+                SyncMain:SyncToLocal(function(result, msg)
+                    if not result then
+                        return false
+                    end
+
+                    InternetLoadWorld.EnterWorld()
+                    Mod.WorldShare.MsgBox:Close()
+                end)
             end)
         else
             if currentWorld.status == 1 then
@@ -612,8 +608,8 @@ function WorldList:EnterWorld(index)
             Compare:Init(function(result)
                 if result == Compare.REMOTEBIGGER then
                     SyncMain:ShowStartSyncPage()
-                    UserConsole:ClosePage()	
-                else	
+                    UserConsole:ClosePage()
+                else
                     InternetLoadWorld.EnterWorld()	
                     UserConsole:ClosePage()	
                 end	
@@ -635,15 +631,15 @@ function WorldList:EnterWorld(index)
 end
 
 function WorldList.FormatStatus(status)
-    if (status == 1) then
+    if status == 1 then
         return L"仅本地"
-    elseif (status == 2) then
+    elseif status == 2 then
         return L"仅网络"
-    elseif (status == 3) then
+    elseif status == 3 then
         return L"本地版本与远程数据源一致"
-    elseif (status == 4) then
+    elseif status == 4 then
         return L"本地版本更加新"
-    elseif (status == 5) then
+    elseif status == 5 then
         return L"远程版本更加新"
     else
         return L"获取状态中"

@@ -180,7 +180,7 @@ end
 function LoginModal:SetAutoLogin()
     local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
 
-    if (not LoginModalPage) then
+    if not LoginModalPage then
         return false
     end
 
