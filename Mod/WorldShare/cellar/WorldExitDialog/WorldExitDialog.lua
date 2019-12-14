@@ -30,6 +30,7 @@ local self = WorldExitDialog
 -- @return void or boolean
 function WorldExitDialog.ShowPage(callback)
     UserConsole:ClosePage()
+
     local function Handle()
         local params = Mod.WorldShare.Utils.ShowWindow({
             url = "Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.html",
@@ -50,10 +51,11 @@ function WorldExitDialog.ShowPage(callback)
         })
 
         params._page.OnClose = function()
-            Store:Remove('page/WorldExitDialog')
+            Mod.WorldShare.Store:Remove('page/WorldExitDialog')
         end
 
-        local WorldExitDialogPage = Store:Get('page/WorldExitDialog')
+        local WorldExitDialogPage = Mod.WorldShare.Store:Get('page/WorldExitDialog')
+
         if WorldExitDialogPage then
             if not GameLogic.IsReadOnly() and not ParaIO.DoesFileExist(self.GetPreviewImagePath(), false) then
                 WorldExitDialog.Snapshot()
@@ -78,8 +80,8 @@ function WorldExitDialog.ShowPage(callback)
                     return false
                 end
 
-                local currentWorld = Store:Get('world/currentWorld')
-    
+                local currentWorld = Mod.WorlShare.Store:Get('world/currentWorld')
+
                 if currentWorld and currentWorld.kpProjectId then
                     KeepworkServiceProject:GetProject(tonumber(currentWorld.kpProjectId), function(data)
                         if data and data.world and data.world.worldName then

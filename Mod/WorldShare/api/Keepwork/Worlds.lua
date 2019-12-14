@@ -35,7 +35,7 @@ end
 ]]
 -- return: object
 function KeepworkWorldsApi:GetWorldByName(foldername, success, error)
-    local url = format("/worlds?worldName=%s", Encoding.url_encode(worldName or ''))
+    local url = format("/worlds?worldName=%s", Encoding.url_encode(foldername or ''))
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
@@ -43,12 +43,12 @@ end
 -- url: /worlds/%s
 -- method: PUT
 -- return: object
-function KeepworkWorldsApi:UpdateWorldinfo(worldId, success, error)
-    if type(worldId) ~= 'number' then
+function KeepworkWorldsApi:UpdateWorldinfo(worldId, params, success, error)
+    if type(worldId) ~= 'number' or type(params) ~= 'table' then
         return false
     end
 
     local url = format("/worlds/%s", worldId)
 
-    KeepworkBaseApi:Get(url, nil, nil, success, error)
+    KeepworkBaseApi:Get(url, params, nil, success, error)
 end

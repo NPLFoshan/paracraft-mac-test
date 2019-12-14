@@ -154,7 +154,7 @@ function ShareWorld:OnClick()
         end)
     end
 
-    if (not canBeShare) then
+    if not canBeShare then
         _guihelper.MessageBox(
             msg,
             function(res)

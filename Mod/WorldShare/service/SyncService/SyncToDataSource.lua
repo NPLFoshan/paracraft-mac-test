@@ -461,33 +461,32 @@ end
 
 -- update world info
 function SyncToDataSource:UpdateRecord(callback)
-    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-
-    if not currentWorld then
+    if not self.currentWorld then
         return false
     end
 
     local function Handle(data, err)
-        if type(data) ~= "table" or #data == 0 then
+        if type(data) ~= "table" or
+           not data.commitId or
+           not data.message then
             self.callback(false, L"获取Commit列表失败")
             Progress:ClosePage()
             return false
         end
 
-        local lastCommits = data[1]
-        local lastCommitFile = lastCommits.title:gsub("paracraft commit: ", "")
-        local lastCommitSha = lastCommits.id
+        local lastCommitFile = string.match(data.message, "revision.xml")
+        local lastCommitSha = data.commitId
 
         if string.lower(lastCommitFile) ~= "revision.xml" then
             self.callback(false, L"上一次同步到数据源同步失败，请重新同步世界到数据源")
             return false
         end
 
-        local localFiles = LocalService:LoadFiles(currentWorld.worldpath)
+        local localFiles = LocalService:LoadFiles(self.currentWorld.worldpath)
 
-        self:SetCurrentCommidId(lastCommitSha)
+        KeepworkService:SetCurrentCommidId(lastCommitSha)
 
-        local filesTotals = currentWorld.size or 0
+        local filesTotals = self.currentWorld.size or 0
 
         local function HandleGetWorld(data)
             local oldWorldInfo = data or false
@@ -510,10 +509,10 @@ function SyncToDataSource:UpdateRecord(callback)
 
             local worldInfo = {}
             local username = Mod.WorldShare.Store:Get("user/username")
-            local base32Foldername = GitEncoding.Base32(currentWorld.foldername or '')
+            local base32Foldername = GitEncoding.Base32(self.currentWorld.foldername or '')
             local repoPath = Mod.WorldShare.Utils.UrlEncode(username .. '/' .. base32Foldername)
 
-            worldInfo.worldName = currentWorld.foldername
+            worldInfo.worldName = self.currentWorld.foldername
             worldInfo.revision = Mod.WorldShare.Store:Get("world/currentRevision")
             worldInfo.fileSize = filesTotals
             worldInfo.commitId = lastCommitSha
@@ -527,8 +526,8 @@ function SyncToDataSource:UpdateRecord(callback)
                 commitIds = commitIds
             }
 
-            if currentWorld.local_tagname and currentWorld.local_tagname ~= foldername.utf8 then
-                worldInfo.extra.worldTagName = currentWorld.local_tagname
+            if self.currentWorld.local_tagname and self.currentWorld.local_tagname ~= self.currentWorld.foldername then
+                worldInfo.extra.worldTagName = self.currentWorld.local_tagname
             end
 
             KeepworkServiceWorld:PushWorld(
@@ -546,19 +545,19 @@ function SyncToDataSource:UpdateRecord(callback)
             )
 
             KeepworkServiceProject:GetProject(
-                currentWorld.kpProjectId,
+                self.currentWorld.kpProjectId,
                 function(data)
                     local extra = data and data.extra or {}
 
                     if Mod.WorldShare.Store:Get('world/isPreviewUpdated') and
-                        currentWorld.local_tagname and
-                        currentWorld.local_tagname ~= foldername.utf8 then
+                        self.currentWorld.local_tagname and
+                        self.currentWorld.local_tagname ~= self.currentWorld.foldername then
 
                         extra.imageUrl = preview
-                        extra.worldTagName = currentWorld.local_tagname
+                        extra.worldTagName = self.currentWorld.local_tagname
 
                         KeepworkServiceProject:UpdateProject(
-                            currentWorld.kpProjectId,
+                            self.currentWorld.kpProjectId,
                             {
                                 extra = extra
                             }
@@ -567,17 +566,17 @@ function SyncToDataSource:UpdateRecord(callback)
                         extra.imageUrl = preview
 
                         KeepworkServiceProject:UpdateProject(
-                            currentWorld.kpProjectId,
+                            self.currentWorld.kpProjectId,
                             {
                                 extra = extra
                             }
                         )
-                    elseif currentWorld.local_tagname and
-                           currentWorld.local_tagname ~= foldername.utf8 then
-                        extra.worldTagName = currentWorld.local_tagname
+                    elseif self.currentWorld.local_tagname and
+                           self.currentWorld.local_tagname ~= foldername.utf8 then
+                        extra.worldTagName = self.currentWorld.local_tagname
 
                         KeepworkServiceProject:UpdateProject(
-                            currentWorld.kpProjectId,
+                            self.currentWorld.kpProjectId,
                             {
                                 extra = extra
                             }
@@ -589,8 +588,8 @@ function SyncToDataSource:UpdateRecord(callback)
             )
         end
 
-        KeepworkServiceWorld:GetWorld(currentWorld.foldername, HandleGetWorld)
+        KeepworkServiceWorld:GetWorld(self.currentWorld.foldername, HandleGetWorld)
     end
 
-    GitService:GetCommits(currentWorld.foldername, Handle)
+    GitService:GetCommits(self.currentWorld.foldername, Handle)
 end
