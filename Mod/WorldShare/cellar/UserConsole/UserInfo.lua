@@ -147,14 +147,8 @@ function UserInfo:LoginWithToken()
                 KeepworkServiceSession:LoginResponse(
                     data,
                     err,
-                    function(gitGateWayData, gitGateWayErr)
+                    function()
                         Mod.WorldShare.MsgBox:Close()
-
-                        if not gitGateWayData or not gitGateWayData.token then
-                            GameLogic.AddBBS(nil, L"Token已过期，请重新登录", 3000, "255 0 0")
-                            KeepworkServiceSession:Logout()
-                            return false
-                        end
 
                         WorldList:RefreshCurrentServerList()
 
@@ -203,15 +197,9 @@ function UserInfo:CheckDoAutoSignin(callback)
                     function(gitGateWayData, gitGateWayErr)
                         Mod.WorldShare.MsgBox:Close()
 
-                        if not gitGateWayData or not gitGateWayData.token then
-                            GameLogic.AddBBS(nil, L"Token已过期，请重新登录", 3000, "255 0 0")
-                            KeepworkServiceSession:Logout()
-                            return false
-                        end
-
                         WorldList:RefreshCurrentServerList()
 
-                        local AfterLogined = Store:Get('user/AfterLogined')
+                        local AfterLogined = Mod.WorldShare.Store:Get('user/AfterLogined')
 
                         if type(AfterLogined) == 'function' then
                             AfterLogined(true)

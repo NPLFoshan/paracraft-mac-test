@@ -29,12 +29,9 @@ end
 
 function Grade:UpdateScore(score, callback)
     local username = Mod.WorldShare.Store:Get('user/username')
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
-    if not KeepworkServiceProject:GetProjectId() then
-        return false
-    end
-
-    if not username then
+    if not username or not currentWorld.kpProjectId then
         return false
     end
 
@@ -45,7 +42,7 @@ function Grade:UpdateScore(score, callback)
     local rate = score * 20
 
     KeepworkServiceRate:SetRatedProject(
-        KeepworkServiceProject:GetProjectId(),
+        currentWorld.kpProjectId,
         rate,
         function(data, err)
             if err == 200 then
@@ -64,7 +61,7 @@ function Grade:IsRated(kpProjectId, callback)
     end
 
     KeepworkServiceRate:GetRatedProject(
-        kpProjectId,
+        tonumber(kpProjectId),
         function(data, err)
             if type(callback) ~= 'function' then
                 return false

@@ -23,7 +23,7 @@ function KeepworkServiceRate:GetRatedProject(kpProjectId, callback)
       return false
   end
 
-  KeepworkProjectRatesApi:GetRatedProject(kpProjectId, callback)
+  KeepworkProjectRatesApi:GetRatedProject(tonumber(kpProjectId), callback)
 end
 
 -- set project rate
@@ -44,6 +44,7 @@ function KeepworkServiceRate:SetRatedProject(kpProjectId, rate, callback)
   self:GetRatedProject(
       kpProjectId,
       function(data, err)
+
           if err ~= 200 or #data == 0 then
             KeepworkProjectRatesApi:CreateProjectRates(params, callback)
           end

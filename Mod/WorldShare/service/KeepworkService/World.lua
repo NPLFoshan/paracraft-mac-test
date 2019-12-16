@@ -61,19 +61,6 @@ function KeepworkServiceWorld:PushWorld(params, callback)
     )
 end
 
--- remove a world
-function KeepworkServiceWorld:DeleteWorld(kpProjectId, callback)
-    if not kpProjectId then
-        return false
-    end
-
-    if not KeepworkService:IsSignedIn() then
-        return false
-    end
-
-    KeepworkProjectsApi:RemoveProject(kpProjectId, callback)
-end
-
 -- get world by project id
 function KeepworkServiceWorld:GetWorldByProjectId(kpProjectId, callback)
     if type(kpProjectId) ~= 'number' or kpProjectId == 0 then

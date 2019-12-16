@@ -119,3 +119,16 @@ end
 function KeepworkServiceProject:Visit(pid)
     KeepworkProjectsApi:Visit(pid)
 end
+
+-- remove a project
+function KeepworkServiceProject:RemoveProject(kpProjectId, callback)
+    if not kpProjectId then
+        return false
+    end
+
+    if not KeepworkService:IsSignedIn() then
+        return false
+    end
+
+    KeepworkProjectsApi:RemoveProject(tonumber(kpProjectId), callback)
+end

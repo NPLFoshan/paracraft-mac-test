@@ -133,7 +133,7 @@ function SyncToDataSource:Start()
         self:HandleCompareList()
     end
 
-    GitService:GetTree(self.currentWorld.foldername, nil, Handle)
+    GitService:GetTree(self.currentWorld.foldername, self.currentWorld.lastCommitId, Handle)
 end
 
 function SyncToDataSource:IgnoreFiles()
@@ -477,15 +477,14 @@ function SyncToDataSource:UpdateRecord(callback)
         local lastCommitFile = string.match(data.message, "revision.xml")
         local lastCommitSha = data.commitId
 
+        self.currentWorld.lastCommitId = lastCommitSha
+
         if string.lower(lastCommitFile) ~= "revision.xml" then
             self.callback(false, L"上一次同步到数据源同步失败，请重新同步世界到数据源")
             return false
         end
 
         local localFiles = LocalService:LoadFiles(self.currentWorld.worldpath)
-
-        KeepworkService:SetCurrentCommidId(lastCommitSha)
-
         local filesTotals = self.currentWorld.size or 0
 
         local function HandleGetWorld(data)
@@ -586,6 +585,9 @@ function SyncToDataSource:UpdateRecord(callback)
                     Mod.WorldShare.Store:Remove('world/isPreviewUpdated')
                 end
             )
+
+            Mod.WorldShare.Store:Set("world/currentWorld", self.currentWorld)
+            KeepworkService:SetCurrentCommitId()
         end
 
         KeepworkServiceWorld:GetWorld(self.currentWorld.foldername, HandleGetWorld)

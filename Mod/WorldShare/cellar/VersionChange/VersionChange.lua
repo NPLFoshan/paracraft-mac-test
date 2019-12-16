@@ -121,16 +121,14 @@ function VersionChange:SelectVersion(index)
     local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
     local commitId = self.allRevision[index]["commitId"]
 
-    Mod.WorldShare.Store:Set("world/commitId", commitId)
-    KeepworkService:SetCurrentCommidId(commitId)
-
     local targetDir = format("%s/%s/", Mod.WorldShare.Utils.GetWorldFolderFullPath(), commonlib.Encoding.Utf8ToDefault(currentWorld.foldername))
 
     commonlib.Files.DeleteFolder(targetDir)
+    ParaIO.CreateDirectory(targetDir)
 
-    Mod.WorldShare.MsgBox:Show(L'请稍后...')
+    currentWorld.lastCommitId = commitId
+    Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
 
     SyncMain:SyncToLocal()
-
     self:ClosePage()
 end

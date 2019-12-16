@@ -67,11 +67,13 @@ end
 ]]
 -- return: object
 function KeepworkReposApi:Tree(foldername, commitId, success, error)
-    if type(foldername) ~= 'string' or type(commitId) ~= 'string' then
-        commitId = 'master'
-    end
+    local url = ''
 
-    local url = format('/repos/%s/tree?ref=%s', self:GetRepoPath(foldername), commitId)
+    if type(foldername) ~= 'string' or type(commitId) ~= 'string' or commitId == 'master' then
+        url = format('/repos/%s/tree', self:GetRepoPath(foldername))
+    else
+        url = format('/repos/%s/tree?commitId=%s', self:GetRepoPath(foldername), commitId)
+    end
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end

@@ -289,6 +289,7 @@ function WorldList:SyncWorldsList(callback)
             local localTagname = ""
             local remoteTagname = ""
             local revision = 0
+            local commitId = ""
             local status
 
             for LKey, LItem in ipairs(localWorlds) do
@@ -298,7 +299,7 @@ function WorldList:SyncWorldsList(callback)
                         revision = LItem['revision']
                     elseif tonumber(LItem["revision"] or 0) > tonumber(DItem["revision"] or 0) then
                         status = 4 --网络更新
-                        revision = LItem['revision']
+                        revision = DItem['revision'] -- use remote revision beacause remote is newest
                     elseif tonumber(LItem["revision"] or 0) < tonumber(DItem["revision"] or 0) then
                         status = 5 --本地更新
                         revision = LItem['revision'] or 0
@@ -487,10 +488,8 @@ function WorldList:Sync()
     end)
 end
 
-function WorldList:DeleteWorld(index)
-    local selectedWorld = self:GetSelectWorld(index)
-
-    DeleteWorld:DeleteWorld(selectedWorld)
+function WorldList:DeleteWorld()
+    DeleteWorld:DeleteWorld()
 end
 
 function WorldList.GetWorldType()

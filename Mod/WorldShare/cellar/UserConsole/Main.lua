@@ -31,6 +31,7 @@ local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkServic
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local GitService = NPL.load("(gl)Mod/WorldShare/service/GitService.lua")
 local CacheProjectId = NPL.load("(gl)Mod/WorldShare/database/CacheProjectId.lua")
+local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 
 local UserConsole = NPL.export()
 
@@ -80,7 +81,7 @@ function UserConsole:ShowPage()
 
         local ignoreAutoLogin = Mod.WorldShare.Store:Get('user/ignoreAutoLogin')
 
-        if (not ignoreAutoLogin) then
+        if not ignoreAutoLogin then
             -- auto sign in here
             UserInfo:CheckDoAutoSignin()
         end
@@ -97,6 +98,11 @@ function UserConsole:ClosePage()
     local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
 
     if UserConsolePage then
+        if Mod.WorldShare.Store:Get('world/isEnterWorld') then
+            -- selecting the world in the world list will change current world data, we should load current world data again when user console page close.
+            Compare:GetCurrentWorldInfo()
+        end
+
         UserConsolePage:CloseWindow()
     end
 end

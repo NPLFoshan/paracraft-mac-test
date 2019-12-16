@@ -6,7 +6,7 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 local WorldExitDialog = NPL.load("(gl)Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua")
-WorldExitDialog.ShowPage();
+WorldExitDialog.ShowPage()
 ------------------------------------------------------------
 ]]
 local ShareWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage")
@@ -72,10 +72,16 @@ function WorldExitDialog.ShowPage(callback)
 
     if GameLogic.IsReadOnly() then
         if KeepworkService:IsSignedIn() then
-            Grade:IsRated(currentWorld.kpProjectId, function(isRated)
-                self.isRated = isRated
-                Handle()
-            end)
+            if currentWorld.kpProjectId then
+                Grade:IsRated(currentWorld.kpProjectId, function(isRated)
+                    self.isRated = isRated
+                    Handle()
+                end)
+
+                return true
+            end
+
+            Handle()
         else
             Handle()
         end
@@ -166,7 +172,7 @@ function WorldExitDialog.UpdateImage(bRefreshAsset)
 
     if WorldExitDialogPage then
         local filepath = ShareWorldPage.GetPreviewImagePath()
-        echo(filepath, true)
+
         WorldExitDialogPage:SetUIValue("ShareWorldImage", filepath)
 
         if bRefreshAsset then

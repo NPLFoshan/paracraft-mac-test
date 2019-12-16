@@ -56,10 +56,10 @@ function SyncToLocal:Init(callback)
     end
 
     self:SetFinish(false)
-    self:SyncToLocal()
+    self:Start()
 end
 
-function SyncToLocal:SyncToLocal()
+function SyncToLocal:Start()
     local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     self.compareListIndex = 1
@@ -70,8 +70,6 @@ function SyncToLocal:SyncToLocal()
             self:DownloadZIP()
             return false
         end
-
-        Mod.WorldShare.MsgBox:Close()
 
         if #data == 0 then
             self.callback(false, 'NEWWORLD')
@@ -90,7 +88,7 @@ function SyncToLocal:SyncToLocal()
         self:HandleCompareList()
     end
 
-    GitService:GetTree(self.currentWorld.foldername, nil, Handle)
+    GitService:GetTree(self.currentWorld.foldername, self.currentWorld.lastCommitId, Handle)
 end
 
 function SyncToLocal:GetCompareList()
@@ -124,7 +122,7 @@ function SyncToLocal:GetCompareList()
             end
         end
 
-        if (not bIsExisted) then
+        if not bIsExisted then
             local currentItem = {
                 file = LItem.filename,
                 status = DELETE
@@ -139,26 +137,29 @@ end
 
 function SyncToLocal:HandleCompareList()
     if self.compareListTotal < self.compareListIndex then
-
-        self:SetFinish(true)
-        self:RefreshList()
-
-        local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
-        KeepworkService:SetCurrentCommidId(currentWorld.lastCommitId)
+        KeepworkService:SetCurrentCommitId()
 
         self.compareListIndex = 1
-        
-        if type(self.callback) == 'function' then
-            self.callback()
-            self.callback = nil
-        end
+        self:SetFinish(true)
 
-        return false
+        Progress:SetFinish(true)
+        Progress:Refresh()
+
+        Mod.WorldShare.Store:Set(
+            "world/CloseProgress",
+            function()
+                self.callback(true, 'success')
+                self.callback = nil
+            end
+        )
+
+        return true
     end
 
-    if (self.broke) then
+    if self.broke then
+        self.compareListIndex = 1
         self:SetFinish(true)
-        LOG.std("SyncToLocal", "debug", "SyncToLocal", "下载被中断")
+        LOG.std("SyncToLocal", "debug", "SyncToLocal", L"下载被中断")
         return false
     end
 
@@ -220,7 +221,7 @@ function SyncToLocal:DownloadOne(file, callback)
     GitService:GetContentWithRaw(
         self.currentWorld.foldername,
         currentRemoteItem.path,
-        nil,
+        self.currentWorld.lastCommitId,
         function(content, size)
             Progress:UpdateDataBar(
                 self.compareListIndex,
@@ -257,14 +258,14 @@ function SyncToLocal:UpdateOne(file, callback)
             format(L"%s （%s） 更新中", currentRemoteItem.path, Utils.FormatFileSize(size, "KB"))
         )
 
-        LocalService:Write(self.currentWorld.foldername, Encoding.Utf8ToDefault(currentRemoteItem.path), content)
+        LocalService:Write(self.currentWorld.foldername, currentRemoteItem.path, content)
 
         if type(callback) == "function" then
             callback()
         end
     end
 
-    GitService:GetContentWithRaw(self.currentWorld.foldername, currentRemoteItem.path, nil, Handle)
+    GitService:GetContentWithRaw(self.currentWorld.foldername, currentRemoteItem.path, self.currentWorld.lastCommitId, Handle)
 end
 
 -- 删除文件
@@ -289,43 +290,30 @@ function SyncToLocal:DownloadZIP()
         return false
     end
 
-    local function Handle(commitId)
-        if not commitId then
-            return false
-        end
+    ParaIO.CreateDirectory(self.currentWorld.worldpath)
 
-        ParaIO.CreateDirectory(self.currentWorld.worldpath)
+    self.localFiles = LocalService:LoadFiles(self.currentWorld.worldpath)
 
-        self.localFiles = LocalService:LoadFiles(self.currentWorld.worldpath)
-
-        if #self.localFiles ~= 0 then
-            LOG.std(nil, "warn", "WorldShare", "target directory: %s is not empty, we will overwrite files in the folder", Encoding.DefaultToUtf8(self.currentWorld.worldpath))
-            GameLogic.RunCommand(format("/menu %s", "file.worldrevision"))
-        end
-
-        GitService:DownloadZIP(
-            self.currentWorld.foldername,
-            commitId,
-            function(bSuccess, downloadPath)
-                LocalService:MoveZipToFolder(self.currentWorld.foldername, downloadPath)
-
-                if type(self.callback) == 'function' then
-                    self.callback(true, 'success')
-                    self.callback = nil
-                end
-
-                Progress:SetFinish(true)
-                Progress:Refresh()
-
-                KeepworkService:SetCurrentCommidId(commitId)
-                Mod.WorldShare.Store:Remove("world/commitId")
-            end
-        )
+    if #self.localFiles ~= 0 then
+        LOG.std(nil, "warn", "WorldShare", "target directory: %s is not empty, we will overwrite files in the folder", Encoding.DefaultToUtf8(self.currentWorld.worldpath))
+        GameLogic.RunCommand(format("/menu %s", "file.worldrevision"))
     end
 
-    KeepworkServiceProject:GetProject(self.currentWorld.kpProjectId, function(data, err)
-        if data and data.world and data.world.commitId then
-            Handle(data.world.commitId)
+    GitService:DownloadZIP(
+        self.currentWorld.foldername,
+        self.currentWorld.lastCommitId,
+        function(bSuccess, downloadPath)
+            LocalService:MoveZipToFolder(self.currentWorld.foldername, downloadPath)
+
+            if type(self.callback) == 'function' then
+                self.callback(true, 'success')
+                self.callback = nil
+            end
+
+            Progress:SetFinish(true)
+            Progress:Refresh()
+
+            KeepworkService:SetCurrentCommitId()
         end
-    end)
+    )
 end

@@ -23,8 +23,21 @@ function GitKeepworkService:GetContent(foldername, path, commitId, callback)
 end
 
 function GitKeepworkService:GetContentWithRaw(foldername, path, commitId, callback)
-
-    
+    KeepworkReposApi:Raw(
+        foldername,
+        path,
+        commitId,
+        function(data, err)
+            if type(callback) == 'function' then
+                callback(data, err)
+            end
+        end,
+        function()
+            if type(callback) == 'function' then
+                callback(nil)
+            end
+        end
+    )
 end
 
 function GitKeepworkService:Upload(foldername, path, content, callback)

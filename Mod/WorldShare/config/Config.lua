@@ -29,6 +29,20 @@ Config.keepworkList = {
   LOCAL = "http://dev.kp-para.cn"
 }
 
+Config.storageList = {
+  ONLINE = "https://api.keepwork.com/storage/v0",
+  STAGE = "http://api-dev.kp-para.cn/storage/v0",
+  RELEASE = "http://api-rls.kp-para.cn/storage/v0",
+  LOCAL = "http://api-dev.kp-para.cn/storage/v0",
+}
+
+Config.qiniuList = {
+  ONLINE = "https://upload-z2.qiniup.com",
+  STAGE = "https://upload-z2.qiniup.com",
+  RELEASE = "https://upload-z2.qiniup.com",
+  LOCAL = "https://upload-z2.qiniup.com"
+}
+
 Config.keepworkServerList = {
   ONLINE = "https://api.keepwork.com/core/v0",
   STAGE = "http://api-dev.kp-para.cn/core/v0",

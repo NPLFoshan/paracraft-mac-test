@@ -85,22 +85,21 @@ function KeepworkService:GetShareUrl()
     end
 
     local baseUrl = Config.keepworkList[env]
-    local foldername = Mod.WorldShare.Store:Get("world/foldername")
     local username = Mod.WorldShare.Store:Get("user/username")
 
     return format("%s/pbl/project/%d/", baseUrl, currentWorld.kpProjectId)
 end
 
-function KeepworkService:SetCurrentCommidId(commitId)
+function KeepworkService:SetCurrentCommitId()
     local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
-    if not currentWorld or not currentWorld.worldpath then
+    if not currentWorld or
+       not currentWorld.worldpath or
+       not currentWorld.lastCommitId then
         return false
     end
 
-    local saveUrl = currentWorld.worldpath
-
-    Mod.WorldShare:SetWorldData("revision", {id = commitId}, saveUrl)
-    ParaIO.CreateDirectory(saveUrl)
-    Mod.WorldShare:SaveWorldData(saveUrl)
+    Mod.WorldShare.worldData = nil
+    Mod.WorldShare:SetWorldData("revision", { id = currentWorld.lastCommitId }, currentWorld.worldpath)
+    Mod.WorldShare:SaveWorldData(currentWorld.worldpath)
 end

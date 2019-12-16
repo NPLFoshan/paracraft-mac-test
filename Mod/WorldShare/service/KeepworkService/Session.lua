@@ -77,7 +77,7 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
             end
 
             if type(callback) == "function" then
-                callback(data, err)
+                callback()
             end
         end
     )
