@@ -75,7 +75,7 @@ end
 ]]
 -- return: object
 function KeepworkUsersApi:RealName(params, success, error, noTryStatus)
-    KeepworkBaseApi:Post('/users/register', params, nil, success, error, noTryStatus)
+    KeepworkBaseApi:Post('/users/cellphone_captcha', params, nil, success, error, noTryStatus)
 end
 
 -- url: /users/svg_captcha?png=true

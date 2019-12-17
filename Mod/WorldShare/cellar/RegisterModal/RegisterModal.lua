@@ -90,8 +90,6 @@ function RegisterModal:Register()
         return false
     end
 
-    -- Mod.WorldShare.Store:Set("user/env", loginServer)
-
     Mod.WorldShare.MsgBox:Show(L"正在注册，可能需要10-15秒的时间，请稍后...", 20000, L"链接超时", 500, 120)
 
     KeepworkServiceSession:Register(account, password, captcha, phone, phonecaptcha, function(state)
