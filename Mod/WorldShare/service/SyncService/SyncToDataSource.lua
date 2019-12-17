@@ -72,6 +72,7 @@ function SyncToDataSource:Init(callback)
                     function(data, err)
                         if err ~= 200 or not data or not data.id then
                             callback(false, L"您创建的帕拉卡(Paracraft)在线项目数量过多。<br />请删除不需要的项目后再试。")
+                            self:SetFinish(true)
                             Progress:ClosePage()
                             return false
                         end
@@ -122,6 +123,9 @@ function SyncToDataSource:Start()
 
     local function Handle(data, err)
         if type(data) ~= 'table' then
+            self.callback(false, L"获取列表失败")
+            self:SetFinish(true)
+            Progress:ClosePage()
             return false
         end
 
@@ -472,6 +476,7 @@ function SyncToDataSource:UpdateRecord(callback)
            not data.commitId or
            not data.message then
             self.callback(false, L"获取Commit列表失败")
+            self:SetFinish(true)
             Progress:ClosePage()
             return false
         end

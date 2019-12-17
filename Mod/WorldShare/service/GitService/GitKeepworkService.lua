@@ -114,7 +114,7 @@ function GitKeepworkService:GetTree(foldername, commitId, callback)
         if type(callback) == 'function' then
             callback(_data, err)
         end
-    end)
+    end, callback)
 end
 
 function GitKeepworkService:GetCommits(foldername, callback)
