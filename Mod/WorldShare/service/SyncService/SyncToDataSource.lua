@@ -17,6 +17,8 @@ local KeepworkServiceWorld = NPL.load("../KeepworkService/World.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local KeepworkGen = NPL.load("(gl)Mod/WorldShare/helper/KeepworkGen.lua")
 local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
+local StorageFilesApi = NPL.load("(gl)Mod/WorldShare/api/Storage/Files.lua")
+local QiniuRootApi = NPL.load("(gl)Mod/WorldShare/api/Qiniu/Root.lua")
 
 local SyncToDataSource = NPL.export()
 
@@ -518,76 +520,114 @@ function SyncToDataSource:UpdateRecord(callback)
             worldInfo.username = username
             worldInfo.archiveUrl = format('%s/repos/%s/download?ref=%s', KeepworkService:GetCoreApi(), repoPath, lastCommitSha)
 
-            local preview = format('%s/repos/%s/files/%s/raw?commitId=%s', KeepworkService:GetCoreApi(), repoPath, Mod.WorldShare.Utils.UrlEncode('preview.jpg'), lastCommitSha)
+            local function AfterHandlePreview(preview)
+                preview = preview or ""
 
-            worldInfo.extra = {
-                coverUrl = preview,
-                commitIds = commitIds
-            }
+                worldInfo.extra = {
+                    coverUrl = preview,
+                    commitIds = commitIds
+                }
 
-            if self.currentWorld.local_tagname and self.currentWorld.local_tagname ~= self.currentWorld.foldername then
-                worldInfo.extra.worldTagName = self.currentWorld.local_tagname
+                if self.currentWorld.local_tagname and self.currentWorld.local_tagname ~= self.currentWorld.foldername then
+                    worldInfo.extra.worldTagName = self.currentWorld.local_tagname
+                end
+
+                KeepworkServiceWorld:PushWorld(
+                    worldInfo,
+                    function(data, err)
+                        if (err ~= 200) then
+                            self.callback(false, L"更新服务器列表失败")
+                            return false
+                        end
+        
+                        if type(callback) == 'function' then
+                            callback()
+                        end
+                    end
+                )
+
+                KeepworkServiceProject:GetProject(
+                    self.currentWorld.kpProjectId,
+                    function(data)
+                        local extra = data and data.extra or {}
+
+                        if Mod.WorldShare.Store:Get('world/isPreviewUpdated') and
+                            self.currentWorld.local_tagname and
+                            self.currentWorld.local_tagname ~= self.currentWorld.foldername then
+
+                            extra.imageUrl = preview
+                            extra.worldTagName = self.currentWorld.local_tagname
+
+                            KeepworkServiceProject:UpdateProject(
+                                self.currentWorld.kpProjectId,
+                                {
+                                    extra = extra
+                                }
+                            )
+                        elseif Mod.WorldShare.Store:Get('world/isPreviewUpdated') then
+                            extra.imageUrl = preview
+
+                            KeepworkServiceProject:UpdateProject(
+                                self.currentWorld.kpProjectId,
+                                {
+                                    extra = extra
+                                }
+                            )
+                        elseif self.currentWorld.local_tagname and
+                            self.currentWorld.local_tagname ~= self.currentWorld.foldername then
+                            extra.worldTagName = self.currentWorld.local_tagname
+
+                            KeepworkServiceProject:UpdateProject(
+                                self.currentWorld.kpProjectId,
+                                {
+                                    extra = extra
+                                }
+                            )
+                        end
+
+                        Mod.WorldShare.Store:Remove('world/isPreviewUpdated')
+                    end
+                )
+
+                Mod.WorldShare.Store:Set("world/currentWorld", self.currentWorld)
+                KeepworkService:SetCurrentCommitId()
             end
 
-            KeepworkServiceWorld:PushWorld(
-                worldInfo,
-                function(data, err)
-                    if (err ~= 200) then
-                        self.callback(false, L"更新服务器列表失败")
-                        return false
-                    end
-    
-                    if type(callback) == 'function' then
-                        callback()
-                    end
+            StorageFilesApi:Token('preview.jpg', function(data, err)
+                if not data.token or not data.key then
+                    return false
                 end
-            )
 
-            KeepworkServiceProject:GetProject(
-                self.currentWorld.kpProjectId,
-                function(data)
-                    local extra = data and data.extra or {}
+                local targetDir = format("%s/%s/preview.jpg", Mod.WorldShare.Utils.GetWorldFolderFullPath(), commonlib.Encoding.Utf8ToDefault(currentWorld.foldername))
+                local content = LocalService:GetFileContent(targetDir)
 
-                    if Mod.WorldShare.Store:Get('world/isPreviewUpdated') and
-                        self.currentWorld.local_tagname and
-                        self.currentWorld.local_tagname ~= self.currentWorld.foldername then
-
-                        extra.imageUrl = preview
-                        extra.worldTagName = self.currentWorld.local_tagname
-
-                        KeepworkServiceProject:UpdateProject(
-                            self.currentWorld.kpProjectId,
-                            {
-                                extra = extra
-                            }
-                        )
-                    elseif Mod.WorldShare.Store:Get('world/isPreviewUpdated') then
-                        extra.imageUrl = preview
-
-                        KeepworkServiceProject:UpdateProject(
-                            self.currentWorld.kpProjectId,
-                            {
-                                extra = extra
-                            }
-                        )
-                    elseif self.currentWorld.local_tagname and
-                           self.currentWorld.local_tagname ~= self.currentWorld.foldername then
-                        extra.worldTagName = self.currentWorld.local_tagname
-
-                        KeepworkServiceProject:UpdateProject(
-                            self.currentWorld.kpProjectId,
-                            {
-                                extra = extra
-                            }
-                        )
-                    end
-
-                    Mod.WorldShare.Store:Remove('world/isPreviewUpdated')
+                if not content then
+                    return false
                 end
-            )
 
-            Mod.WorldShare.Store:Set("world/currentWorld", self.currentWorld)
-            KeepworkService:SetCurrentCommitId()
+                QiniuRootApi:Upload(
+                    data.token,
+                    data.key,
+                    self.currentWorld.kpProjectId .. '-preview-' .. lastCommitSha .. '.jpg',
+                    content,
+                    function()
+                        StorageFilesApi:List(function(listData, err)
+                            if listData and type(listData.data) ~= 'table' then
+                                AfterHandlePreview()
+                                return false
+                            end
+
+                            for key, item in ipairs(listData.data) do
+                                if item.key == data.key then
+                                    if item.downloadUrl then
+                                        AfterHandlePreview(item.downloadUrl)
+                                    end
+                                end
+                            end
+                        end)
+                    end
+                )
+            end)
         end
 
         KeepworkServiceWorld:GetWorld(self.currentWorld.foldername, HandleGetWorld)

@@ -17,7 +17,9 @@ local StorageFilesApi = NPL.export()
 -- method: GET
 -- params: key string
 -- return: object
-function StorageFilesApi:Token(ext, success, error)
+function StorageFilesApi:Token(filename, success, error)
+    local ext = string.match(filename, '.+%.(%S+)$')
+
     if type(ext) ~= 'string' then
         return false
     end
@@ -28,5 +30,20 @@ function StorageFilesApi:Token(ext, success, error)
 
     local url = format('/files/%s/token', key)
 
-    StorageBaseApi:Get("/lessonOrganizations/userOrgInfo", nil, nil, success, error)
+    StorageBaseApi:Get(url, nil, nil, function(data, err)
+        if not data or not data.data or not data.data.token then
+            return false
+        end
+
+        if type(success) == 'function' then
+            success({ token = data.data.token, key = key }, err)
+        end
+    end, error)
+end
+
+-- url: /files/list
+-- method: GET
+-- return: object
+function StorageFilesApi:List(success, error)
+    StorageBaseApi:Get('/files/list', nil, nil, success, error)
 end
