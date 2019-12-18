@@ -153,7 +153,7 @@ function KeepworkReposApi:UpdateFile(foldername, filePath, content, success, err
 
     local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
 
-    KeepworkBaseApi:Put(url, { content = content }, nil, success, error)
+    KeepworkBaseApi:Put(url, { encoding = 'binary', content = content }, nil, success, error)
 end
 
 -- url: /repos/:repoPath/files/:filePath
