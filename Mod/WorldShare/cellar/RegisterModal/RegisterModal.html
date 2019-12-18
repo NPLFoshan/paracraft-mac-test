@@ -85,10 +85,10 @@
                         })
 
                         KeepworkServiceSession:GetPhoneCaptcha(page:GetValue("phone"), function(data, err)
-                            if err == 500 then
+                            if err == 400 and data and data.code and data.message then
                                 isClickedGetPhoneCaptcha = false
                                 page:SetValue("getPhonecaptcha", L"获取验证码")
-                                GameLogic.AddBBS(nil, L"发送验证码失败", 3000, "255 0 0")
+                                GameLogic.AddBBS(nil, format("%s%s(%d)", L"获取验证码失败，错误信息：", data.message, data.code), 3000, "255 0 0")
                                 timer:Change(nil, nil)
                             end
                         end)

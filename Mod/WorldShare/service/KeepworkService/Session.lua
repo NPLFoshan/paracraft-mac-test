@@ -217,7 +217,7 @@ function KeepworkServiceSession:GetPhoneCaptcha(phone, callback)
         return false
     end
 
-    KeepworkUsersApi:CellphoneCaptcha(phone, callback)
+    KeepworkUsersApi:CellphoneCaptcha(phone, callback, callback)
 end
 
 function KeepworkServiceSession:BindPhone(cellphone, captcha, callback)
