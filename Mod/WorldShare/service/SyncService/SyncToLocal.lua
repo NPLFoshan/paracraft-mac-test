@@ -66,6 +66,13 @@ function SyncToLocal:Start()
     self.compareListTotal = 0
 
     local function Handle(data, err)
+        if type(data) ~= 'table' then
+            self.callback(false, L"获取列表失败")
+            self:SetFinish(true)
+            Progress:ClosePage()
+            return false
+        end
+
         if currentWorld.status == 2 and #data ~= 0 then
             self:DownloadZIP()
             return false
@@ -83,6 +90,7 @@ function SyncToLocal:Start()
 
         self.localFiles = LocalService:LoadFiles(self.currentWorld.worldpath)
         self.dataSourceFiles = data
+
 
         self:GetCompareList()
         self:HandleCompareList()

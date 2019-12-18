@@ -67,10 +67,14 @@ function Compare:GetCompareResult()
     if not currentWorld or currentWorld.is_zip then
         self:SetFinish(true)
         self.callback(false)
+
         return false
     end
 
     if currentWorld.status == 1 then
+        local currentRevision = WorldRevision:new():init(currentWorld.worldpath):Checkout()
+        Mod.WorldShare.Store:Set("world/currentRevision", currentRevision)
+
         self:SetFinish(true)
         self.callback(JUSTLOCAL)
         return true
@@ -105,18 +109,26 @@ function Compare:CompareRevision()
 
         local function CompareRevision(currentRevision, remoteRevision)
             if remoteRevision == 0 then
+                currentWorld.status = 1
+                Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
                 return JUSTLOCAL
             end
 
             if currentRevision < remoteRevision then
+                currentWorld.status = 4
+                Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
                 return REMOTEBIGGER
             end
 
             if currentRevision > remoteRevision then
+                currentWorld.status = 5
+                Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
                 return LOCALBIGGER
             end
 
             if currentRevision == remoteRevision then
+                currentWorld.status = 3
+                Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
                 return EQUAL
             end
         end
@@ -208,6 +220,7 @@ function Compare:GetCurrentWorldInfo(callback)
             IsFolder = false,
             is_zip = true,
             Title = worldTag.name,
+            text = worldTag.name,
             author = "None",
             costTime = "0:0:0",
             filesize = 0,
@@ -250,15 +263,15 @@ function Compare:GetCurrentWorldInfo(callback)
         end
     end
 
-    if not currentWorld then -- new world
+    if not currentWorld then
         local originWorldPath = ParaWorld.GetWorldDirectory()
         local worldTag = WorldCommon.GetWorldInfo() or {}
 
-        Mod.WorldShare.Store:Set("world/worldTag", worldTag)
-        Mod.WorldShare.Store:Set("world/currentWorld", {
+        currentWorld = {
             IsFolder = true,
             is_zip = false,
             Title = worldTag.name,
+            text = worldTag.name,
             author = "None",
             costTime = "0:0:0",
             filesize = 0,
@@ -274,8 +287,16 @@ function Compare:GetCurrentWorldInfo(callback)
             progress = "0",
             size = 0,
             worldpath = originWorldPath, 
-            kpProjectId = worldTag.kpProjectId
-        })
+        }
+
+        if worldTag.kpProjectId then
+            currentWorld.kpProjectId = worldTag.kpProjectId
+        else
+            currentWorld.status = 1
+        end
+
+        Mod.WorldShare.Store:Set("world/worldTag", worldTag)
+        Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
     end
 
     if type(callback) == 'function' then

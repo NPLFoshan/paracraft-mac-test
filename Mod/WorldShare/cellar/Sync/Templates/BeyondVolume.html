@@ -2,8 +2,6 @@
     <pe:mcml>
         <script type="text/npl" refresh="false">
             <![CDATA[
-                local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
-                local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
                 local SyncMain = NPL.load("../Main.lua")
 
                 SyncMain:SetBeyondVolumePage();
@@ -28,12 +26,12 @@
                 function open_world_folder()
                     SyncMain:CloseBeyondVolumePage()
 
-                    local currentWorld = Store:Get("world/currentWorld")
+                    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
                     ParaGlobal.ShellExecute("open", currentWorld and currentWorld.worldpath, "", "", 1);
                 end
 
                 function get_window_style()
-                    return Utils.FixCenter(500, 270)
+                    return Mod.WorldShare.Utils.FixCenter(500, 270)
                 end
 
                 function close()

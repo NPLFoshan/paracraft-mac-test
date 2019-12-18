@@ -241,13 +241,13 @@ function SyncMain:CheckWorldSize()
     local filesTotal = LocalService:GetWorldSize(currentWorld.worldpath)
     local maxSize = 0
 
-    if (userType == "vip") then
+    if userType == "vip" then
         maxSize = 50 * 1024 * 1024
     else
         maxSize = 25 * 1024 * 1024
     end
 
-    if (filesTotal > maxSize) then
+    if filesTotal > maxSize then
         self:ShowBeyondVolume()
 
         return true
@@ -257,10 +257,10 @@ function SyncMain:CheckWorldSize()
 end
 
 function SyncMain:GetWorldDateTable()
-    local currentWorld = Store:Get("world/currentWorld")
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
     local date = {}
 
-    if (currentWorld and currentWorld.tooltip) then
+    if currentWorld and currentWorld.tooltip then
         for item in string.gmatch(currentWorld.tooltip, "[^:]+") do
             date[#date + 1] = item
         end

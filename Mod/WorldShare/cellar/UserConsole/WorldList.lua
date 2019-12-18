@@ -281,6 +281,7 @@ function WorldList:SyncWorldsList(callback)
         local localWorlds = Mod.WorldShare.Store:Get("world/localWorlds") or {}
         local remoteWorldsList = data
         local compareWorldList = commonlib.vector:new()
+        local currentWorld
 
         -- 处理 本地网络同时存在/本地不存在/网络存在 的世界
         for DKey, DItem in ipairs(remoteWorldsList) do
@@ -324,7 +325,7 @@ function WorldList:SyncWorldsList(callback)
 
             local text = DItem["worldName"]
 
-            if (not isExist) then
+            if not isExist then
                 --仅网络
                 status = 2
                 revision = DItem['revision']
@@ -335,7 +336,7 @@ function WorldList:SyncWorldsList(callback)
                 end
             end
 
-            local currentWorld = {
+            currentWorld = {
                 text = text,
                 foldername = DItem["worldName"],
                 revision = revision,

@@ -127,6 +127,8 @@ function DeleteWorld:DeleteRemote()
                 KeepworkServiceProject:RemoveProject(
                     currentWorld.kpProjectId,
                     function(data, err)
+                        self:ClosePage()
+
                         if err ~= 204 and err ~= 200 then
                             GameLogic.AddBBS(nil, format("%s:%d", L"服务器返回错误状态码", err), 3000, "255 0 0")
                         end

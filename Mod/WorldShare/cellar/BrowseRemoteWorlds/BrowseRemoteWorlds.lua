@@ -149,7 +149,7 @@ function BrowseRemoteWorlds.EnterWorld(index)
 
     currentRemoteWorld.is_zip = true
 
-    Store:Set("world/currentWorld", currentRemoteWorld)
+    Mod.WorldShare.Store:Set("world/currentWorld", currentRemoteWorld)
     InternetLoadWorld.EnterWorld(index)
 end
 
@@ -163,10 +163,10 @@ function BrowseRemoteWorlds.DeleteWorld(index)
     InternetLoadWorld.selected_world_index = index
 
     local currentRemoteWorld = InternetLoadWorld.GetCurrentWorld()
-    local currentWorld = Store:Get('world/currentWorld')
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
     if currentWorld then
-        if (currentWorld.foldername == currentRemoteWorld.foldername) then
+        if currentWorld.foldername == currentRemoteWorld.foldername then
             _guihelper.MessageBox(L"不能刪除正在编辑的世界")
             return
         end

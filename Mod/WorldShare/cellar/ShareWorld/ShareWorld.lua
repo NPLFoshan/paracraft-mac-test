@@ -19,13 +19,14 @@ local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
+local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 
 local ShareWorld = NPL.export()
 
 function ShareWorld:Init()
-    local currentWorld = self:GetEnterWorld()
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     if not currentWorld or currentWorld.is_zip then
         _guihelper.MessageBox(L"此世界不支持分享")
@@ -43,7 +44,7 @@ function ShareWorld:Init()
                 currentWorld.foldername,
                 function()
                     WorldList:RefreshCurrentServerList(function()
-                        SyncMain:GetCurrentWorldInfo(
+                        Compare:GetCurrentWorldInfo(
                             function()
                                 Compare:Init(function(result)
                                     if result then
@@ -66,6 +67,7 @@ function ShareWorld:Init()
     end
 
     Compare:Init(function(result)
+        echo(result, true)
         if result then
             self:ShowPage()
         end
@@ -88,10 +90,6 @@ function ShareWorld:ShowPage()
     end
 
     self:Refresh()
-end
-
-function ShareWorld:GetEnterWorld()
-    return Mod.WorldShare.Store:Get("world/currentWorld")
 end
 
 function ShareWorld:GetPreviewImagePath()
@@ -120,9 +118,10 @@ function ShareWorld:Refresh(times)
 end
 
 function ShareWorld:GetWorldSize()
-    local tagInfo = WorldCommon.GetWorldInfo()
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
+    local filesTotal = LocalService:GetWorldSize(currentWorld.worldpath)
 
-    return Mod.WorldShare.Utils.FormatFileSize(tagInfo.size)
+    return Mod.WorldShare.Utils.FormatFileSize(filesTotal)
 end
 
 function ShareWorld:GetRemoteRevision()
