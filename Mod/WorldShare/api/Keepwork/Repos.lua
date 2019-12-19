@@ -172,7 +172,7 @@ function KeepworkReposApi:CreateFile(foldername, filePath, content, success, err
 
     local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
 
-    KeepworkBaseApi:Post(url, { content = content }, nil, success, error)
+    KeepworkBaseApi:Post(url, { encoding = 'binary', content = content }, nil, success, error)
 end
 
 -- url: /repos/:repoPath/files/:filePath
