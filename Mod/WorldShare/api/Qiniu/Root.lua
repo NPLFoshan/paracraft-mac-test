@@ -20,23 +20,28 @@ function QiniuRootApi:Upload(token, key, filename, content, success, error)
     local boundary = ParaMisc.md5('')
     local boundaryLine = "--" .. boundary .. "\n"
 
+    local postFieldsString = boundaryLine ..
+                             "Content-Disposition: form-data; name=\"file\"; filename=\"" .. filename .. "\"\n" ..
+                             "Content-Type: image/jpeg\n\n" ..
+                             content .. "\n" ..
+                             boundaryLine ..
+                             "Content-Disposition: form-data; name=\"x:filename\"\n\n" ..
+                             filename ..  "\n" ..
+                             boundaryLine ..
+                             "Content-Disposition: form-data; name=\"token\"\n\n" ..
+                             token ..  "\n" ..
+                             boundaryLine ..
+                             "Content-Disposition: form-data; name=\"key\"\n\n" ..
+                             key .. "\n" .. 
+                             boundaryLine
+
     QiniuBaseApi:PostFields(
         '/',
-        { ['Content-Type'] = "multipart/form-data; boundary=" .. boundary },
-        boundaryLine ..
-        "Content-Disposition: form-data; name=\"file\"; filename=\"" .. filename .. "\"\n" ..
-        "Content-Type: image/jpeg\n\n" ..
-        content .. "\n" ..
-        boundaryLine ..
-        "Content-Disposition: form-data; name=\"x:filename\"\n\n" ..
-        filename ..  "\n" ..
-        boundaryLine ..
-        "Content-Disposition: form-data; name=\"token\"\n\n" ..
-        token ..  "\n" ..
-        boundaryLine ..
-        "Content-Disposition: form-data; name=\"key\"\n\n" ..
-        key .. "\n" .. 
-        boundaryLine,
+        {
+            ['Content-Type'] = "multipart/form-data; boundary=" .. boundary,
+            ['Content-Length'] = #postFieldsString,
+        },
+        postFieldsString,
         success,
         error
     )
