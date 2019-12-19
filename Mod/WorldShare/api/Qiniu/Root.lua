@@ -13,16 +13,20 @@ local QiniuBaseApi = NPL.load('./BaseApi.lua')
 
 local QiniuRootApi = NPL.export()
 
+QiniuRootApi.boundary = ParaMisc.md5('')
+
 -- url: /
 -- method: POST FIELDS
 -- return: object
 function QiniuRootApi:Upload(token, key, filename, content, success, error)
-    local boundary = ParaMisc.md5('')
+    local boundary = QiniuRootApi.boundary
     local boundaryLine = "--" .. boundary .. "\n"
+
 
     local postFieldsString = boundaryLine ..
                              "Content-Disposition: form-data; name=\"file\"; filename=\"" .. filename .. "\"\n" ..
-                             "Content-Type: image/jpeg\n\n" ..
+                             "Content-Type: application/octet-stream\n" ..
+                             "Content-Transfer-Encoding: binary\n\n" ..
                              content .. "\n" ..
                              boundaryLine ..
                              "Content-Disposition: form-data; name=\"x:filename\"\n\n" ..
@@ -38,8 +42,13 @@ function QiniuRootApi:Upload(token, key, filename, content, success, error)
     QiniuBaseApi:PostFields(
         '/',
         {
+            ['Host'] = "upload-z2.qiniup.com",
+            ['User-Agent'] = "paracraft",
+            ["Accept"] = "*/*",
+            ["Cache-Control"] = "no-cache",
             ['Content-Type'] = "multipart/form-data; boundary=" .. boundary,
             ['Content-Length'] = #postFieldsString,
+            ['Connection'] = "keep-alive",
         },
         postFieldsString,
         success,

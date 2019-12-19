@@ -67,7 +67,6 @@ function ShareWorld:Init()
     end
 
     Compare:Init(function(result)
-        echo(result, true)
         if result then
             self:ShowPage()
         end
