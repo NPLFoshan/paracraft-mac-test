@@ -20,7 +20,7 @@ QiniuRootApi.boundary = ParaMisc.md5('')
 -- return: object
 function QiniuRootApi:Upload(token, key, filename, content, success, error)
     local boundary = QiniuRootApi.boundary
-    local boundaryLine = "--" .. boundary .. "\n"
+    local boundaryLine = "--WebKitFormBoundary" .. boundary .. "\n"
 
 
     local postFieldsString = boundaryLine ..
@@ -46,7 +46,7 @@ function QiniuRootApi:Upload(token, key, filename, content, success, error)
             ['User-Agent'] = "paracraft",
             ["Accept"] = "*/*",
             ["Cache-Control"] = "no-cache",
-            ['Content-Type'] = "multipart/form-data; boundary=" .. boundary,
+            ['Content-Type'] = "multipart/form-data; boundary=WebKitFormBoundary" .. boundary,
             ['Content-Length'] = #postFieldsString,
             ['Connection'] = "keep-alive",
         },
