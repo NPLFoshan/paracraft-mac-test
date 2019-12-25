@@ -70,8 +70,13 @@ function SyncToDataSource:Init(callback)
                 KeepworkServiceProject:CreateProject(
                     self.currentWorld.foldername,
                     function(data, err)
+                        if err == 400 and data and data.code == 14 then
+                            callback(false, L"您创建的帕拉卡(Paracraft)在线项目数量过多。请删除不需要的项目后再试。")
+                            return false
+                        end
+
                         if err ~= 200 or not data or not data.id then
-                            callback(false, L"您创建的帕拉卡(Paracraft)在线项目数量过多。<br />请删除不需要的项目后再试。")
+                            callback(false, L"创建项目失败")
                             self:SetFinish(true)
                             Progress:ClosePage()
                             return false
@@ -598,15 +603,12 @@ function SyncToDataSource:UpdateRecord(callback)
                 KeepworkService:SetCurrentCommitId()
             end
 
-            echo('from request storage files api token!!!!!!', true)
             StorageFilesApi:Token('preview.jpg', function(data, err)
-                echo(data, true)
                 if not data.token or not data.key then
                     return false
                 end
 
                 local targetDir = format("%s/%s/preview.jpg", Mod.WorldShare.Utils.GetWorldFolderFullPath(), commonlib.Encoding.Utf8ToDefault(self.currentWorld.foldername))
-                echo(targetDir, true)
                 local content = LocalService:GetFileContent(targetDir)
 
                 if not content then

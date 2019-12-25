@@ -40,6 +40,10 @@ function SyncToLocal:Init(callback)
     self.finish = false
     self.callback = callback
 
+    -- //TODO: Move to UI file
+    -- 加载进度UI界面
+    Progress:Init(self)
+
     -- we build a world folder path if worldpath is not exit
     if not self.currentWorld.worldpath or self.currentWorld.worldpath == "" then
         self.currentWorld.worldpath = Encoding.Utf8ToDefault(format("%s/%s/", Mod.WorldShare.Utils.GetWorldFolderFullPath(), self.currentWorld.foldername))
@@ -60,10 +64,10 @@ function SyncToLocal:Init(callback)
 end
 
 function SyncToLocal:Start()
-    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
-
     self.compareListIndex = 1
     self.compareListTotal = 0
+
+    Progress:UpdateDataBar(0, 0, L"正在对比文件列表...")
 
     local function Handle(data, err)
         if type(data) ~= 'table' then
@@ -73,24 +77,20 @@ function SyncToLocal:Start()
             return false
         end
 
-        if currentWorld.status == 2 and #data ~= 0 then
+        if self.currentWorld.status == 2 and #data ~= 0 then
             self:DownloadZIP()
             return false
         end
 
         if #data == 0 then
             self.callback(false, 'NEWWORLD')
+            self:SetFinish(true)
+            Progress:ClosePage()
             return false
         end
 
-        -- //TODO: Move to UI file
-        -- 加载进度UI界面
-        Progress:Init(self)
-        Progress:UpdateDataBar(0, 0, L"正在对比文件列表...")
-
         self.localFiles = LocalService:LoadFiles(self.currentWorld.worldpath)
         self.dataSourceFiles = data
-
 
         self:GetCompareList()
         self:HandleCompareList()
@@ -318,6 +318,13 @@ function SyncToLocal:DownloadZIP()
                 self.callback = nil
             end
 
+            self:SetFinish(true)
+            Progress:UpdateDataBar(
+                1,
+                1,
+                format(L"处理完成"),
+                self.finish
+            )
             Progress:SetFinish(true)
             Progress:Refresh()
 

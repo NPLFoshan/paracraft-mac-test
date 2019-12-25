@@ -151,8 +151,8 @@ function LocalService:Delete(foldername, filename)
     local deletePath = format(
                         "%s/%s/%s",
                         Mod.WorldShare.Utils.GetWorldFolderFullPath(),
-                        Encoding.Utf8ToDefault(foldername or ''),
-                        Encoding.Utf8ToDefault(filename or '')
+                        CommonlibEncoding.Utf8ToDefault(foldername or ''),
+                        CommonlibEncoding.Utf8ToDefault(filename or '')
                        )
 
     ParaIO.DeleteFile(deletePath)
@@ -230,9 +230,11 @@ function LocalService:MoveZipToFolder(foldername, zipPath)
                 -- remove file path
                 folderArray[#folderArray] = nil
 
-                -- create folder
-                for _, folderItem in pairs(folderArray) do
-                    ParaIO.CreateDirectory(format('%s/%s', worldpath, folderItem))
+                if #folderArray >= 1 then
+                    -- create folder
+                    for _, folderItem in pairs(folderArray) do
+                        ParaIO.CreateDirectory(format('%s/%s/', worldpath, folderItem))
+                    end
                 end
 
                 -- create file
