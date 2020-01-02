@@ -127,11 +127,11 @@
                 }
             </style>
             <!-- <pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="position:relative;background:" onclick="OnSelect"></pe:container> -->
-            <pe:container alignment="_lt" ClickThrough="true" style="position:relative;width:960px;height:64px;background:url()">
+            <pe:container alignment="_ctt" ClickThrough="true" style="position:relative;width:960px;height:64px;background:url()">
                 <iframe ClickThrough="true" src="Mod/WorldShare/cellar/MainLogin/ParaWorldLoginDocker/ParaWorldLoginDocker.html"></iframe>
             </pe:container>
             <pe:container alignment="_ct" ClickThrough="true" style="position:relative;background:;margin-left:-260px;margin-top:-250px;width:520px;height:500px;">
-                <div style='<%="position:relative;margin-left:0px;margin-top:-10px;width:512px;height:177px;background:url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 550 512 175);"%>'></div>
+                <div style='<%="position:relative;margin-left:150px;margin-top: 40px;width:230px;height:100px;background:url(textures/worldshare_32bits.png#12 346 230 100);"%>'></div>
                 <pe:if condition='<%=Rebranding:GetValue("companylogo") ~= nil %>'>
                     <div style='<%=format("position:relative;margin-top:15px;margin-left:-220px;width:256px;height:64px;background:url(%s)", Rebranding:GetValue("companylogo"))%>'></div>
                 </pe:if>
@@ -141,7 +141,7 @@
                 <div style="position:relative;margin-left:0px;width:520px;margin-top:150px;font-size:14px;font-weight:bold;color:#572712;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;text-align:center">
                     <%=Rebranding:GetValue("titleaddon")%>
                 </div>
-                <div style="position:relative;margin-left:100px;margin-top:150px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8)">
+                <div style="position:relative;margin-left:100px;margin-top: 80px;padding-top: 50px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 34 34:8 8 8 8)">
                     <div name="login" class="user_login">
                         <pe:if condition="<%= login_text() ~= nil %>">
                             <div style="margin-bottom:15px;"><%= login_text()%></div>
