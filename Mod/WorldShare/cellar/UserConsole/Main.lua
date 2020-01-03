@@ -57,10 +57,6 @@ function UserConsole:ShowPage()
 
     local params = Mod.WorldShare.Utils.ShowWindow(850, 470, "Mod/WorldShare/cellar/UserConsole/UserConsole.html", "UserConsole")
 
-    params._page.OnClose = function()
-        Mod.WorldShare.Store:Remove('page/UserConsole')
-    end
-
     -- load last selected avatar if world is not loaded before.
     UserInfo:OnChangeAvatar()
 
