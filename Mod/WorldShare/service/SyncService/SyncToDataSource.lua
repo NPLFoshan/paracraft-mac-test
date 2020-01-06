@@ -70,8 +70,10 @@ function SyncToDataSource:Init(callback)
                 KeepworkServiceProject:CreateProject(
                     self.currentWorld.foldername,
                     function(data, err)
-                        if err == 400 and data and data.code == 14 then
+                        if err == 400 and data and data.code == 17 then
                             callback(false, L"您创建的帕拉卡(Paracraft)在线项目数量过多。请删除不需要的项目后再试。")
+                            self:SetFinish(true)
+                            Progress:ClosePage()
                             return false
                         end
 
