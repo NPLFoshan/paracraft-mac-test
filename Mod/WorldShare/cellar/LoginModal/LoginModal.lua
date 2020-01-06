@@ -187,7 +187,7 @@ function LoginModal:SetAutoLogin()
     local autoLogin = LoginModalPage:GetValue("autoLogin")
     local rememberMe = LoginModalPage:GetValue("rememberMe")
     local password = LoginModalPage:GetValue("password")
-    self.loginServer = 'ONLINE' -- LoginModalPage:GetValue("loginServer")
+    self.loginServer = KeepworkService:GetEnv()
     self.account = string.lower(LoginModalPage:GetValue("account"))
 
     if autoLogin then
@@ -205,14 +205,14 @@ end
 function LoginModal:SetRememberMe()
     local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
 
-    if (not LoginModalPage) then
+    if not LoginModalPage then
         return false
     end
 
-    local loginServer = 'ONLINE' -- LoginModalPage:GetValue("loginServer")
+    local loginServer = KeepworkService:GetEnv()
     local password = LoginModalPage:GetValue("password")
     local rememberMe = LoginModalPage:GetValue("rememberMe")
-    self.loginServer = 'ONLINE' -- LoginModalPage:GetValue("loginServer")
+    self.loginServer = KeepworkService:GetEnv()
     self.account = string.lower(LoginModalPage:GetValue("account"))
 
     if rememberMe then

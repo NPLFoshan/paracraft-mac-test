@@ -3,9 +3,9 @@
         <pe:mcml>
             <script type="text/npl" refresh="false">
                 <![CDATA[
-                    LoginModal = NPL.load("./LoginModal.lua")
-                    RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
-                    ForgetPassword = NPL.load("(gl)Mod/WorldShare/cellar/ForgetPassword/ForgetPassword.lua")
+                    local LoginModal = NPL.load("./LoginModal.lua")
+                    local RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
+                    local ForgetPassword = NPL.load("(gl)Mod/WorldShare/cellar/ForgetPassword/ForgetPassword.lua")
 
                     page = document:GetPageCtrl()
                     Mod.WorldShare.Store:Set('page/LoginModal', page)
