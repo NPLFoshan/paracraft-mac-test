@@ -109,6 +109,14 @@
                     function set_auto_login()
                         MainLogin:SetAutoLogin()
                     end
+
+                    function select_account(name, username)
+                        MainLogin:SelectAccount(username)
+                    end
+
+                    function remove_account(username)
+                        MainLogin:RemoveAccount(username)
+                    end
                 ]]>
             </script>
             <style type="text/mcss">

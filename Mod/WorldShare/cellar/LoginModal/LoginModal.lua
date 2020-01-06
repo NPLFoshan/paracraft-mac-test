@@ -70,11 +70,11 @@ function LoginModal:ClosePage()
     LoginModalPage:CloseWindow()
 end
 
-function LoginModal:Refresh(time, callback)
+function LoginModal:Refresh(times)
     local LoginModalPage = Mod.WorldShare.Store:Get('page/LoginModal')
 
-    if (LoginModalPage) then
-        LoginModalPage:Refresh(time or 0.01)
+    if LoginModalPage then
+        LoginModalPage:Refresh(times or 0.01)
     end
 end
 
@@ -268,7 +268,7 @@ function LoginModal:SelectAccount(username)
     LoginModalPage:SetValue("rememberMe", session.rememberMe)
     LoginModalPage:SetValue("password", session.password)
 
-    LoginModalPage:Refresh(0.01)
+    self:Refresh()
 end
 
 function LoginModal:GetHistoryUsers()
