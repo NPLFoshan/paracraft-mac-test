@@ -142,7 +142,7 @@
                         ["margin-left"] = 0,
                         width = 75,
                         height = 33,
-                        ["font-size"] = 16,
+                        ["font-size"] = 14,
                     },
                     login_button = {
                         ["margin-left"] = 5,
@@ -151,7 +151,7 @@
                         textcolor = "#000000",
                         color = "#000000",
                         ["font-size"] = 18
-                        background = "textures/worldshare_32bits.png;149 104 16 16:4 4 4 4",
+                        background = "textures/worldshare_32bits.png;149 104 17 16:4 4 4 4",
                     },
                 }
             </style>
@@ -160,7 +160,7 @@
                 <iframe ClickThrough="true" src="Mod/WorldShare/cellar/MainLogin/ParaWorldLoginDocker/ParaWorldLoginDocker.html"></iframe>
             </pe:container>
             <pe:container alignment="_ct" ClickThrough="true" style="position:relative;background:;margin-left:-260px;margin-top:-250px;width:520px;height:500px;">
-                <div style='<%="position:relative;margin-left:148px;margin-top: 40px;width: 231px;height: 98px;background:url(textures/worldshare_32bits.png#12 345 231 98);"%>'></div>
+                <div style='<%="position:relative;margin-left:145px;margin-top: 40px;width: 231px;height: 98px;background:url(textures/worldshare_32bits.png#12 345 231 98);"%>'></div>
                 <pe:if condition='<%=Rebranding:GetValue("companylogo") ~= nil %>'>
                     <div style='<%=format("position:relative;margin-top:15px;margin-left:-220px;width:256px;height:64px;background:url(%s)", Rebranding:GetValue("companylogo"))%>'></div>
                 </pe:if>
@@ -192,7 +192,7 @@
                             </div>
                         </div>
                         <div style="margin-top:30px;margin-bottom:15px;">
-                            <input type="button" class="offline_button mc_light_grey_button_with_fillet" onclick="use_offline()" value="离线模式" />
+                            <input type="button" class="offline_button mc_light_grey_button_with_fillet" onclick="use_offline()" value="<%= L'离线模式' .. '  ' %>" />
                             <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"登 录"%>' />
                         </div>
                         <div style="<%='text-align:left;margin-left:55px;' .. get_english_style('margin-left:15px;')%>">
