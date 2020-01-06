@@ -19,7 +19,7 @@
                     Mod.WorldShare.Store:Set("page/MainLogin", page)
 
                     -- @param name: "local", "internet"
-                    function OnSelect()
+                    function use_offline()
                         MainLogin:EnterUserConsole()
                     end
 
@@ -97,9 +97,11 @@
                     function forget_password()
                         ForgetPassword:ShowPage()
                     end
-                    
+
                     function register()
-                        RegisterModal:ShowPage()
+                        RegisterModal:ShowPage(function()
+                            MainLogin:EnterUserConsole()
+                        end)
                     end
 
                     function set_remember_me()
@@ -158,7 +160,7 @@
                 <iframe ClickThrough="true" src="Mod/WorldShare/cellar/MainLogin/ParaWorldLoginDocker/ParaWorldLoginDocker.html"></iframe>
             </pe:container>
             <pe:container alignment="_ct" ClickThrough="true" style="position:relative;background:;margin-left:-260px;margin-top:-250px;width:520px;height:500px;">
-                <div style='<%="position:relative;margin-left:150px;margin-top: 40px;width:230px;height:100px;background:url(textures/worldshare_32bits.png#12 346 230 100);"%>'></div>
+                <div style='<%="position:relative;margin-left:148px;margin-top: 40px;width: 231px;height: 98px;background:url(textures/worldshare_32bits.png#12 345 231 98);"%>'></div>
                 <pe:if condition='<%=Rebranding:GetValue("companylogo") ~= nil %>'>
                     <div style='<%=format("position:relative;margin-top:15px;margin-left:-220px;width:256px;height:64px;background:url(%s)", Rebranding:GetValue("companylogo"))%>'></div>
                 </pe:if>
@@ -190,7 +192,7 @@
                             </div>
                         </div>
                         <div style="margin-top:30px;margin-bottom:15px;">
-                            <input type="button" class="offline_button mc_light_grey_button_with_fillet" onclick="OnSelect()" value="离线模式" />
+                            <input type="button" class="offline_button mc_light_grey_button_with_fillet" onclick="use_offline()" value="离线模式" />
                             <input type="button" DefaultButton="true" class="login_button" onclick="login()" value='<%= L"登 录"%>' />
                         </div>
                         <div style="<%='text-align:left;margin-left:55px;' .. get_english_style('margin-left:15px;')%>">

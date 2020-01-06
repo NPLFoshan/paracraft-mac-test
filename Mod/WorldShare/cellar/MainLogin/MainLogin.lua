@@ -36,6 +36,25 @@ function MainLogin:Show()
             height = 0,
         cancelShowAnimation = true,
     })
+
+    local MainLoginPage = Mod.WorldShare.Store:Get('page/MainLogin')
+
+    if not MainLoginPage then
+        return false
+    end
+
+    local PWDInfo = KeepworkServiceSession:LoadSigninInfo()
+
+    if PWDInfo then
+        MainLoginPage:SetValue('autoLogin', PWDInfo.autoLogin or false)
+        MainLoginPage:SetValue('rememberMe', PWDInfo.rememberMe or false)
+        MainLoginPage:SetValue('password', PWDInfo.password or '')
+
+        self.loginServer = PWDInfo.loginServer
+        self.account = PWDInfo.account
+    end
+
+    self:Refresh()
 end
 
 function MainLogin:Refresh(times)
