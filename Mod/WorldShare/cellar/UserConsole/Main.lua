@@ -13,6 +13,7 @@ local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalL
 local RemoteWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld")
 local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
 local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
+local GameMainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin")
 
 local WorldShare = commonlib.gettable("Mod.WorldShare")
 local ExplorerApp = commonlib.gettable("Mod.ExplorerApp")
@@ -86,11 +87,11 @@ function UserConsole:ShowPage()
     WorldList:RefreshCurrentServerList()
 end
 
-function UserConsole:ClosePage()
-    if UserConsole.IsMCVersion() then
-        InternetLoadWorld.ReturnLastStep()
-    end
+function UserConsole:EnterMainLogin()
+    GameMainLogin:next_step({IsLoginModeSelected = false})
+end
 
+function UserConsole:ClosePage()
     local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
 
     if UserConsolePage then
