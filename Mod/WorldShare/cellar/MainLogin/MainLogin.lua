@@ -55,6 +55,14 @@ function MainLogin:Show()
     end
 
     self:Refresh()
+
+    if not self.notFirstTimeShown then
+        self.notFirstTimeShown = true
+
+        if PWDInfo.autoLogin then
+            self:EnterUserConsole()
+        end
+    end
 end
 
 function MainLogin:Refresh(times)

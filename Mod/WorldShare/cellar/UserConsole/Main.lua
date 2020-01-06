@@ -61,12 +61,8 @@ function UserConsole:ShowPage()
     -- load last selected avatar if world is not loaded before.
     UserInfo:OnChangeAvatar()
 
-    local notFirstTimeShown = Mod.WorldShare.Store:Get('user/notFirstTimeShown')
-
-    if notFirstTimeShown then
-        Mod.WorldShare.Store:Set('user/ignoreAutoLogin', true)
-    else
-        Mod.WorldShare.Store:Set('user/notFirstTimeShown', true)
+    if not self.notFirstTimeShown then
+        self.notFirstTimeShown = true
 
         KeepworkServiceSession:GetUserTokenFromUrlProtocol()
 
@@ -76,12 +72,8 @@ function UserConsole:ShowPage()
             return false
         end
 
-        local ignoreAutoLogin = Mod.WorldShare.Store:Get('user/ignoreAutoLogin')
-
-        if not ignoreAutoLogin then
-            -- auto sign in here
-            UserInfo:CheckDoAutoSignin()
-        end
+        -- auto sign in here
+        UserInfo:CheckDoAutoSignin()
     end
 
     WorldList:RefreshCurrentServerList()
