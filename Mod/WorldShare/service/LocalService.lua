@@ -111,7 +111,7 @@ function LocalService:GetFileContent(filePath)
 end
 
 function LocalService:Write(foldername, path, content)
-    if not foldername or not path then
+    if not foldername or not path or type(content) ~= 'string' then
         return false
     end
 
