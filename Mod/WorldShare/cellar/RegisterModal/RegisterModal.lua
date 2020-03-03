@@ -19,6 +19,12 @@ local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 local RegisterModal = NPL.export()
 
 function RegisterModal:ShowPage(callback)
+    local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
+
+    if LoginModalPage then
+        LoginModalPage:CloseWindow()
+    end
+
     Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
     self.callback = callback
 end
@@ -144,7 +150,7 @@ function RegisterModal:Bind(method)
             BindingPage:CloseWindow()
 
             if err == 409 then
-                GameLogic.AddBBS(nil, L"手机已被绑定", 3000, "255 0 0")
+                GameLogic.AddBBS(nil, L"该手机号已绑定其他账号，每个手机号码仅可绑定一个账号。如果忘记账号，请使用手机号作为账号登录", 3000, "255 0 0")
                 return false
             end
 
@@ -175,6 +181,11 @@ function RegisterModal:Bind(method)
 
         KeepworkServiceSession:BindEmail(email, emailcaptcha, function(data, err)
             BindingPage:CloseWindow()
+
+            if err == 409 then
+                GameLogic.AddBBS(nil, L"邮箱已被绑定", 3000, "255 0 0")
+                return false
+            end
 
             if data == 'true' and err == 200 then
                 GameLogic.AddBBS(nil, L"绑定成功", 3000, "0 255 0")

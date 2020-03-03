@@ -47,15 +47,15 @@ function GitService:Upload(...)
     end
 end
 
-function GitService:Update(projectName, path, content, sha, callback)
+function GitService:Update(...)
     if self:GetDataSourceType() == KEEPWORK then
-        GitKeepworkService:Update(projectName, path, content, sha, callback)
+        GitKeepworkService:Update(...)
     end
 end
 
-function GitService:DeleteFile(projectName, path, sha, callback)
+function GitService:DeleteFile(...)
     if self:GetDataSourceType() == KEEPWORK then
-        GitKeepworkService:DeleteFile(projectName, path, sha, callback)
+        GitKeepworkService:DeleteFile(...)
     end
 end
 

@@ -15,7 +15,6 @@ local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
-local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
 local RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
@@ -31,6 +30,12 @@ function LoginModal:Init(callbackFunc)
 end
 
 function LoginModal:ShowPage()
+    local RegisterModalPage = Mod.WorldShare.Store:Get("page/RegisterModal")
+
+    if RegisterModalPage then
+        RegisterModalPage:CloseWindow()
+    end
+
     if KeepworkServiceSession:GetCurrentUserToken() then
         return false
     end
@@ -49,6 +54,7 @@ function LoginModal:ShowPage()
         LoginModalPage:SetValue('autoLogin', PWDInfo.autoLogin or false)
         LoginModalPage:SetValue('rememberMe', PWDInfo.rememberMe or false)
         LoginModalPage:SetValue('password', PWDInfo.password or '')
+        LoginModalPage:SetValue('showaccount', PWDInfo.account or '')
 
         self.loginServer = PWDInfo.loginServer
         self.account = PWDInfo.account
@@ -243,6 +249,7 @@ function LoginModal:RemoveAccount(username)
         LoginModalPage:SetValue("autoLogin", false)
         LoginModalPage:SetValue("rememberMe", false)
         LoginModalPage:SetValue("password", "")
+        LoginModalPage:SetValue("showaccount", "")
     end
 
     self:Refresh()
@@ -267,6 +274,7 @@ function LoginModal:SelectAccount(username)
     LoginModalPage:SetValue("autoLogin", session.autoLogin)
     LoginModalPage:SetValue("rememberMe", session.rememberMe)
     LoginModalPage:SetValue("password", session.password)
+    LoginModalPage:SetValue('showaccount', session.account or '')
 
     self:Refresh()
 end

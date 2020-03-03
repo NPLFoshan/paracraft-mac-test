@@ -22,15 +22,23 @@ LocalService.nMaxFileLevels = 0
 LocalService.nMaxFilesNum = 500
 LocalService.output = {}
 
+function LocalService:Find(path)
+    return Files.Find({}, path, self.nMaxFileLevels, self.nMaxFilesNum, self.filter)
+end
+
 function LocalService:LoadFiles(worldDir)
     if not worldDir or #worldDir == 0 then
         return {}
     end
 
+    if string.sub(worldDir, #worldDir, #worldDir) == "/" then
+        worldDir = string.sub(worldDir, 0, #worldDir - 1)
+    end
+
     self.output = {}
     self.worldDir = worldDir
 
-    local result = Files.Find({}, self.worldDir, self.nMaxFileLevels, self.nMaxFilesNum, self.filter)
+    local result = self:Find(self.worldDir)
 
     self:FilesFind(result, self.worldDir)
 
@@ -86,7 +94,7 @@ function LocalService:FilesFind(result, path, subPath)
                 end
             else
                 local newPath = curPath .. "/" .. item.filename
-                local newResult = Files.Find({}, newPath, self.nMaxFileLevels, self.nMaxFilesNum, self.filter)
+                local newResult = self:Find(newPath)
                 local newSubPath = nil
 
                 if (curSubPath) then
@@ -110,15 +118,13 @@ function LocalService:GetFileContent(filePath)
     end
 end
 
-function LocalService:Write(foldername, path, content)
-    if not foldername or not path or type(content) ~= 'string' then
+function LocalService:Write(worldpath, path, content)
+    if not worldpath or not path or type(content) ~= 'string' then
         return false
     end
 
-    foldername = CommonlibEncoding.Utf8ToDefault(foldername)
     path = CommonlibEncoding.Utf8ToDefault(path)
 
-    local root = Mod.WorldShare.Utils.GetWorldFolderFullPath()
     local allPath = {}
 
     for segmentation in string.gmatch(path, "[^/]+") do
@@ -133,13 +139,12 @@ function LocalService:Write(foldername, path, content)
                 curFolderPath = format("%s/%s", curFolderPath, allPath[i] or '')
             end
 
-            local curCreatePath = format("%s/%s%s/", root, foldername, curFolderPath)
-
+            local curCreatePath = format("%s/%s/", worldpath, curFolderPath)
             ParaIO.CreateDirectory(curCreatePath)
         end
     end
 
-    local writePath = format("%s/%s/%s", root, foldername, path)
+    local writePath = format("%s/%s", worldpath, path)
 
     local write = ParaIO.open(writePath, "w")
 
@@ -147,13 +152,8 @@ function LocalService:Write(foldername, path, content)
     write:close()
 end
 
-function LocalService:Delete(foldername, filename)
-    local deletePath = format(
-                        "%s/%s/%s",
-                        Mod.WorldShare.Utils.GetWorldFolderFullPath(),
-                        CommonlibEncoding.Utf8ToDefault(foldername or ''),
-                        CommonlibEncoding.Utf8ToDefault(filename or '')
-                       )
+function LocalService:Delete(worldpath, filename)
+    local deletePath = format("%s/%s", worldpath, CommonlibEncoding.Utf8ToDefault(filename or ''))
 
     ParaIO.DeleteFile(deletePath)
 end
@@ -181,8 +181,8 @@ function LocalService:IsZip(path)
     end
 end
 
-function LocalService:MoveZipToFolder(foldername, zipPath)
-    if not ParaAsset.OpenArchive(zipPath, true) then
+function LocalService:MoveZipToFolder(worldpath, zipPath)
+    if not worldpath or not ParaAsset.OpenArchive(zipPath, true) then
         return false
     end
 
@@ -199,8 +199,6 @@ function LocalService:MoveZipToFolder(foldername, zipPath)
             break
         end
     end
-
-    local worldpath = format("%s/%s", Mod.WorldShare.Utils.GetWorldFolderFullPath(), CommonlibEncoding.Utf8ToDefault(foldername))
 
     for _, item in ipairs(fileList) do
         if item.filesize > 0 then

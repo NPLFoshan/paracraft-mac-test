@@ -83,6 +83,7 @@ function VersionChange:GetVersionSource(callback)
 
     KeepworkServiceWorld:GetWorld(
         self.foldername,
+        currentWorld.shared,
         function(world)
             if type(callback) ~= 'function' then
                 return false
@@ -129,6 +130,7 @@ function VersionChange:SelectVersion(index)
     commonlib.Files.DeleteFolder(targetDir)
     ParaIO.CreateDirectory(targetDir)
 
+    currentWorld.status = 2
     currentWorld.lastCommitId = commitId
     Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
 

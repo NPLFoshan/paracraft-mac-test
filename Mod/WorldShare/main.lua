@@ -42,7 +42,7 @@ NPL.load("(gl)script/ide/System/Encoding/guid.lua")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldLessons.lua")
 
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
-local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox.lua")
+local MsgBox = NPL.load("(gl)Mod/WorldShare/cellar/Common/MsgBox/MsgBox.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
 local MainLogin = NPL.load("(gl)Mod/WorldShare/cellar/MainLogin/MainLogin.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
@@ -53,8 +53,9 @@ local HistoryManager = NPL.load("(gl)Mod/WorldShare/cellar/HistoryManager/Histor
 local WorldExitDialog = NPL.load("(gl)Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local Grade = NPL.load("(gl)Mod/WorldShare/cellar/Grade/Grade.lua")
-local SocketService = commonlib.gettable("Mod.WorldShare.service.SocketService")
+local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
 
+local SocketService = commonlib.gettable("Mod.WorldShare.service.SocketService")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
@@ -62,7 +63,7 @@ local WorldShare = commonlib.inherit(commonlib.gettable("Mod.ModBase"), commonli
 
 WorldShare:Property({"Name", "WorldShare", "GetName", "SetName", { auto = true }})
 WorldShare:Property({"Desc", "world share mod can share world to keepwork online", "GetDesc", "SetDesc", { auto = true }})
-WorldShare.version = '0.0.11'
+WorldShare.version = '0.0.12'
 
 -- register mod global variable
 WorldShare.Store = Store
@@ -173,5 +174,6 @@ function WorldShare:OnWorldLoad()
 end
 
 function WorldShare:OnLeaveWorld()
+    KeepworkServiceWorld:UnlockWorld()
     Store:Remove("world/currentWorld")
 end

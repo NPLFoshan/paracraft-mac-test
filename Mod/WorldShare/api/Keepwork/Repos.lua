@@ -17,8 +17,8 @@ local Encoding = commonlib.gettable("System.Encoding")
 
 local KeepworkReposApi = NPL.export()
 
-function KeepworkReposApi:GetRepoPath(foldername)
-    local username = Mod.WorldShare.Store:Get('user/username')
+function KeepworkReposApi:GetRepoPath(foldername, username)
+    username = username or Mod.WorldShare.Store:Get('user/username')
 
     if type(username) ~= 'string' or type(foldername) ~= 'string' then
         return ''
@@ -35,8 +35,8 @@ end
     ref string 必须 ref
 ]]
 -- return: object
-function KeepworkReposApi:Download(foldername, commitId, success, error)
-    local url = format('%s/repos/%s/download?ref=%s', KeepworkBaseApi:GetApi(), self:GetRepoPath(foldername), commitId)
+function KeepworkReposApi:Download(foldername, username, commitId, success, error)
+    local url = format('%s/repos/%s/download?ref=%s', KeepworkBaseApi:GetApi(), self:GetRepoPath(foldername, username), commitId)
 
     FileDownloader:new():Init(
         foldername,
@@ -63,18 +63,18 @@ end
 -- method: GET
 -- params:
 --[[
-    repoPath string 必须 仓库路径
-    recursive string 选填 是否递归获取文件
-    ref string 必须 commitId
+    repoPath string necessary repo path
+    ref string necessary commitId
+    recursive string not necessary Is get recursive files
 ]]
 -- return: object
-function KeepworkReposApi:Tree(foldername, commitId, success, error)
+function KeepworkReposApi:Tree(foldername, username, commitId, success, error)
     local url = ''
 
     if type(foldername) ~= 'string' or type(commitId) ~= 'string' or commitId == 'master' then
-        url = format('/repos/%s/tree?recursive=true', self:GetRepoPath(foldername))
+        url = format('/repos/%s/tree?recursive=true', self:GetRepoPath(foldername, username))
     else
-        url = format('/repos/%s/tree?recursive=true&commitId=%s', self:GetRepoPath(foldername), commitId)
+        url = format('/repos/%s/tree?recursive=true&commitId=%s', self:GetRepoPath(foldername, username), commitId)
     end
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
@@ -84,12 +84,12 @@ end
 -- method: GET
 -- params: [[]]
 -- return: object
-function KeepworkReposApi:CommitInfo(foldername, success, error)
+function KeepworkReposApi:CommitInfo(foldername, username, success, error)
     if type(foldername) ~= 'string' then
         return false
     end
 
-    local url = format('/repos/%s/commitInfo', self:GetRepoPath(foldername))
+    local url = format('/repos/%s/commitInfo', self:GetRepoPath(foldername, username))
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
@@ -113,7 +113,7 @@ end
     filePath string 必须 文件路径
 ]]
 -- return: object
-function KeepworkReposApi:Raw(username, foldername, filePath, commitId, success, error)
+function KeepworkReposApi:Raw(foldername, username, filePath, commitId, success, error)
     if type(filePath) ~= 'string' then
         return false
     end
@@ -124,15 +124,7 @@ function KeepworkReposApi:Raw(username, foldername, filePath, commitId, success,
         commitIdUrl = format('?commitId=%s', commitId)
     end
 
-    local repoPath
-
-    if username then
-        repoPath = Mod.WorldShare.Utils.UrlEncode(username .. '/' .. GitEncoding.Base32(foldername))
-    else
-        repoPath = self:GetRepoPath(foldername)
-    end
-
-    local url = format('/repos/%s/files/%s/raw%s', repoPath, Mod.WorldShare.Utils.UrlEncode(filePath), commitIdUrl)
+    local url = format('/repos/%s/files/%s/raw%s', self:GetRepoPath(foldername, username), Mod.WorldShare.Utils.UrlEncode(filePath), commitIdUrl)
 
     KeepworkBaseApi:Get(url, nil, nil, success, error)
 end
@@ -156,12 +148,12 @@ end
     filePath string 必须 文件路径
 ]]
 -- return: object
-function KeepworkReposApi:UpdateFile(foldername, filePath, content, success, error)
+function KeepworkReposApi:UpdateFile(foldername, username, filePath, content, success, error)
     if type(foldername) ~= 'string' or type(filePath) ~= 'string' then
         return false
     end
 
-    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
+    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername, username), Mod.WorldShare.Utils.UrlEncode(filePath))
 
     local write = ParaIO.open("/temp/t/" .. filePath, "w")
 
@@ -180,12 +172,12 @@ end
     content binary 必须 文件内容
 ]]
 -- return: object
-function KeepworkReposApi:CreateFile(foldername, filePath, content, success, error)
+function KeepworkReposApi:CreateFile(foldername, username, filePath, content, success, error)
     if type(foldername) ~= 'string' or type(filePath) ~= 'string' then
         return false
     end
 
-    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
+    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername, username), Mod.WorldShare.Utils.UrlEncode(filePath))
 
     KeepworkBaseApi:Post(url, { encoding = 'base64', content = Encoding.base64(content) }, nil, success, error)
 end
@@ -198,12 +190,12 @@ end
     filePath string 必须 文件路径
 ]]
 -- return: object
-function KeepworkReposApi:RemoveFile(foldername, filePath, success, error)
+function KeepworkReposApi:RemoveFile(foldername, username, filePath, success, error)
     if type(foldername) ~= 'string' or type(filePath) ~= 'string' then
         return false
     end
 
-    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername), Mod.WorldShare.Utils.UrlEncode(filePath))
+    local url = format('/repos/%s/files/%s', self:GetRepoPath(foldername, username), Mod.WorldShare.Utils.UrlEncode(filePath))
 
     KeepworkBaseApi:Delete(url, nil, nil, success, error)
 end
