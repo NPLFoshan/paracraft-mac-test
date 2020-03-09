@@ -423,3 +423,13 @@ function LocalService:ClearUserWorlds()
         end
     end
 end
+
+function LocalService:GetWorldFolderFullPath()
+    local username = Mod.WorldShare.Store:Get('user/username')
+
+    if username then
+        return 'worlds/testv11'
+    else
+        return 'worlds/testv8'
+    end
+end
