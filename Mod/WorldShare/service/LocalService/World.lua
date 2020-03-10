@@ -168,22 +168,23 @@ function LocalServiceWorld:GetSharedWorldList()
 end
 
 function LocalServiceWorld:GetInternetLocalWorldList()
-  local ServerPage = InternetLoadWorld.GetCurrentServerPage()
+    echo('from local service world get internet local world list!!!!!', true)
+    local ServerPage = InternetLoadWorld.GetCurrentServerPage()
 
-  RemoteServerList:new():Init(
-      "local",
-      "localworld",
-      function(bSucceed, serverlist)
-          if not serverlist:IsValid() then
-              return false
-          end
+    RemoteServerList:new():Init(
+        "local",
+        "localworld",
+        function(bSucceed, serverlist)
+            if not serverlist:IsValid() then
+                return false
+            end
 
-          ServerPage.ds = serverlist.worlds or {}
-          InternetLoadWorld.OnChangeServerPage()
-      end
-  )
+            ServerPage.ds = serverlist.worlds or {}
+            InternetLoadWorld.OnChangeServerPage()
+        end
+    )
 
-  return ServerPage.ds or {}
+    return ServerPage.ds or {}
 end
 
 function LocalServiceWorld:MergeInternetLocalWorldList(currentWorldList)

@@ -153,7 +153,7 @@ function WorldShare:init()
     GameLogic.GetFilters():add_filter(
         "LocalLoadWorld.GetWorldFolderFullPath",
         function()
-            return LocalService:GetWorldFolderFullPath()
+            return LocalService:FilterGetWorldFolderFullPath()
         end
     )
 

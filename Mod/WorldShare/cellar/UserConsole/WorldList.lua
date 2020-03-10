@@ -536,9 +536,9 @@ function WorldList:GetWorldsPath()
 
    for key, item in pairs(list) do
         if item.filename == 'DesignHouse' then
-            allPath[#allPath + 1] = { text = L"临时文件夹", value = "DesignHouse", selected = true }
+            allPath[#allPath + 1] = { text = L"临时文件夹", value = "worlds/DesignHouse", selected = true }
         else
-            allPath[#allPath + 1] = { text = item.filename, value = item.filename }
+            allPath[#allPath + 1] = { text = item.filename, value = "worlds/" .. item.filename }
         end
    end
 

@@ -424,14 +424,17 @@ function LocalService:ClearUserWorlds()
     end
 end
 
-function LocalService:GetWorldFolderFullPath()
-    local username = Mod.WorldShare.Store:Get('user/username')
+function LocalService:FilterGetWorldFolderFullPath()
+    echo(11111, true)
+    local myWorldFolder = Mod.WorldShare.Store:Get('world/myWorldFolder') or 'worlds/DesignHouse'
 
-    if username then
-        return 'worlds/testv11'
-    else
-        return 'worlds/testv8'
+    if not self.myWorldFolder or self.myWorldFolder ~= myWorldFolder then
+        self.myWorldFolder = myWorldFolder
+
+        return self.myWorldFolder, true
     end
+
+    return self.myWorldFolder, false
 end
 
 function LocalService:GetSystemWorldsPath()

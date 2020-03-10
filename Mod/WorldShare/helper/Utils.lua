@@ -13,6 +13,9 @@ local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalL
 
 local Utils = NPL.export()
 
+Utils.GetWorldFolderFullPath = LocalLoadWorld.GetWorldFolderFullPath
+Utils.SetTimeOut = commonlib.TimerManager.SetTimeout
+
 -- show one page
 -- @param option window width or selfdefined params
 -- @param height window height
@@ -96,10 +99,6 @@ function Utils.FormatFileSize(size, unit)
     end
 
     return s or "0"
-end
-
-function Utils.SetTimeOut(callback, times)
-    commonlib.TimerManager.SetTimeout(callback, times or 100)
 end
 
 function Utils.FixCenter(width, height)
@@ -210,10 +209,6 @@ function Utils.IsEnglish()
     else
         return false
     end
-end
-
-function Utils.GetWorldFolderFullPath()
-    return LocalLoadWorld.GetWorldFolderFullPath()
 end
 
 function Utils:GetFolderName()
