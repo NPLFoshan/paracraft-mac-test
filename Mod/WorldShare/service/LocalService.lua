@@ -433,3 +433,15 @@ function LocalService:GetWorldFolderFullPath()
         return 'worlds/testv8'
     end
 end
+
+function LocalService:GetSystemWorldsPath()
+    if not self.systemWorldsPath then
+        if System.os.GetExternalStoragePath() ~= "" then
+            self.systemWorldsPath = System.os.GetExternalStoragePath() .. "paracraft/worlds"
+        else
+            self.systemWorldsPath = ParaIO.GetWritablePath() .. "worlds"
+        end
+    end
+
+    return self.systemWorldsPath
+end

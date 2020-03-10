@@ -513,9 +513,34 @@ function WorldList:OpenProject(index)
 end
 
 function WorldList:GetWorldsPath()
-    local allPath = {
-        { text="临时文件夹", value="DesignHouse", selected=true }
-    }
+    local allPath = {}
+
+    local list = LocalService:Find(LocalService:GetSystemWorldsPath())
+
+    -- remove useless folder 
+    local function RemoveFilename(name)
+        for key, item in pairs(list) do
+            if item and item.filename == name then
+                for i = key, #list do
+                    list[i] = list[i + 1]
+                end
+    
+                break;
+            end
+        end
+    end
+
+    RemoveFilename('.DS_Store')
+    RemoveFilename('BlockTextures')
+    RemoveFilename('MyWorlds')
+
+   for key, item in pairs(list) do
+        if item.filename == 'DesignHouse' then
+            allPath[#allPath + 1] = { text = L"临时文件夹", value = "DesignHouse", selected = true }
+        else
+            allPath[#allPath + 1] = { text = item.filename, value = item.filename }
+        end
+   end
 
     return allPath
 end
