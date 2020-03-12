@@ -14,6 +14,7 @@ local LocalService = NPL.load("../LocalService.lua")
 local KeepworkService = NPL.load("../KeepworkService.lua")
 local KeepworkServiceProject = NPL.load("../KeepworkService/Project.lua")
 local KeepworkServiceWorld = NPL.load("../KeepworkService/World.lua")
+local KeepworkServiceSession = NPL.load("../KeepworkService/Session.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local KeepworkGen = NPL.load("(gl)Mod/WorldShare/helper/KeepworkGen.lua")
 local GitEncoding = NPL.load("(gl)Mod/WorldShare/helper/GitEncoding.lua")
@@ -32,6 +33,20 @@ function SyncToDataSource:Init(callback)
     end
 
     self.callback = callback
+
+    local token = Mod.WorldShare.Store:Get('user/token')
+    local tokeninfo = System.Encoding.jwt.decode(token)
+    local exp = tokeninfo.exp and tokeninfo.exp or 0
+
+    echo(exp, true)
+
+    if exp <= (os.time() + 5 * 24 * 3600) then
+        
+    end
+
+    if true then
+        return false
+    end
 
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
     self.currentWorld = currentWorld

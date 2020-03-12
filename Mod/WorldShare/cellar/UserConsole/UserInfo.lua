@@ -165,6 +165,9 @@ end
 function UserInfo:CheckDoAutoSignin(callback)
     local info = KeepworkServiceSession:LoadSigninInfo()
 
+    echo('from userinfo checkout do auto sign in!!!!', true)
+    echo(info, true)
+
     if not info or not info.autoLogin or not info.account or not info.password then
         return false
     end
