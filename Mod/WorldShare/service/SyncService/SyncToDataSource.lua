@@ -34,6 +34,7 @@ function SyncToDataSource:Init(callback)
 
     self.callback = callback
 
+    -- TODO: test token is can be use
     local token = Mod.WorldShare.Store:Get('user/token')
     local tokeninfo = System.Encoding.jwt.decode(token)
     local exp = tokeninfo.exp and tokeninfo.exp or 0
