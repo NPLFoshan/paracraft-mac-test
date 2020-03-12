@@ -43,7 +43,7 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
         GameLogic.AddBBS(nil, L"服务器连接失败", 3000, "255 0 0")
         return false
     end
-echo(response, true)
+
     local token = response["token"] or System.User.keepworktoken
     local userId = response["id"] or 0
     local username = response["username"] or ""

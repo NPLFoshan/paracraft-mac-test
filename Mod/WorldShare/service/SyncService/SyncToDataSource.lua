@@ -38,14 +38,29 @@ function SyncToDataSource:Init(callback)
     local tokeninfo = System.Encoding.jwt.decode(token)
     local exp = tokeninfo.exp and tokeninfo.exp or 0
 
-    echo(exp, true)
+    if exp <= (os.time() + 1 * 24 * 3600) then
+        KeepworkServiceSession:Logout()
 
-    if exp <= (os.time() + 5 * 24 * 3600) then
-        
-    end
+        local currentUser = KeepworkServiceSession:LoadSigninInfo()
 
-    if true then
-        return false
+        if not currentUser.account or not currentUser.password then
+            return false
+        end
+
+        KeepworkServiceSession:Login(
+            currentUser.account,
+            currentUser.password,
+            function(response, err)
+                if err ~= 200 then
+                    self.callback(false, L"RE-ENTRY")
+                    return false
+                end
+
+                KeepworkServiceSession:LoginResponse(response, err, function()
+                    self:Init(self.callback)
+                end)
+            end
+        )
     end
 
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
