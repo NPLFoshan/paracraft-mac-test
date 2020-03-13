@@ -34,106 +34,86 @@ function SyncToDataSource:Init(callback)
 
     self.callback = callback
 
-    -- TODO: test token is can be use
-    local token = Mod.WorldShare.Store:Get('user/token')
-    local tokeninfo = System.Encoding.jwt.decode(token)
-    local exp = tokeninfo.exp and tokeninfo.exp or 0
-
-    if exp <= (os.time() + 1 * 24 * 3600) then
-        KeepworkServiceSession:Logout()
-
-        local currentUser = KeepworkServiceSession:LoadSigninInfo()
-
-        if not currentUser.account or not currentUser.password then
+    local function Handle()
+        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+        self.currentWorld = currentWorld
+    
+        if not self.currentWorld.worldpath or self.currentWorld.worldpath == "" then
+            callback(false, L"上传失败，将使用离线模式，原因：上传目录为空")
             return false
         end
-
-        KeepworkServiceSession:Login(
-            currentUser.account,
-            currentUser.password,
-            function(response, err)
-                if err ~= 200 then
-                    self.callback(false, L"RE-ENTRY")
-                    return false
+    
+        -- 加载进度UI界面
+        -- // TODO: move to UI file
+        Progress:Init(self)
+    
+        self:SetFinish(false)
+        self:SetBroke(false)
+    
+        self:IsProjectExist(
+            function(beExisted)
+                if beExisted then
+                    -- update world
+                    KeepworkServiceProject:GetProjectIdByWorldName(self.currentWorld.foldername, self.currentWorld.shared, function(pid)
+                        currentWorld = Mod.WorldShare.Store:Get('world/currentWorld') 
+    
+                        if currentWorld and currentWorld.kpProjectId then
+                            local tag = LocalService:GetTag(currentWorld.worldpath)
+    
+                            if type(tag) == 'table' then
+                                tag.kpProjectId = currentWorld.kpProjectId
+                                LocalService:SetTag(currentWorld.worldpath, tag)
+                            end
+                        end
+    
+                        self:Start()
+                    end)
+                else
+                    KeepworkServiceProject:CreateProject(
+                        self.currentWorld.foldername,
+                        function(data, err)
+                            if err == 400 and data and data.code == 17 then
+                                callback(false, L"您创建的帕拉卡(Paracraft)在线项目数量过多。请删除不需要的项目后再试。")
+                                self:SetFinish(true)
+                                Progress:ClosePage()
+                                return false
+                            end
+    
+                            if err ~= 200 or not data or not data.id then
+                                callback(false, L"创建项目失败")
+                                self:SetFinish(true)
+                                Progress:ClosePage()
+                                return false
+                            end
+    
+                            currentWorld.kpProjectId = data.id
+    
+                            if currentWorld and currentWorld.kpProjectId then
+                                local tag = LocalService:GetTag(currentWorld.worldpath)
+    
+                                if type(tag) == 'table' then
+                                    tag.kpProjectId = currentWorld.kpProjectId
+    
+                                    LocalService:SetTag(currentWorld.worldpath, tag)
+                                end
+                            end
+    
+                            Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
+                            self:Start()
+                        end
+                    )
                 end
-
-                KeepworkServiceSession:LoginResponse(response, err, function()
-                    self:Init(self.callback)
-                end)
             end
         )
     end
 
-    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-    self.currentWorld = currentWorld
-
-    if not self.currentWorld.worldpath or self.currentWorld.worldpath == "" then
-        callback(false, L"上传失败，将使用离线模式，原因：上传目录为空")
-        return false
-    end
-
-    -- 加载进度UI界面
-    -- // TODO: move to UI file
-    Progress:Init(self)
-
-    self:SetFinish(false)
-    self:SetBroke(false)
-
-    self:IsProjectExist(
-        function(beExisted)
-            if beExisted then
-                -- update world
-                KeepworkServiceProject:GetProjectIdByWorldName(self.currentWorld.foldername, self.currentWorld.shared, function(pid)
-                    currentWorld = Mod.WorldShare.Store:Get('world/currentWorld') 
-
-                    if currentWorld and currentWorld.kpProjectId then
-                        local tag = LocalService:GetTag(currentWorld.worldpath)
-
-                        if type(tag) == 'table' then
-                            tag.kpProjectId = currentWorld.kpProjectId
-                            LocalService:SetTag(currentWorld.worldpath, tag)
-                        end
-                    end
-
-                    self:Start()
-                end)
-            else
-                KeepworkServiceProject:CreateProject(
-                    self.currentWorld.foldername,
-                    function(data, err)
-                        if err == 400 and data and data.code == 17 then
-                            callback(false, L"您创建的帕拉卡(Paracraft)在线项目数量过多。请删除不需要的项目后再试。")
-                            self:SetFinish(true)
-                            Progress:ClosePage()
-                            return false
-                        end
-
-                        if err ~= 200 or not data or not data.id then
-                            callback(false, L"创建项目失败")
-                            self:SetFinish(true)
-                            Progress:ClosePage()
-                            return false
-                        end
-
-                        currentWorld.kpProjectId = data.id
-
-                        if currentWorld and currentWorld.kpProjectId then
-                            local tag = LocalService:GetTag(currentWorld.worldpath)
-
-                            if type(tag) == 'table' then
-                                tag.kpProjectId = currentWorld.kpProjectId
-
-                                LocalService:SetTag(currentWorld.worldpath, tag)
-                            end
-                        end
-
-                        Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
-                        self:Start()
-                    end
-                )
-            end
+    KeepworkServiceSession:CheckTokenExpire(function(bIsSuccess)
+        if bIsSuccess then
+            Handle()
+        else
+            self.callback(false, L"RE-ENTRY")
         end
-    )
+    end)
 end
 
 function SyncToDataSource:IsProjectExist(callback)
