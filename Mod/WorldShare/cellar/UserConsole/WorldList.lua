@@ -32,8 +32,6 @@ local SyncToLocal = NPL.load("(gl)Mod/WorldShare/service/SyncService/SyncToLocal
 
 local WorldList = NPL.export()
 
-WorldList.zipDownloadFinished = true
-
 function WorldList:RefreshCurrentServerList(callback)
     local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
 
@@ -512,8 +510,11 @@ function WorldList:OpenProject(index)
     ParaGlobal.ShellExecute("open", format("%s/pbl/project/%d/", KeepworkService:GetKeepworkUrl(), compareWorldList[index].kpProjectId or 0), "", "", 1)
 end
 
+WorldList.curWorldsFolder = 'worlds/DesignHouse'
 function WorldList:GetWorldsPath()
-    local allPath = {}
+    local allPath = {
+        { text = L"临时文件夹", value = "worlds/DesignHouse" }
+    }
 
     local list = LocalService:Find(LocalService:GetSystemWorldsPath())
 
@@ -533,14 +534,19 @@ function WorldList:GetWorldsPath()
     RemoveFilename('.DS_Store')
     RemoveFilename('BlockTextures')
     RemoveFilename('MyWorlds')
+    RemoveFilename('DesignHouse')
 
-   for key, item in pairs(list) do
-        if item.filename == 'DesignHouse' then
-            allPath[#allPath + 1] = { text = L"临时文件夹", value = "worlds/DesignHouse", selected = true }
+    for key, item in pairs(list) do
+        allPath[#allPath + 1] = { text = item.filename, value = "worlds/" .. item.filename }
+    end
+
+    for key, item in pairs(allPath) do
+        if item.value == self.curWorldsFolder then
+            item.selected = true
         else
-            allPath[#allPath + 1] = { text = item.filename, value = "worlds/" .. item.filename }
+            item.selected = nil
         end
-   end
+    end
 
     return allPath
 end

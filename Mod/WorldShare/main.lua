@@ -65,7 +65,7 @@ local WorldShare = commonlib.inherit(commonlib.gettable("Mod.ModBase"), commonli
 
 WorldShare:Property({"Name", "WorldShare", "GetName", "SetName", { auto = true }})
 WorldShare:Property({"Desc", "world share mod can share world to keepwork online", "GetDesc", "SetDesc", { auto = true }})
-WorldShare.version = '0.0.13'
+WorldShare.version = '0.0.14'
 
 -- register mod global variable
 WorldShare.Store = Store
@@ -153,7 +153,7 @@ function WorldShare:init()
     GameLogic.GetFilters():add_filter(
         "LocalLoadWorld.GetWorldFolderFullPath",
         function()
-            return LocalService:FilterGetWorldFolderFullPath()
+            return LocalService:FilterGetWorldsFolderFullPath()
         end
     )
 

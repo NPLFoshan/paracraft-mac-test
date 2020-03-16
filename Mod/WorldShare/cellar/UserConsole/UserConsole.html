@@ -420,8 +420,9 @@
                     return WorldList:GetWorldsPath()
                 end
 
-                function select_my_world_path(name, value)
-                    Mod.WorldShare.Store:Set('world/myWorldFolder', value)
+                function select_my_worlds_path(name, value)
+                    WorldList.curWorldsFolder = value
+                    Mod.WorldShare.Store:Set('world/myWorldsFolder', value)
                     refresh()
                 end
             ]]>
@@ -693,7 +694,7 @@
                 <div style="height:350px;">
                     <div style="margin-top: -2px;margin-bottom: 5px;">
                         <%= L"世界文件储存位置：" %>
-                        <select name="select_worlds_path" class="bbs_text" style="width: 100px;height: 25px;margin-top: -2px;" onselect="<%= select_my_world_path %>" DataSource="<%= get_worlds_path() %>"></select>
+                        <select name="select_worlds_path" class="bbs_text" style="width: 100px;height: 25px;margin-top: -2px;" onselect="<%= select_my_worlds_path %>" DataSource="<%= get_worlds_path() %>"></select>
                     </div>
                     <pe:if style="margin-top:10px;font-weight:bold;color:#ffffff" condition="<%= is_list_refreshing() %>">
                         <%= L"正在刷新, 请稍候 ... " %>
