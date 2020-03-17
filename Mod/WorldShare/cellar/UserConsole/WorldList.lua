@@ -9,7 +9,6 @@ use the lib:
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 ------------------------------------------------------------
 ]]
-local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
 local RemoteServerList = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteServerList")
 local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld")
 local Encoding = commonlib.gettable("commonlib.Encoding")
@@ -25,7 +24,6 @@ local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua
 local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
-local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local LocalServiceWorld = NPL.load("(gl)Mod/WorldShare/service/LocalService/World.lua")
 local SyncToLocal = NPL.load("(gl)Mod/WorldShare/service/SyncService/SyncToLocal.lua")

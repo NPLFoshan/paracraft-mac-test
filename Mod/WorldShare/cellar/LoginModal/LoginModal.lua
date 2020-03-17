@@ -7,6 +7,9 @@ Desc:
 use the lib:
 ------------------------------------------------------------
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+LoginModal:Init(function(result)
+    -- after login execute
+end)
 LoginModal:ShowPage()
 ------------------------------------------------------------
 ]]

@@ -16,12 +16,18 @@ local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.Create
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
+local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 
 local CreateWorld = NPL.export()
 
 function CreateWorld:CreateNewWorld(foldername, callback)
     local function Handle()
+        if type(callback) == 'function' then
+            callback()
+        end
+
         CreateNewWorld.ShowPage()
     
         if type(foldername) == 'string' then
@@ -39,7 +45,15 @@ function CreateWorld:CreateNewWorld(foldername, callback)
                 No = L"登录创建个人世界"
             },
             function(res)
-                echo(res, true)
+                if res == 8 then
+                    Handle()
+                elseif res == 4 then
+                    LoginModal:Init(function(result)
+                        if result then
+                            Handle()
+                        end
+                    end)
+                end
             end,
             _guihelper.MessageBoxButtons.YesNo,
             {
@@ -50,10 +64,6 @@ function CreateWorld:CreateNewWorld(foldername, callback)
             }
         )
     else
-        if type(callback) == 'function' then
-            callback()
-        end
-
         Handle()
     end
 end
