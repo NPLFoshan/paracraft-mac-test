@@ -39,7 +39,7 @@ function WorldList:RefreshCurrentServerList(callback)
 
     Compare:RefreshWorldList(function(currentWorldList)
         self:SetRefreshing(false)
-echo(currentWorldList, true)
+
         if UserConsolePage then
             UserConsolePage:GetNode("gw_world_ds"):SetAttribute("DataSource", currentWorldList)
             WorldList:OnSwitchWorld(1)
