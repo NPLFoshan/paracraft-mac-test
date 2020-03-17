@@ -39,7 +39,7 @@ function WorldList:RefreshCurrentServerList(callback)
 
     Compare:RefreshWorldList(function(currentWorldList)
         self:SetRefreshing(false)
-
+echo(currentWorldList, true)
         if UserConsolePage then
             UserConsolePage:GetNode("gw_world_ds"):SetAttribute("DataSource", currentWorldList)
             WorldList:OnSwitchWorld(1)
@@ -220,6 +220,7 @@ function WorldList:EnterWorld(index)
 
             if currentWorld.shared then
                 Mod.WorldShare.MsgBox:Dialog(
+                    "WorldReadOnly",
                     L"此世界为多人世界，请登陆后再打开世界，或者以只读模式打开世界",
                     {
                         Title = L"多人世界",
@@ -280,6 +281,7 @@ function WorldList:EnterWorld(index)
                                     Mod.WorldShare.MsgBox:Close()
     
                                     Mod.WorldShare.MsgBox:Dialog(
+                                        "OccupyWorld",
                                         format(
                                             L"此账号已在其他地方占用此世界，请退出后再或者以只读模式打开世界",
                                             data.owner.username,
@@ -304,6 +306,7 @@ function WorldList:EnterWorld(index)
                             end
                         else
                             Mod.WorldShare.MsgBox:Dialog(
+                                "OthersOccupyWorld",
                                 format(
                                     L"%s正在以独占模式编辑世界%s，请联系%s退出编辑或者以只读模式打开世界",
                                     data.owner.username,
@@ -391,6 +394,7 @@ function WorldList:EnterWorld(index)
                         local remoteRevision = Mod.WorldShare.Store:Get("world/remoteRevision") or 0
 
                         Mod.WorldShare.MsgBox:Dialog(
+                            "SharedLowerVersion",
                             format(L"你的本地版本%d比远程版本%d旧， 是否更新为最新的远程版本？", currentRevision, remoteRevision),
                             {
                                 Title = L"多人世界",

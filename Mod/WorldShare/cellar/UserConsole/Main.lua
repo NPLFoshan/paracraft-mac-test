@@ -148,8 +148,9 @@ function UserConsole.OnClickOfficialWorlds(callback)
 end
 
 function UserConsole:CreateNewWorld()
-    self:ClosePage()
-    CreateWorld:CreateNewWorld()
+    CreateWorld:CreateNewWorld(nil, function()
+        self:ClosePage()
+    end)
 end
 
 function UserConsole:ShowHistoryManager()
