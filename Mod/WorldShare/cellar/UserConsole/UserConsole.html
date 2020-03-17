@@ -12,6 +12,7 @@
                 UserInfo = NPL.load("./UserInfo.lua")
                 Server = NPL.load('../Server/Server.lua')
                 MySchool = NPL.load("(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua")
+                local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 
                 InternetLoadWorld.OnStaticInit()
                 InternetLoadWorld.GetEvents():AddEventListener(
@@ -163,7 +164,19 @@
                 end
 
                 function can_be_sync()
-                    return UserInfo.IsSignedIn() and not WorldList.GetCurWorldInfo("is_zip", Eval("index"))
+                    if UserInfo.IsSignedIn() then
+                        if KeepworkServiceSession:IsMyWorldsFolder() then
+                            if WorldList.GetCurWorldInfo("is_zip", Eval("index")) then
+                                return false
+                            else
+                                return true
+                            end
+                        else
+                            return false
+                        end
+                    else
+                        return false
+                    end
                 end
 
                 function get_world_date()
@@ -421,7 +434,6 @@
                 end
 
                 function select_my_worlds_path(name, value)
-                    WorldList.curWorldsFolder = value
                     Mod.WorldShare.Store:Set('world/myWorldsFolder', value)
                     refresh()
                 end
@@ -755,10 +767,10 @@
                                         <div name="worldinfo">
                                             <div class="share_world_info" style="position:relative;margin-top:2px;">
                                                 <div>
-                                                    <pe:if condition='<%= is_signed_in() %>'>
+                                                    <pe:if condition='<%= can_be_sync() %>'>
                                                         <div style="float:left;width:25px;height:20px;background:#fff" />
                                                     </pe:if>
-                                                    <pe:if condition='<%= not is_signed_in() %>'>
+                                                    <pe:if condition='<%= not can_be_sync() %>'>
                                                         <div style="float:left;width:10px;height:20px;background:#fff" />
                                                     </pe:if>
                                                     <pe:if condition='<%= not Eval("is_zip") %>'>
@@ -780,10 +792,10 @@
                                                     </pe:if>
                                                 </div>
                                                 <div>
-                                                    <pe:if condition='<%= is_signed_in() %>'>
+                                                    <pe:if condition='<%= can_be_sync() %>'>
                                                         <div style="float:left;width:24px;height:20px;background:#fff" />
                                                     </pe:if>
-                                                    <pe:if condition='<%= not is_signed_in() %>'>
+                                                    <pe:if condition='<%= not can_be_sync() %>'>
                                                         <div style="float:left;width:10px;height:20px;background:#fff" />
                                                     </pe:if>
                                                     <span style="margin-left:0px;">
@@ -845,10 +857,10 @@
                                                 </pe:if>
                                             </div>
                                             <div class="share_world_info" style="padding-top:5px;">
-                                                <pe:if condition='<%= is_signed_in() %>'>
+                                                <pe:if condition='<%= can_be_sync() %>'>
                                                     <div style="float:left;width:24px;height:10px;background:#fff" />
                                                 </pe:if>
-                                                <pe:if condition='<%= not is_signed_in() %>'>
+                                                <pe:if condition='<%= not can_be_sync() %>'>
                                                     <div style="float:left;width:10px;height:20px;background:#fff" />
                                                 </pe:if>
                                                 <span style="float:left;margin-left:0px;">

@@ -67,6 +67,16 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
     local SetUserinfo = Mod.WorldShare.Store:Action("user/SetUserinfo")
     SetUserinfo(token, userId, username, nickname)
 
+    local userWorldsFolder = 'worlds/' .. username
+
+    if System.os.GetExternalStoragePath() ~= "" then
+        ParaIO.CreateDirectory(System.os.GetExternalStoragePath() .. "paracraft/" .. userWorldsFolder .. '/')
+    else
+        ParaIO.CreateDirectory(ParaIO.GetWritablePath() .. userWorldsFolder .. '/')
+    end
+
+    Mod.WorldShare.Store:Set('world/myWorldsFolder', 'worlds/' .. username)
+
     LessonOrganizationsApi:GetUserAllOrgs(
         function(data, err)
             if err == 200 then
@@ -383,4 +393,20 @@ function KeepworkServiceSession:RenewToken()
     Mod.WorldShare.Utils.SetTimeOut(function()
         self:RenewToken()
     end, 3600 * 1000)
+end
+
+function KeepworkServiceSession:IsMyWorldsFolder()
+    local username = Mod.WorldShare.Store:Get('user/username') or ""
+    local myWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder') or ""
+    local myWorldsFolderUsername = string.match(myWorldsFolder, '^worlds/(.+)') or ""
+
+    if username == "" or myWorldsFolderUsername == "" then
+        return false
+    end
+
+    if username == myWorldsFolderUsername then
+        return true
+    else
+        return false
+    end
 end

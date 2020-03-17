@@ -512,13 +512,13 @@ function WorldList:OpenProject(index)
     ParaGlobal.ShellExecute("open", format("%s/pbl/project/%d/", KeepworkService:GetKeepworkUrl(), compareWorldList[index].kpProjectId or 0), "", "", 1)
 end
 
-WorldList.curWorldsFolder = 'worlds/DesignHouse'
 function WorldList:GetWorldsPath()
     local allPath = {
         { text = L"临时文件夹", value = "worlds/DesignHouse" }
     }
 
     local list = LocalService:Find(LocalService:GetSystemWorldsPath())
+    local curWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder') or "worlds/DesignHouse"
 
     -- remove useless folder 
     local function RemoveFilename(name)
@@ -543,7 +543,7 @@ function WorldList:GetWorldsPath()
     end
 
     for key, item in pairs(allPath) do
-        if item.value == self.curWorldsFolder then
+        if item.value == curWorldsFolder then
             item.selected = true
         else
             item.selected = nil
