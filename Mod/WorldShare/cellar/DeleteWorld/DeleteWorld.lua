@@ -38,7 +38,7 @@ function DeleteWorld:ShowPage()
             if myWorldsFolder == 'worlds/DesignHouse' then
                 Mod.WorldShare.MsgBox:Dialog(
                     "DeleteWorld",
-                    L"是否确认删除本地临时世界文件夹中储存的世界：？删除后该世界文件将在本地所有用户临时文件夹世界列表中删除。",
+                    format(L"是否确认删除本地临时世界文件夹中储存的世界：%s？删除后该世界文件将在本地所有用户临时文件夹世界列表中删除。", currentWorld and currentWorld.foldername or ""),
                     {
                         Yes = L"取消",
                         No = L"确认"
@@ -87,7 +87,7 @@ function DeleteWorld:ShowPage()
         else
             Mod.WorldShare.MsgBox:Dialog(
                 "DeleteWorld",
-                L"是否确认删除本地临时世界文件夹中储存的世界：？删除后该世界文件将在本地所有用户临时文件夹世界列表中删除。",
+                format(L"是否确认删除本地临时世界文件夹中储存的世界：%s？删除后该世界文件将在本地所有用户临时文件夹世界列表中删除。", currentWorld and currentWorld.foldername or ""),
                 {
                     Yes = L"取消",
                     No = L"确认"

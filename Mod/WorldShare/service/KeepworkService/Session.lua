@@ -23,6 +23,12 @@ local KeepworkServiceSession = NPL.export()
 
 KeepworkServiceSession.captchaKey = ''
 
+function KeepworkServiceSession:IsSignedIn()
+    local token = Mod.WorldShare.Store:Get("user/token")
+
+    return token ~= nil
+end
+
 function KeepworkServiceSession:Login(account, password, callback)
     KeepworkUsersApi:Login(account, password, callback, callback)
 end

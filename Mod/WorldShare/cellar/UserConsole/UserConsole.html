@@ -38,38 +38,69 @@
                 end
 
                 function covert_status()
-                    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-                    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+                    local function handle()
+                        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+                        local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
 
-                    if currentEnterWorld and currentEnterWorld.foldername == currentWorld.foldername then
-                        GameLogic.AddBBS(nil, L"不能重命名当前编辑的世界", 3000, "255 0 0")
-                        return false
-                    end
-
-                    if do_modify then
-                        -- update world name
-
-                        if UserConsole:WorldRename(
-                            current_item_index,
-                            temp_modify_worldname,
-                            function()
-                                WorldList:RefreshCurrentServerList(function()
-                                    switch_world(current_item_index)
-                                end)
-                            end
-                        ) then
-                            temp_modify_worldname = ''
-                        else
-                            temp_modify_worldname = ''
-                            do_modify = not do_modify
-                            page:Refresh(0.01)
+                        if currentEnterWorld and currentEnterWorld.foldername == currentWorld.foldername then
+                            GameLogic.AddBBS(nil, L"不能重命名当前编辑的世界", 3000, "255 0 0")
+                            return false
                         end
 
-                        return true
+                        if do_modify then
+                            -- update world name
+
+                            if UserConsole:WorldRename(
+                                current_item_index,
+                                temp_modify_worldname,
+                                function()
+                                    WorldList:RefreshCurrentServerList(function()
+                                        switch_world(current_item_index)
+                                    end)
+                                end
+                            ) then
+                                temp_modify_worldname = ''
+                            else
+                                temp_modify_worldname = ''
+                                do_modify = not do_modify
+                                page:Refresh(0.01)
+                            end
+
+                            return true
+                        end
+
+                        do_modify = not do_modify
+                        page:Refresh(0.01)
                     end
 
-                    do_modify = not do_modify
-                    page:Refresh(0.01)
+                    if not is_modifying() then
+                        local myWorldsFolder = Mod.WorldShare.Store:Get("world/myWorldsFolder")
+
+                        if KeepworkServiceSession:IsSignedIn() then
+                            -- Handle()
+                        else
+                            if myWorldsFolder and myWorldsFolder ~= 'worlds/DesignHouse' then
+
+                            else
+                                Mod.WorldShare.MsgBox:Dialog(
+                                    "RenameWorld",
+                                    format(L"是否确认重命名此临时世界文件？重命名后的该临时世界名称将应用于所有用户的临时文件夹中。"),
+                                    {
+                                        Yes = L"取消",
+                                        No = L"确认"
+                                    },
+                                    function(res)
+                                        if res == 4 then
+                                            handle()
+                                        end
+                                    end,
+                                    _guihelper.MessageBoxButtons.YesNo
+                                )
+                            end
+                        end
+                    else
+                        handle()
+                    end
                 end
 
                 function be_selected()
@@ -709,7 +740,7 @@
                         <select name="select_worlds_path" class="bbs_text" style="width: 100px;height: 25px;margin-top: -2px;" onselect="<%= select_my_worlds_path %>" DataSource="<%= get_worlds_path() %>"></select>
                         <input class="flat_button mc_light_grey_button_with_fillet"
                                onclick="refresh()"
-                               style="height:25px;width:40px;margin-top: -2px;margin-left:4px;"
+                               style="height:25px;min-width:40px;margin-top: -2px;margin-left:4px;"
                                type="button"
                                value="<%= L'刷新' %>" />
                     </div>
