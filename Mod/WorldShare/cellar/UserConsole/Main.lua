@@ -72,6 +72,26 @@ function UserConsole:ShowPage()
         if not KeepworkService:IsSignedIn() then
             UserInfo:CheckDoAutoSignin()
         end
+
+        -- show login notice
+        if not KeepworkService:IsSignedIn() then
+            Mod.WorldShare.MsgBox:Dialog(
+                "ShowLoginNotice",
+                L"当前未登录状态下世界文件列表默认显示临时文件夹中的世界条目，登陆后世界文件列表将默认显示您的个人世界。",
+                {
+                    Yes = L"暂不登录",
+                    No = L"现在登录"
+                },
+                function(res)
+                    if res == 4 then
+                        LoginModal:Init(function(result)
+                            WorldList:RefreshCurrentServerList()
+                        end)
+                    end
+                end,
+                _guihelper.MessageBoxButtons.YesNo
+            )
+        end
     end
 
     WorldList:RefreshCurrentServerList()
