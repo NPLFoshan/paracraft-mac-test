@@ -13,6 +13,7 @@
                 Server = NPL.load('../Server/Server.lua')
                 MySchool = NPL.load("(gl)Mod/WorldShare/cellar/MySchool/MySchool.lua")
                 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+                local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 
                 InternetLoadWorld.OnStaticInit()
                 InternetLoadWorld.GetEvents():AddEventListener(
@@ -77,10 +78,41 @@
                         local myWorldsFolder = Mod.WorldShare.Store:Get("world/myWorldsFolder")
 
                         if KeepworkServiceSession:IsSignedIn() then
-                            -- Handle()
+                            if KeepworkServiceSession:IsMyWorldsFolder() then
+                                handle()
+                            else
+                                _guihelper.MessageBox(L"无法重命名他人本地世界文件夹中储存的世界。")
+                            end
                         else
                             if myWorldsFolder and myWorldsFolder ~= 'worlds/DesignHouse' then
+                                Mod.WorldShare.MsgBox:Dialog(
+                                    "DeleteWorld",
+                                    L"未登录状态下无法重命名世界，请先登录。",
+                                    {
+                                        Yes = L"取消",
+                                        No = L"登录"
+                                    },
+                                    function(res)
+                                        if res == 4 then
+                                            LoginModal:Init(function(result)
+                                                if not result then
+                                                    return false
+                                                end
 
+                                                Mod.WorldShare.Store:Set('world/myWorldsFolder', myWorldsFolder)
+
+                                                WorldList:RefreshCurrentServerList()
+
+                                                if KeepworkServiceSession:IsMyWorldsFolder() then
+                                                    handle()
+                                                else
+                                                    _guihelper.MessageBox(L"无法重命名他人本地世界文件夹中储存的世界。")
+                                                end
+                                            end)
+                                        end
+                                    end,
+                                    _guihelper.MessageBoxButtons.YesNo
+                                )
                             else
                                 Mod.WorldShare.MsgBox:Dialog(
                                     "RenameWorld",
