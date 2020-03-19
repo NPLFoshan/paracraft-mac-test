@@ -137,6 +137,7 @@ function WorldShare:init()
         end
     )
 
+    -- handle enter world width pid
     GameLogic.GetFilters():add_filter(
         "cmd_loadworld", 
         function(url, options)
@@ -150,10 +151,27 @@ function WorldShare:init()
         end
     )
 
+    -- return current user worlds folder or temp folder
     GameLogic.GetFilters():add_filter(
         "LocalLoadWorld.GetWorldFolderFullPath",
         function()
             return LocalService:FilterGetWorldsFolderFullPath()
+        end
+    )
+
+    -- save world
+    GameLogic.GetFilters():add_filter(
+        "SaveWorldPage.OnSaveWorld",
+        function(callback)
+            return SaveWorld:Save(callback)
+        end
+    )
+
+    -- save world as
+    GameLogic.GetFilters():add_filter(
+        "WorldCommon.SaveWorldAs",
+        function(callback)
+            return SaveWorld:SaveAa(callback)
         end
     )
 

@@ -30,14 +30,12 @@ local self = WorldExitDialog
 function WorldExitDialog.ShowPage(callback)
     UserConsole:ClosePage()
 
-    echo('a1111', true)
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-    echo(currentWorld, true)
+
     if not currentWorld then
         return false
     end
 
-    echo('a2222222', true)
     Mod.WorldShare.MsgBox:Show(L"请稍后...")
 
     local function Handle()
@@ -91,20 +89,14 @@ function WorldExitDialog.ShowPage(callback)
             Handle()
         end
     else
-        echo('a3333333')
         if KeepworkServiceSession:IsSignedIn() then
-            echo('a44444')
             Compare:Init(function(result)
-                echo('a55555')
-                echo(result, true)
                 if not result then
                     return false
                 end
 
                 if currentWorld and currentWorld.kpProjectId then
-                    echo(11111, true)
                     KeepworkServiceProject:GetProject(currentWorld.kpProjectId, function(data)
-                        echo(222222, true)
                         if data and data.world and data.world.worldName then
                             self.currentWorldKeepworkInfo = data
                         end
@@ -162,30 +154,57 @@ end
 
 -- @param res: _guihelper.DialogResult
 function WorldExitDialog.OnDialogResult(res)
-    local function Handle()
+    local function Handle(_res)
         local WorldExitDialogPage = Mod.WorldShare.Store:Get('page/WorldExitDialog')
 
-        if (WorldExitDialogPage) then
+        if WorldExitDialogPage then
             WorldExitDialogPage:CloseWindow()
         end
 
-        if (WorldExitDialogPage.callback) then
-            WorldExitDialogPage.callback(res)
+        if WorldExitDialogPage.callback then
+            WorldExitDialogPage.callback(_res)
         end
     end
 
     if res == 8 then -- guihelper.DialogResult.Yes
         if KeepworkServiceSession:IsSignedIn() then
             if KeepworkServiceSession:IsMyWorldsFolder() then
-                Handle()
+                Handle(res)
             else
-                
+                local myWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder')
+
+                Mod.WorldShare.MsgBox:Dialog(
+                    "SaveWorldAndExit",
+                    format(L"此世界储存在本地%s世界文件夹中，如需保存当前编辑内容，请另存为个人世界", myWorldsFolder == 'worlds/DesignHouse' and L'临时' or L'其他用户'),
+                    {
+                        Yes = L"取消",
+                        No = L"另存为个人世界"
+                    },
+                    function(res)
+                        if res == 4 then
+                            -- TOOD: copy current world to my worlds folder
+
+                            Handle(_guihelper.DialogResult.No)
+                        end
+                    end,
+                    _guihelper.MessageBoxButtons.YesNo,
+                    {
+                        Yes = { marginLeft = '50px' },
+                        No = { width = '120px' },
+                    }
+                )
             end
         else
+            local myWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder')
 
+            if myWorldsFolder == 'worlds/DesignHouse' then
+                
+            else
+
+            end
         end
     else
-        Handle()
+        Handle(res)
     end
 end
 
