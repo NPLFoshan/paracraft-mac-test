@@ -12,10 +12,9 @@ WorldExitDialog.ShowPage()
 local ShareWorldPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage")
 local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision")
 
-local Utils = NPL.load("(gl)Mod/WorldShare/helper/Utils.lua")
-local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
@@ -31,12 +30,14 @@ local self = WorldExitDialog
 function WorldExitDialog.ShowPage(callback)
     UserConsole:ClosePage()
 
+    echo('a1111', true)
     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-
+    echo(currentWorld, true)
     if not currentWorld then
         return false
     end
 
+    echo('a2222222', true)
     Mod.WorldShare.MsgBox:Show(L"请稍后...")
 
     local function Handle()
@@ -90,14 +91,20 @@ function WorldExitDialog.ShowPage(callback)
             Handle()
         end
     else
-        if KeepworkService:IsSignedIn() then
+        echo('a3333333')
+        if KeepworkServiceSession:IsSignedIn() then
+            echo('a44444')
             Compare:Init(function(result)
+                echo('a55555')
+                echo(result, true)
                 if not result then
                     return false
                 end
 
                 if currentWorld and currentWorld.kpProjectId then
+                    echo(11111, true)
                     KeepworkServiceProject:GetProject(currentWorld.kpProjectId, function(data)
+                        echo(222222, true)
                         if data and data.world and data.world.worldName then
                             self.currentWorldKeepworkInfo = data
                         end
@@ -146,23 +153,39 @@ function WorldExitDialog:OnInit()
 end
 
 function WorldExitDialog:Refresh(sec)
-    local worldExitDialogPage = Store:Get('page/WorldExitDialog')
+    local WorldExitDialogPage = Mod.WorldShare.Store:Get('page/WorldExitDialog')
 
-    if worldExitDialogPage then
-        worldExitDialogPage:Refresh(sec or 0.01)
+    if WorldExitDialogPage then
+        WorldExitDialogPage:Refresh(sec or 0.01)
     end
 end
 
 -- @param res: _guihelper.DialogResult
 function WorldExitDialog.OnDialogResult(res)
-    local WorldExitDialogPage = Store:Get('page/WorldExitDialog')
+    local function Handle()
+        local WorldExitDialogPage = Mod.WorldShare.Store:Get('page/WorldExitDialog')
 
-    if (WorldExitDialogPage) then
-        WorldExitDialogPage:CloseWindow()
+        if (WorldExitDialogPage) then
+            WorldExitDialogPage:CloseWindow()
+        end
+
+        if (WorldExitDialogPage.callback) then
+            WorldExitDialogPage.callback(res)
+        end
     end
 
-    if (WorldExitDialogPage.callback) then
-        WorldExitDialogPage.callback(res)
+    if res == 8 then -- guihelper.DialogResult.Yes
+        if KeepworkServiceSession:IsSignedIn() then
+            if KeepworkServiceSession:IsMyWorldsFolder() then
+                Handle()
+            else
+                
+            end
+        else
+
+        end
+    else
+        Handle()
     end
 end
 

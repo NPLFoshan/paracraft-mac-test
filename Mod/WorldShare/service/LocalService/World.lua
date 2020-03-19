@@ -168,7 +168,6 @@ function LocalServiceWorld:GetSharedWorldList()
 end
 
 function LocalServiceWorld:GetInternetLocalWorldList()
-    echo('from local service world get internet local world list!!!!!', true)
     local ServerPage = InternetLoadWorld.GetCurrentServerPage()
 
     RemoteServerList:new():Init(
