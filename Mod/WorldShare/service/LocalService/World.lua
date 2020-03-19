@@ -40,8 +40,9 @@ function LocalServiceWorld:GetWorldList()
 
             if tag.kpProjectId then
                 value.kpProjectId = tag.kpProjectId
+                value.hasPid = true
             else
-                value.kpProjectId = 0
+                value.hasPid = false
             end
 
             if tag.size then
