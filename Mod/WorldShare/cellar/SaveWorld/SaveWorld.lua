@@ -21,19 +21,17 @@ function SaveWorld:Save(callback)
                 callback()
             end
         else
-            local myWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder')
-
             Mod.WorldShare.MsgBox:Dialog(
                 "SaveWorldSignInSave",
-                format(L"此世界储存在本地%s世界文件夹中，如需保存当前编辑内容，请另存为个人世界", myWorldsFolder == 'worlds/DesignHouse' and L'临时' or L'其他用户'),
+                format(L"此世界储存在本地%s世界文件夹中，如需保存当前编辑内容，请另存为个人世界", KeepworkServiceSession:IsTempWorldsFolder() and L'临时' or L'其他用户'),
                 {
                     Yes = L"取消",
                     No = L"另存为个人世界"
                 },
                 function(res)
                     if res == 4 then
-                        -- TOOD: copy and open current world to my worlds folder
-
+                        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+                        echo(currentWorld, true)
                         
                     end
                 end,
@@ -54,9 +52,7 @@ function SaveWorld:Save(callback)
             },
             function(res)
                 if res == 8 then
-                    local myWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder')
-
-                    if myWorldsFolder == 'worlds/DesignHouse' then
+                    if KeepworkServiceSession:IsTempWorldsFolder() then
                         if type(callback) == 'function' then
                             callback()
                         end
@@ -129,7 +125,7 @@ function SaveWorld:SaveAs(callback)
             },
             function(res)
                 if res == 8 then
-                    
+
                 end
 
                 if res == 4 then
