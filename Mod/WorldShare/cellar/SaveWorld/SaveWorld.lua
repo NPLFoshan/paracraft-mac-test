@@ -104,12 +104,51 @@ function SaveWorld:SaveAs(callback)
                 callback()
             end
         else
-
+            Mod.WorldShare.MsgBox:Dialog(
+                "SaveWorldSignInSaveAsConfirm",
+                format(L'此世界储存在本地%s世界文件夹中，如需另存为当前编辑内容，请另存为个人世界。', KeepworkServiceSession:IsTempWorldsFolder() and L'临时' or L'其他用户'),
+                {
+                    Yes = L"取消",
+                    No = L"确认"
+                },
+                function(res)
+                    if res == 4 then
+                        -- move current world to personal folder
+                    end
+                end,
+                _guihelper.MessageBoxButtons.YesNo
+            )
         end
     else
+        Mod.WorldShare.MsgBox:Dialog(
+            "SaveWorldOfflineSaveAsConfirm",
+            L'是否希望将该"临时世界"编辑内容作为个人世界保存在个人文件夹中？如果保存为个人文件，请先登录。',
+            {
+                Yes = L"暂时保存为临时文件",
+                No = L"登录并保存为个人世界"
+            },
+            function(res)
+                if res == 8 then
+                    
+                end
 
+                if res == 4 then
+                    LoginModal:Init(function(result)
+                        if result then
+                            
+                        end
+                    end)
+                end
+            end,
+            _guihelper.MessageBoxButtons.YesNo,
+            {
+                Window = { width = '440px' },
+                Container = { width = '430px' },
+                Yes = { width = '150px', marginLeft = '50px' },
+                No = { width = '160px' }
+            }
+        )
     end
-
 
     return true
 end

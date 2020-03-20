@@ -172,7 +172,7 @@ function WorldShare:init()
     GameLogic.GetFilters():add_filter(
         "WorldCommon.SaveWorldAs",
         function(callback)
-            return SaveWorld:SaveAa(callback)
+            return SaveWorld:SaveAs(callback)
         end
     )
 

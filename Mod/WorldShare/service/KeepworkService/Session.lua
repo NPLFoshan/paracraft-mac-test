@@ -416,3 +416,13 @@ function KeepworkServiceSession:IsMyWorldsFolder()
         return false
     end
 end
+
+function KeepworkServiceSession:IsTempWorldsFolder()
+    local myWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder') or ""
+
+    if myWorldsFolder == 'worlds/DesignHouse' then
+        return true
+    else
+        return false
+    end
+end
