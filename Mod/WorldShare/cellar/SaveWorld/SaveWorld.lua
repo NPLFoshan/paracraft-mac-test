@@ -31,7 +31,14 @@ function SaveWorld:Save(callback)
                 function(res)
                     if res == 4 then
                         local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-                        echo(currentWorld, true)
+                        local username = Mod.WorldShare.Store:Get('user/username')
+
+                        if not currentWorld or not currentWorld.worldpath or currentWorld.worldpath == '' or not username or username == '' then
+                            return false
+                        end
+                        
+                        local dest = string.gsub(currentWorld.worldpath, '/worlds/%w+/', '/worlds/' .. username .. '/')
+
                         
                     end
                 end,

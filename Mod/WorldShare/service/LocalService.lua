@@ -15,6 +15,7 @@ local SystemEncoding = commonlib.gettable("System.Encoding")
 local CommonlibEncoding = commonlib.gettable("commonlib.Encoding")
 local FileDownloader = commonlib.gettable("Mod.WorldShare.service.FileDownloader.FileDownloader")
 local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 
 local LocalService = NPL.export()
 
@@ -273,6 +274,25 @@ function LocalService:MoveZipToFolder(worldpath, zipPath)
     end
 
     ParaAsset.CloseArchive(zipPath)
+end
+
+-- copy current world to destination path
+function LocalService:CopyWorldTo(dest)
+    if not dest or dest == "" then
+        return false
+    end
+
+    if ParaIO.DoesFileExist(targetFolder.."tag.xml", false) then
+        _guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
+            if(res and res == _guihelper.DialogResult.Yes) then
+                WorldCommon.SaveWorldAsImp(targetFolder);
+            end
+        end, _guihelper.MessageBoxButtons.YesNo);
+    else
+        WorldCommon.SaveWorldAsImp(targetFolder);
+    end
+
+    WorldCommon.CopyWorldTo(dest)
 end
 
 -- get all world total files size
