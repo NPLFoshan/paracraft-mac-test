@@ -57,6 +57,7 @@ local Grade = NPL.load("(gl)Mod/WorldShare/cellar/Grade/Grade.lua")
 local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/World.lua")
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local SaveWorld = NPL.load("(gl)Mod/WorldShare/cellar/SaveWorld/SaveWorld.lua")
+local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
 
 local SocketService = commonlib.gettable("Mod.WorldShare.service.SocketService")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -72,6 +73,10 @@ WorldShare.version = '0.0.14'
 WorldShare.Store = Store
 WorldShare.MsgBox = MsgBox
 WorldShare.Utils = Utils
+
+if Config.defaultEnv ~= 'ONLINE' then
+    System.options.isAD_SDK = true
+end
 
 LOG.std(nil, "info", "WorldShare", "world share version %s", WorldShare.version)
 
