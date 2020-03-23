@@ -11,6 +11,7 @@ local SaveWorld = NPL.load("(gl)Mod/WorldShare/cellar/SaveWorld/SaveWorld.lua")
 
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 
 local SaveWorld = NPL.export()
 
@@ -36,10 +37,10 @@ function SaveWorld:Save(callback)
                         if not currentWorld or not currentWorld.worldpath or currentWorld.worldpath == '' or not username or username == '' then
                             return false
                         end
-                        
+
                         local dest = string.gsub(currentWorld.worldpath, '/worlds/%w+/', '/worlds/' .. username .. '/')
 
-                        
+                        LocalService:CopyWorldTo(dest)
                     end
                 end,
                 _guihelper.MessageBoxButtons.YesNo,
@@ -64,25 +65,48 @@ function SaveWorld:Save(callback)
                             callback()
                         end
                     else
-                        -- move current world to personal folder
+                        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+
+                        if not currentWorld or not currentWorld.worldpath or currentWorld.worldpath == '' then
+                            return false
+                        end
+
+                        local dest = string.gsub(currentWorld.worldpath, '/worlds/%w+/', '/worlds/DesignHouse/')
+
+                        LocalService:CopyWorldTo(dest)
                     end
                 elseif res == 4 then
                     LoginModal:Init(function(result)
                         if result then
-                            Mod.WorldShare.MsgBox:Dialog(
-                                "SaveWorldOfflineSaveConfirm",
-                                L'登录成功，点击"确认"按钮将当前世界另存为个人世界。',
-                                {
-                                    Yes = L"取消",
-                                    No = L"确认"
-                                },
-                                function(res)
-                                    if res == 4 then
-                                        -- move current world to personal folder
-                                    end
-                                end,
-                                _guihelper.MessageBoxButtons.YesNo
-                            )
+                            if KeepworkServiceSession:IsMyWorldsFolder() then
+                                if type(callback) == 'function' then
+                                    callback()
+                                end
+                            else
+                                Mod.WorldShare.MsgBox:Dialog(
+                                    "SaveWorldOfflineSaveConfirm",
+                                    L'登录成功，点击"确认"按钮将当前世界另存为个人世界。',
+                                    {
+                                        Yes = L"取消",
+                                        No = L"确认"
+                                    },
+                                    function(res)
+                                        if res == 4 then
+                                            local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+                                            local username = Mod.WorldShare.Store:Get('user/username')
+    
+                                            if not currentWorld or not currentWorld.worldpath or currentWorld.worldpath == '' or not username or username == '' then
+                                                return false
+                                            end
+    
+                                            local dest = string.gsub(currentWorld.worldpath, '/worlds/%w+/', '/worlds/' .. username .. '/')
+    
+                                            LocalService:CopyWorldTo(dest)
+                                        end
+                                    end,
+                                    _guihelper.MessageBoxButtons.YesNo
+                                )
+                            end
                         end
                     end)
                 end
@@ -116,7 +140,16 @@ function SaveWorld:SaveAs(callback)
                 },
                 function(res)
                     if res == 4 then
-                        -- move current world to personal folder
+                        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+                        local username = Mod.WorldShare.Store:Get('user/username')
+
+                        if not currentWorld or not currentWorld.worldpath or currentWorld.worldpath == '' or not username or username == '' then
+                            return false
+                        end
+
+                        local dest = string.gsub(currentWorld.worldpath, '/worlds/%w+/', '/worlds/' .. username .. '/')
+
+                        LocalService:CopyWorldTo(dest)
                     end
                 end,
                 _guihelper.MessageBoxButtons.YesNo
@@ -132,13 +165,55 @@ function SaveWorld:SaveAs(callback)
             },
             function(res)
                 if res == 8 then
+                    if KeepworkServiceSession:IsTempWorldsFolder() then
+                        if type(callback) == 'function' then
+                            callback()
+                        end
+                    else
+                        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
 
+                        if not currentWorld or not currentWorld.worldpath or currentWorld.worldpath == '' then
+                            return false
+                        end
+
+                        local dest = string.gsub(currentWorld.worldpath, '/worlds/%w+/', '/worlds/DesignHouse/')
+
+                        LocalService:CopyWorldTo(dest)
+                    end
                 end
 
                 if res == 4 then
                     LoginModal:Init(function(result)
                         if result then
-                            
+                            if KeepworkServiceSession:IsMyWorldsFolder() then
+                                if type(callback) == 'function' then
+                                    callback()
+                                end
+                            else
+                                Mod.WorldShare.MsgBox:Dialog(
+                                    "SaveWorldOfflineSaveConfirm",
+                                    L'登录成功，点击"确认"按钮将当前世界另存为个人世界。',
+                                    {
+                                        Yes = L"取消",
+                                        No = L"确认"
+                                    },
+                                    function(res)
+                                        if res == 4 then
+                                            local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+                                            local username = Mod.WorldShare.Store:Get('user/username')
+    
+                                            if not currentWorld or not currentWorld.worldpath or currentWorld.worldpath == '' or not username or username == '' then
+                                                return false
+                                            end
+    
+                                            local dest = string.gsub(currentWorld.worldpath, '/worlds/%w+/', '/worlds/' .. username .. '/')
+    
+                                            LocalService:CopyWorldTo(dest)
+                                        end
+                                    end,
+                                    _guihelper.MessageBoxButtons.YesNo
+                                )
+                            end
                         end
                     end)
                 end

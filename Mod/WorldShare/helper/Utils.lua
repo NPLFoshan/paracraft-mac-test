@@ -304,3 +304,18 @@ function Utils:DatetimeToTimestamp(str)
 
     return timestamp or 0
 end
+
+-- get last folder name in fullpath
+function Utils:GetLastFoldername(path)
+    if type(path) ~= 'string' or path == '' then
+        return false
+    end
+
+    local pathArray = {}
+
+    for segmentation in string.gmatch(path, "[^/]+") do
+        pathArray[#pathArray + 1] = segmentation 
+    end
+
+    return pathArray[#pathArray]
+end

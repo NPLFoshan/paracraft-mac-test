@@ -282,17 +282,27 @@ function LocalService:CopyWorldTo(dest)
         return false
     end
 
-    if ParaIO.DoesFileExist(targetFolder.."tag.xml", false) then
-        _guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
-            if(res and res == _guihelper.DialogResult.Yes) then
-                WorldCommon.SaveWorldAsImp(targetFolder);
-            end
-        end, _guihelper.MessageBoxButtons.YesNo);
-    else
-        WorldCommon.SaveWorldAsImp(targetFolder);
+    local foldername = Mod.WorldShare.Utils:GetLastFoldername(dest)
+
+    local function Handle()
+        if WorldCommon.CopyWorldTo(dest) then
+            _guihelper.MessageBox(format(L"世界已经成功保存到: %s, 是否现在打开?", commonlib.Encoding.DefaultToUtf8(dest)), function(res)
+                if(res and res == _guihelper.DialogResult.Yes) then
+                    WorldCommon.OpenWorld(dest, true)
+                end
+            end, _guihelper.MessageBoxButtons.YesNo)
+        end
     end
 
-    WorldCommon.CopyWorldTo(dest)
+    if ParaIO.DoesFileExist(dest .. "tag.xml", false) then
+        _guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(foldername)), function(res)
+            if res and res == _guihelper.DialogResult.Yes then
+                Handle()
+            end
+        end, _guihelper.MessageBoxButtons.YesNo)
+    else
+        Handle()
+    end
 end
 
 -- get all world total files size
