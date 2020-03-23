@@ -74,8 +74,8 @@ WorldShare.Store = Store
 WorldShare.MsgBox = MsgBox
 WorldShare.Utils = Utils
 
-if Config.defaultEnv ~= 'ONLINE' then
-    System.options.isAD_SDK = true
+if Config.defaultEnv == 'RELEASE' or Config.defaultEnv == 'STAGE' then
+    System.options.isAB_SDK = true
 end
 
 LOG.std(nil, "info", "WorldShare", "world share version %s", WorldShare.version)
