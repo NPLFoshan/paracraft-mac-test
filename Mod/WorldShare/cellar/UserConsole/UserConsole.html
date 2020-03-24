@@ -140,7 +140,7 @@
                 end
 
                 function get_world_status(index)
-                    return UserInfo.IsSignedIn() and not WorldList.GetCurWorldInfo("is_zip", Eval("index")) and WorldList.GetCurWorldInfo("status", Eval("index")) == index;
+                    return can_be_sync() and not WorldList.GetCurWorldInfo("is_zip", Eval("index")) and WorldList.GetCurWorldInfo("status", Eval("index")) == index;
                 end
 
                 function get_world_status_icon(index)
