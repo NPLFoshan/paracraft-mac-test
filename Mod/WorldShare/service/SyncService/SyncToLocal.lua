@@ -383,7 +383,7 @@ function SyncToLocal:DeleteOne(file, callback)
         method = 'UPDATE-PROGRESS',
         current = self.compareListIndex,
         total = self.compareListTotal,
-        msg = format(L"%s （%s） 删除成功", currentRemoteItem.path, Mod.WorldShare.Utils.FormatFileSize(currentLocalItem.size, "KB"))
+        msg = format(L"%s （%s） 删除成功", currentLocalItem.filename, Mod.WorldShare.Utils.FormatFileSize(currentLocalItem.size, "KB"))
     })
 
     if type(callback) == "function" then
