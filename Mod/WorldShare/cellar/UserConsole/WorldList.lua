@@ -439,8 +439,12 @@ function WorldList:EnterWorld(index)
     end
 
     if not KeepworkService:IsSignedIn() and currentWorld.kpProjectId then
+        -- get my worlds folder when click enter button
+        local myWorldsFolder = Mod.WorldShare.Store:Get('world/myWorldsFolder')
         LoginModal:Init(function(result)
             if result then
+                -- set my worlds folder back to at click time value
+                Mod.WorldShare.Store:Set('world/myWorldsFolder', myWorldsFolder)
                 -- refresh world list after 
                 self:RefreshCurrentServerList(function()
                     Handle(result)
