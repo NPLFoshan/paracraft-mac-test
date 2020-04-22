@@ -391,7 +391,7 @@ end
 function KeepworkServiceSession:PreventIndulge(callback)
     local function Handle()
         local times = 1000
-        self.gameTime = (self.gameTime or 0) + 1 * 60
+        self.gameTime = (self.gameTime or 0) + 1
 
         -- 40 minutes
         if self.gameTime == (40 * 60) then
