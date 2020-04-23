@@ -7,6 +7,7 @@
                 SyncMain:SetBeyondVolumePage();
 
                 function get_title()
+                    local userType = Mod.WorldShare.Store:Get("user/userType")
                     if userType == "vip" then
                         return L"提示"
                     else
