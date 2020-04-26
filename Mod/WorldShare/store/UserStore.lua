@@ -48,6 +48,7 @@ function UserStore:Action()
             commonlib.setfield("System.User.username", nil)
             commonlib.setfield("System.User.keepworkUsername", nil)
             commonlib.setfield("System.User.NickName", nil)
+            commonlib.setfield("System.User.isVip", nil)
         end
     }
 end
