@@ -152,6 +152,31 @@
                             return "margin-top:-140px;margin-left: 20px; width: 290px; height: 100px;padding: 8px;font-size: 12px;background: url(textures/worldshare_32bits.png#72 20 16 16:3 3 3 3);"
                         end
                     end
+
+                    function set_mode(mode)
+                        if mode == 'account_mode' then
+                            RegisterModal.g_mode = "account"
+                        end
+
+                        if mode == 'phonenumber_mode' then
+                            RegisterModal.g_mode = "phonenumber"
+                        end
+
+                        page:Rebuild()
+                    end
+
+                    function get_mode_active_style(mode) 
+                        if mode == RegisterModal.g_mode then
+                            return "background: Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8";
+                        else
+                            return "background: Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8;"
+                        end
+                    end
+
+                    function next()
+                        page:CloseWindow()
+                        RegisterModal:SetUsername()
+                    end
                 ]]>
             </script>
             <style type="text/mcss">
@@ -178,16 +203,30 @@
                         color = "#000000",
                         ["font-size"] = 18
                     },
+                    mode_button = {
+                        height = 30,
+                        color = "#FFFFFF",
+                    }
                 }
             </style>
             <aries:window mode="thin" width="360" style="float:left;" title_height="40" close_height="25" title='<%=L"注册" %>' onclose="close()">
                 <div name="register" class="user_register">
-                    <div style="text-align: center;">
-                        <input type="button" class="mc_light_grey_button_with_fillet" value="账号注册" />
-                        <input type="button" class="mc_light_grey_button_with_fillet" value="手机号注册" />
+                    <div style="padding-left: 75px;padding-top: 10px;padding-bottom: 10px;">
+                        <input type="button"
+                               style="<%= get_mode_active_style('account') %>"
+                               class="mode_button"
+                               value="账号注册"
+                               name="account_mode"
+                               onclick="set_mode"/>
+                        <input type="button"
+                               style="<%= get_mode_active_style('phonenumber') %>"
+                               class="mode_button"
+                               value="手机号注册"
+                               name="phonenumber_mode"
+                               onclick="set_mode"/>
                     </div>
-                    <pe:if condition="true">
-                        <div style="margin-bottom:12px;"><%=L"填写基本注册信息"%></div>
+                    <div style="margin-bottom:12px;"><%=L"填写基本注册信息"%></div>
+                    <pe:if condition="<%= RegisterModal.g_mode == 'account'%>">
                         <div style="margin-bottom:12px;">
                             <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:80px;') %>"><%= L"账户：" %></div>
                             <input type="text"
@@ -235,7 +274,7 @@
                         </div>
                     </pe:if>
                     <!-- <div style="margin-bottom:12px;"><%=L"实名验证（推荐）"%></div> -->
-                    <pe:if condition="<%= false %>">
+                    <pe:if condition="<%= RegisterModal.g_mode == 'phonenumber' %>">
                         <div style="margin-bottom:12px;">
                             <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:120px;') %>"><%= L"手机号：" %></div>
                             <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phone" />
@@ -254,8 +293,12 @@
                                 value='<%= L"获取验证码"%>'
                             />
                         </div>
+                        <div style="margin-bottom:12px;">
+                            <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:120px;') %>"><%= L"手机号：" %></div>
+                            <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phone" />
+                        </div>
                         <div>
-                            <input type="button" DefaultButton="true" class="common_button mc_light_grey_button_with_fillet" style="margin-top: 10px;margin-left:70px;width: 140px;" onclick="register()" value='<%= L"注册"%>' />
+                            <input type="button" DefaultButton="true" class="common_button mc_light_grey_button_with_fillet" style="margin-top: 10px;margin-left:70px;width: 140px;" onclick="next()" value='<%= L"下一步"%>' />
                         </div>
                     </pe:if>
                     <!-- <div style="<%= 'margin-top: 10px;margin-left: 50px;' .. get_english_style('margin-left: 10px;') %>">

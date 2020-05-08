@@ -18,6 +18,8 @@ local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 
 local RegisterModal = NPL.export()
 
+RegisterModal.g_mode = "account"
+
 function RegisterModal:ShowPage(callback)
     local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
 
@@ -197,4 +199,8 @@ function RegisterModal:Bind(method)
 
         return true
     end
+end
+
+function RegisterModal:SetUsername()
+    Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/SetUsername.html", "RegisterModal/SetUsername")
 end

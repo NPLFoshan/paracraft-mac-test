@@ -1,0 +1,49 @@
+<html>
+    <body>
+        <pe:mcml>
+            <script type="text/npl" refresh="false">
+                page = document:GetPageCtrl()
+
+                function close()
+                    page:CloseWindow()
+                end
+            </script>
+            <style type="text/mcss">
+                {
+                    set_username = {
+                        ["base-font-size"] = 16,
+                        ["font-size"] = 16,
+                        ["padding-right"] = 30,
+                        ["padding-left"] = 30,
+                        ["padding-top"] = 10,
+                        ["padding-bottom"] = 20,
+                        color = '#ffffff'
+                        textcolor = '#ffffff'
+                    },
+                }
+            </style>
+            <aries:window mode="thin" width="360" style="float:left;" title_height="40" close_height="25" title='<%=L"注册" %>' onclose="close()">
+                <div name="set_username" class="set_username">
+                    <div>为自己注册一个个性账号</div>
+                    <div>
+                        <div style="<%='float:left;min-width:65px;' %>"><%= L"账户：" %></div>
+                        <input type="text"
+                                class="bbs_text text_field"
+                                EmptyText='<%= L"请输入账号" %>'
+                                style="height: 30px;"
+                                name="account" />
+                    </div>
+                    <div style="margin-top: 5px;margin-bottom: 5px;">
+                        <input type="checkbox" style="float:left;margin-top:3px;min-width:90px;" name="agree" onclick="set_remember_me()" checked="checked"/>
+                        <div style="float:left; color: white;font-size: 12px;margin-top:1px;">
+                            <div style="float:left;width: 2px;"></div>
+                            <%= L"我同意" %>
+                            <div style="float:left;color: #fe5927" onclick="user_agreement()"><%= L"《Paracraft用户协议》" %></div>
+                            <%= L"中的内容" %>
+                        </div>
+                    </div>
+                </div>
+            </aries:window>
+        </pe:mcml>
+    </body>
+</html>
