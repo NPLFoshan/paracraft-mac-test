@@ -22,6 +22,7 @@ RegisterModal.m_mode = "account"
 RegisterModal.account = ""
 RegisterModal.password = ""
 RegisterModal.phonenumber = ""
+RegisterModal.phonepassword = ""
 RegisterModal.phonecaptcha = ""
 
 function RegisterModal:ShowPage(callback)
@@ -36,6 +37,7 @@ function RegisterModal:ShowPage(callback)
     self.account = ""
     self.password = ""
     self.phonenumber = ""
+    self.phonepassword = ""
     self.phonecaptcha = ""
 
     Mod.WorldShare.Utils.ShowWindow(360, 360, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")

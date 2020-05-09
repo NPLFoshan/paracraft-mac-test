@@ -3,6 +3,7 @@
         <pe:mcml>
             <script type="text/npl" refresh="false">
                 <![CDATA[
+                    local Validated = NPL.load("(gl)Mod/WorldShare/helper/Validated.lua")
                     KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
                     RegisterModal = NPL.load("./RegisterModal.lua")
 
@@ -82,7 +83,7 @@
                     local isClickedGetPhoneCaptcha = false
 
                     function get_phone_captcha()
-                        if #page:GetValue("phone") ~= 11 then
+                        if #page:GetValue("phonenumber") ~= 11 then
                             GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
                             return false
                         end
@@ -109,7 +110,7 @@
                             end
                         })
 
-                        KeepworkServiceSession:GetPhoneCaptcha(page:GetValue("phone"), function(data, err)
+                        KeepworkServiceSession:GetPhoneCaptcha(page:GetValue("phonenumber"), function(data, err)
                             if err == 400 and data and data.code and data.message then
                                 isClickedGetPhoneCaptcha = false
                                 page:SetValue("getPhonecaptcha", L"获取验证码")
@@ -200,16 +201,22 @@
                     end
 
                     function next()
-                        local phone = page:GetValue("phone")
+                        local phonenumber = page:GetValue("phonenumber")
                         local phonecaptcha = page:GetValue("phonecaptcha")
+                        local phonepassword = page:GetValue("phonepassword")
 
-                        if #phone > 0 and not Validated:Phone(phone) then
+                        if not Validated:Phone(phonenumber) then
                             GameLogic.AddBBS(nil, L"手机格式错误", 3000, "255 0 0")
                             return false
                         end
                     
-                        if #phone > 0 and #phonecaptcha == 0 then
+                        if #phonecaptcha == 0 then
                             GameLogic.AddBBS(nil, L"手机验证码不能为空", 3000, "255 0 0")
+                            return false
+                        end
+
+                        if #phonepassword < 6 then
+                            GameLogic.AddBBS(nil, L"密码最少为6位", 3000, "255 0 0")
                             return false
                         end
 
@@ -300,7 +307,7 @@
                             </div>
                         </div>
                         <div style="margin-top: 5px;margin-bottom: 5px;">
-                            <input type="checkbox" style="float:left;margin-top:3px;min-width:90px;" name="agree" onclick="set_remember_me()" checked="checked"/>
+                            <input type="checkbox" style="float:left;margin-top:3px;min-width:90px;" name="agree" checked="checked"/>
                             <div style="float:left; color: white;font-size: 12px;margin-top:1px;">
                                 <div style="float:left;width: 2px;"></div>
                                 <%= L"我同意" %>
@@ -315,7 +322,7 @@
                     <pe:if condition="<%= RegisterModal.m_mode == 'phonenumber' %>">
                         <div style="margin-bottom:12px;">
                             <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:120px;') %>"><%= L"手机号：" %></div>
-                            <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phone" />
+                            <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phonenumber" />
                         </div>
                         <div style="margin-bottom:12px;">
                             <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:75px;') %>"><%= L"验证码：" %></div>
@@ -332,8 +339,8 @@
                             />
                         </div>
                         <div style="margin-bottom:12px;">
-                            <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:120px;') %>"><%= L"手机号：" %></div>
-                            <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phone" />
+                            <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:120px;') %>"><%= L"密码：" %></div>
+                            <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phonepassword" />
                         </div>
                         <div>
                             <input type="button" DefaultButton="true" class="common_button mc_light_grey_button_with_fillet" style="margin-top: 10px;margin-left:70px;width: 140px;" onclick="next()" value='<%= L"下一步"%>' />
