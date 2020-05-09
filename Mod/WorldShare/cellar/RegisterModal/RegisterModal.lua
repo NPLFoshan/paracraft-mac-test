@@ -18,10 +18,11 @@ local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 
 local RegisterModal = NPL.export()
 
-RegisterModal.g_mode = "account"
+RegisterModal.m_mode = "account"
 RegisterModal.account = ""
 RegisterModal.password = ""
 RegisterModal.phonenumber = ""
+RegisterModal.phonecaptcha = ""
 
 function RegisterModal:ShowPage(callback)
     local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
@@ -30,8 +31,14 @@ function RegisterModal:ShowPage(callback)
         LoginModalPage:CloseWindow()
     end
 
-    Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
     self.callback = callback
+    self.m_mode = "account"
+    self.account = ""
+    self.password = ""
+    self.phonenumber = ""
+    self.phonecaptcha = ""
+
+    Mod.WorldShare.Utils.ShowWindow(360, 360, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
 end
 
 function RegisterModal:ShowUserAgreementPage()
@@ -65,50 +72,48 @@ function RegisterModal:Register()
     end
 
     local loginServer = KeepworkService:GetEnv()
-    local account = RegisterModalPage:GetValue("account")
-    local password = RegisterModalPage:GetValue("password")
-    local captcha = RegisterModalPage:GetValue("captcha")
-    local phone = RegisterModalPage:GetValue("phone")
-    local phonecaptcha = RegisterModalPage:GetValue("phonecaptcha")
-    local agree = RegisterModalPage:GetValue("agree")
 
-    if not agree then
-        GameLogic.AddBBS(nil, L"您未同意用户协议", 3000, "255 0 0")
+    if not self.account or self.account == "" then
         return false
     end
 
-    if not account or account == "" then
-        GameLogic.AddBBS(nil, L"账号不能为空", 3000, "255 0 0")
+    if #self.password < 6 then
         return false
     end
 
-    if #password < 6 then
-        GameLogic.AddBBS(nil, L"密码最少为6位", 3000, "255 0 0")
+    if not self.captcha or self.captcha == "" then
         return false
     end
 
-    if not captcha or captcha == "" then
-        GameLogic.AddBBS(nil, L"验证码不能为空", 3000, "255 0 0")
+    if #self.phonenumber > 0 and not Validated:Phone(self.phonenumber) then
         return false
     end
 
-    if #phone > 0 and not Validated:Phone(phone) then
-        GameLogic.AddBBS(nil, L"手机格式错误", 3000, "255 0 0")
-        return false
-    end
-
-    if #phone > 0 and #phonecaptcha == 0 then
-        GameLogic.AddBBS(nil, L"手机验证码不能为空", 3000, "255 0 0")
+    if #self.phonenumber > 0 and #self.phonecaptcha == 0 then
         return false
     end
 
     Mod.WorldShare.MsgBox:Show(L"正在注册，可能需要10-15秒的时间，请稍后...", 20000, L"链接超时", 500, 120)
 
-    KeepworkServiceSession:Register(account, password, captcha, phone, phonecaptcha, function(state)
+    KeepworkServiceSession:Register(self.account, self.password, self.captcha, self.phonenumber, self.phonecaptcha, function(state)
         if state and state.id then
             if state.code then
                 GameLogic.AddBBS(nil, state.message, 5000, "0 0 255")
             else
+                if self.m_mode == "account" then
+                    Mod.WorldShare.Utils.ShowWindow(
+                        370,
+                        280,
+                        "Mod/WorldShare/cellar/RegisterModal/BindPhoneInAccountRegister.html",
+                        "RegisterModal/BindPhoneInAccountRegister",
+                        nil,
+                        nil,
+                        nil,
+                        nil,
+                        10
+                    )
+                end
+
                 GameLogic.AddBBS(nil, L"注册成功", 5000, "0 255 0")
             end
 
@@ -130,18 +135,11 @@ function RegisterModal:Register()
     end)
 end
 
-function RegisterModal:Bind(method)
-    local BindingPage = Mod.WorldShare.Store:Get('page/Binding')
-
-    if not BindingPage then
-        return false
-    end
-
+function RegisterModal:Bind(method, ...)
     if method == 'bindphone' then
-        local phone = BindingPage:GetValue("phone")
-        local phonecaptcha = BindingPage:GetValue("phonecaptcha")
+        local phonenumber, phonecaptcha, callback = ...;
 
-        if not Validated:Phone(phone) then
+        if not Validated:Phone(phonenumber) then
             GameLogic.AddBBS(nil, L"手机号码格式错误", 3000, "255 0 0")
             return false
         end
@@ -151,8 +149,13 @@ function RegisterModal:Bind(method)
             return false
         end
 
-        KeepworkServiceSession:BindPhone(phone, phonecaptcha, function(data, err)
-            BindingPage:CloseWindow()
+        Mod.WorldShare.MsgBox:Show(L"请稍后...")
+        KeepworkServiceSession:BindPhone(phonenumber, phonecaptcha, function(data, err)
+            Mod.WorldShare.MsgBox:Close()
+
+            if type(callback) == "function" then
+                callback();
+            end
 
             if err == 409 then
                 GameLogic.AddBBS(nil, L"该手机号已绑定其他账号，每个手机号码仅可绑定一个账号。如果忘记账号，请使用手机号作为账号登录", 3000, "255 0 0")
@@ -171,8 +174,7 @@ function RegisterModal:Bind(method)
     end
 
     if method == 'bindemail' then
-        local email = BindingPage:GetValue("email")
-        local emailcaptcha = BindingPage:GetValue("emailcaptcha")
+        local email, emailcaptcha, callback = ...;
 
         if not Validated:Email(email) then
             GameLogic.AddBBS(nil, L"EMAIL格式错误", 3000, "255 0 0")
@@ -184,8 +186,13 @@ function RegisterModal:Bind(method)
             return false
         end
 
+        Mod.WorldShare.MsgBox:Show(L"请稍后...")
         KeepworkServiceSession:BindEmail(email, emailcaptcha, function(data, err)
-            BindingPage:CloseWindow()
+            Mod.WorldShare.MsgBox:Close()
+
+            if type(callback) == "function" then
+                callback();
+            end
 
             if err == 409 then
                 GameLogic.AddBBS(nil, L"邮箱已被绑定", 3000, "255 0 0")
@@ -202,8 +209,4 @@ function RegisterModal:Bind(method)
 
         return true
     end
-end
-
-function RegisterModal:ShowSetUsernamePage()
-    Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/SetUsername.html", "RegisterModal/SetUsername")
 end

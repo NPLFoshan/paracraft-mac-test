@@ -99,7 +99,23 @@
                     end
 
                     function bind(m)
-                        RegisterModal:Bind(m)
+                        if m == "phonecaptcha" then
+                            local phonenumber = BindingPage:GetValue("phonenumber")
+                            local phonecaptcha = BindingPage:GetValue("phonecaptcha")
+
+                            RegisterModal:Bind(m, phonenumber, phonecaptcha, function()
+                                close()
+                            end)
+                        end
+
+                        if m == "emailcaptcha" then
+                            local email = BindingPage:GetValue("email")
+                            local emailcaptcha = BindingPage:GetValue("emailcaptcha")
+
+                            RegisterModal:Bind(m, email, emailcaptcha, function()
+                                close()
+                            end)
+                        end
                     end
 
                     function is_english()
@@ -148,7 +164,7 @@
                             <pe:tab-item name="phonetab" text="<%= L'手机号码' %>" selected="true" style="padding-top: 12px;">
                                 <div style="margin-bottom:12px;">
                                     <div style="<%= 'float:left;min-width:65px;' .. get_english_style('min-width: 120px;') %>"><%= L"手机号：" %></div>
-                                    <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入手机号" %>' style="<%= 'height: 30px;width: 220px;' .. get_english_style('width: 165px;')" name="phone" />
+                                    <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入手机号" %>' style="<%= 'height: 30px;width: 220px;' .. get_english_style('width: 165px;')" name="phonenumber" />
                                 </div>
                                 <div style="margin-bottom:12px;">
                                     <div style="float:left;min-width:65px"><%= L"验证码：" %></div>

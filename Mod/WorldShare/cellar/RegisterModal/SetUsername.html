@@ -3,6 +3,7 @@
         <pe:mcml>
             <script type="text/npl" refresh="false">
                 <![CDATA[
+                    RegisterModal = NPL.load("./RegisterModal.lua")
                     page = document:GetPageCtrl()
 
                     function close()
@@ -38,11 +39,16 @@
                         color = "#000000",
                         ["font-size"] = 18
                     },
+                    text_field = {
+                        background = "textures/worldshare_32bits.png;72 20 16 16:3 3 3 3",
+                        border = "none",
+                        width = 210
+                    },
                 }
             </style>
-            <aries:window mode="thin" width="360" style="float:left;" title_height="40" close_height="25" title='<%=L"注册" %>' onclose="close()">
+            <aries:window mode="thin" width="360" height="230" style="float:left;" title_height="40" close_height="25" title='<%=L"注册" %>' onclose="close()">
                 <div name="set_username" class="set_username">
-                    <div>为自己注册一个个性账号</div>
+                    <div style="margin-top: 10px;">为自己注册一个个性账号</div>
                     <div style="margin-top:10px;">
                         <div style="<%='float:left;min-width:65px;' %>"><%= L"账户：" %></div>
                         <input type="text"
