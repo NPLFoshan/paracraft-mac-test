@@ -32,7 +32,9 @@
                     end
 
                     function register()
-                        RegisterModal:Register()
+                        -- RegisterModal:Register()
+                        close()
+                        Mod.WorldShare.Utils.ShowWindow(370, 280, "Mod/WorldShare/cellar/RegisterModal/BindPhoneInAccountRegister.html", "RegisterModal/BindPhoneInAccountRegister")
                     end
 
                     function get_captcha()
@@ -175,7 +177,7 @@
 
                     function next()
                         page:CloseWindow()
-                        RegisterModal:SetUsername()
+                        RegisterModal:ShowSetUsernamePage()
                     end
                 ]]>
             </script>
