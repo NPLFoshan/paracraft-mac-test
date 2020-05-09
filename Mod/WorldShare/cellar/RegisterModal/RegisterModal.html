@@ -127,32 +127,41 @@
                     function set_show_password()
                         local account = page:GetValue('account')
                         local password = page:GetValue('password')
-                        local phone = page:GetValue('phone')
+                        local phonenumber = page:GetValue('phonenumber')
+                        local phonepassword = page:GetValue('phonepassword')
                         local captcha = page:GetValue('captcha')
                         local phonecaptcha = page:GetValue('phonecaptcha')
                         local checkboxPassword = page:GetNode('checkboxPassword'):GetAttribute("checked")
+                        local checkboxPhonePassword = page:GetNode('checkboxPhonePassword'):GetAttribute("checked")
                         
                         if checkboxPassword == "false" then
                             checkboxPassword = "true"
+                            checkboxPhonePassword = "true"
                         elseif checkboxPassword == "true" then
                             checkboxPassword = "false"
+                            checkboxPhonePassword = "false"
                         end
 
                         beShowPassword = not beShowPassword
 
                         if beShowPassword then
                             page:GetNode('password'):SetAttribute('PasswordChar', nil)
+                            page:GetNode('phonepassword'):SetAttribute('PasswordChar', nil)
                         else
                             page:GetNode('password'):SetAttribute('PasswordChar', "*")
+                            page:GetNode('phonepassword'):SetAttribute('PasswordChar', "*")
                         end
+
                         page:Refresh(0.01)
                         page:SetValue('account', account)
                         page:SetValue('password', password)
-                        page:SetValue('phone', phone)
+                        page:SetValue('phonenumber', phonenumber)
+                        page:SetValue('phonepassword', phonepassword)
                         page:SetValue('captcha', captcha)
                         page:SetValue('phonecaptcha', phonecaptcha)
 
                         page:GetNode('checkboxPassword'):SetAttribute('checked', checkboxPassword)
+                        page:GetNode('checkboxPhonePassword'):SetAttribute('checked', checkboxPhonePassword)
                     end
 
                     function user_agreement()
@@ -181,6 +190,13 @@
                     end
 
                     function set_mode(mode)
+                        RegisterModal.account = page:GetValue("account")
+                        RegisterModal.password = page:GetValue("password")
+                        RegisterModal.phonepassword = page:GetValue("phonepassword")
+                        RegisterModal.captcha = page:GetValue("captcha")
+                        RegisterModal.phonenumber = page:GetValue("phonenumber")
+                        RegisterModal.phonecaptcha = page:GetValue("phonecaptcha")
+
                         if mode == 'account_mode' then
                             RegisterModal.m_mode = "account"
                         end
@@ -190,6 +206,15 @@
                         end
 
                         page:Rebuild()
+
+                        page:SetValue("account", RegisterModal.account)
+                        page:SetValue("password", RegisterModal.password)
+                        page:SetValue("phonepassword", RegisterModal.phonepassword)
+                        page:SetValue("captcha", RegisterModal.captcha)
+                        page:SetValue("phonenumber", RegisterModal.phonenumber)
+                        page:SetValue("phonecaptcha", RegisterModal.phonecaptcha)
+
+                        page:Refresh(0.01)
                     end
 
                     function get_mode_active_style(mode) 
@@ -209,7 +234,7 @@
                             GameLogic.AddBBS(nil, L"手机格式错误", 3000, "255 0 0")
                             return false
                         end
-                    
+ 
                         if #phonecaptcha == 0 then
                             GameLogic.AddBBS(nil, L"手机验证码不能为空", 3000, "255 0 0")
                             return false
@@ -219,6 +244,10 @@
                             GameLogic.AddBBS(nil, L"密码最少为6位", 3000, "255 0 0")
                             return false
                         end
+
+                        RegisterModal.phonenumber = phonenumber
+                        RegisterModal.phonecaptcha = phonecaptcha
+                        RegisterModal.password = phonepassword
 
                         page:CloseWindow()
                         Mod.WorldShare.Utils.ShowWindow(360, 230, "Mod/WorldShare/cellar/RegisterModal/SetUsername.html", "RegisterModal/SetUsername")
@@ -340,7 +369,15 @@
                         </div>
                         <div style="margin-bottom:12px;">
                             <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:120px;') %>"><%= L"密码：" %></div>
-                            <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phonepassword" />
+                            <input type="text" PasswordChar="*" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phonepassword" />
+                            <input name="checkboxPhonePassword"
+                                   type="checkbox"
+                                   checked="false"
+                                   iconsize="22"
+                                   style="position: relative;margin-left: -25px;margin-top: 5px;"
+                                   CheckedBG="Texture/Aries/Common/Teen/map/players_shown_32bits.png;0 0 22 22"
+                                   UncheckedBG="Texture/Aries/Common/Teen/map/players_hidden_32bits.png;0 0 22 22"
+                                   onclick="set_show_password"/>
                         </div>
                         <div>
                             <input type="button" DefaultButton="true" class="common_button mc_light_grey_button_with_fillet" style="margin-top: 10px;margin-left:70px;width: 140px;" onclick="next()" value='<%= L"下一步"%>' />

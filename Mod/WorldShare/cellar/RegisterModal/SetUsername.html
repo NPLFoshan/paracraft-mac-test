@@ -12,11 +12,19 @@
 
                     function last()
                         close()
-                        Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
+                        local params = Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
+                        params._page:SetValue("phonenumber", RegisterModal.phonenumber)
+                        params._page:SetValue("phonecaptcha", RegisterModal.phonecaptcha)
+                        params._page:SetValue("phonepassword", RegisterModal.phonepassword)
+                        params._page:Refresh(0.01)
                     end
 
                     function user_agreement()
                         RegisterModal:ShowUserAgreementPage()
+                    end
+
+                    function register()
+
                     end
                 ]]>
             </script>
