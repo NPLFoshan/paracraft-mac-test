@@ -83,7 +83,7 @@ function RegisterModal:Register()
         return false
     end
 
-    if not self.captcha or self.captcha == "" then
+    if #self.phonenumber == 0 and not self.captcha or self.captcha == "" then
         return false
     end
 

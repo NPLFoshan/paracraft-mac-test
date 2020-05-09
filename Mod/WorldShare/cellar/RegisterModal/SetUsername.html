@@ -24,7 +24,27 @@
                     end
 
                     function register()
+                        local account = page:GetValue("account")
 
+                        RegisterModal.account = account
+                        RegisterModal.password = RegisterModal.phonepassword
+                        RegisterModal:Register()
+                    end
+
+                    function show_notice()
+                        page:FindControl('notice').visible = true
+                    end
+
+                    function hide_notice()
+                        page:FindControl('notice').visible = false
+                    end
+
+                    function get_notice_english_style()
+                        if Mod.WorldShare.Utils.IsEnglish() then
+                            return "margin-top:-160px;margin-left: 23px; width: 320px; height: 120px;padding: 8px;font-size: 12px;background: url(textures/worldshare_32bits.png#72 20 16 16:3 3 3 3);"
+                        else
+                            return "margin-top:-140px;margin-left: 20px; width: 290px; height: 100px;padding: 8px;font-size: 12px;background: url(textures/worldshare_32bits.png#72 20 16 16:3 3 3 3);"
+                        end
                     end
                 ]]>
             </script>
@@ -60,10 +80,22 @@
                     <div style="margin-top:10px;">
                         <div style="<%='float:left;min-width:65px;' %>"><%= L"账户：" %></div>
                         <input type="text"
-                                class="bbs_text text_field"
-                                EmptyText='<%= L"请输入账号" %>'
-                                style="height: 30px;"
-                                name="account" />
+                               class="bbs_text text_field"
+                               onfocusin="show_notice()"
+                                onfocusout="hide_notice()"
+                               EmptyText='<%= L"请输入账号" %>'
+                               style="height: 30px;"
+                               name="account" />
+                        <pe:container name="notice" visible="false" style="display:none;position:relative;background:">
+                            <div style="<%= get_notice_english_style() %>">
+                                <div><%= L'账户名注册成功不可更改' %></div>
+                                <div><%= L'推荐使用英文字母、数字组合（例如：keep123）' %></div>
+                                <div><%= L'系统默认网址地址：' %></div>
+                                <div>
+                                    <pe:label name="personalweb" value="https://keepwork.com/u/" style="color:#409eff;font-size:12px;" />
+                                </div>
+                            </div>
+                        </pe:container>
                     </div>
                     <div style="margin-top: 10px;margin-bottom: 10px;">
                         <input type="checkbox" style="float:left;margin-top:3px;min-width:90px;" name="agree" checked="checked"/>
