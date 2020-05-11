@@ -63,7 +63,7 @@
                         RegisterModal.captcha = captcha
                         RegisterModal.agree = agree
 
-                        RegisterModal:Register()
+                        RegisterModal:Register(page)
                     end
 
                     function get_captcha()
@@ -85,6 +85,11 @@
                     function get_phone_captcha()
                         if #page:GetValue("phonenumber") ~= 11 then
                             GameLogic.AddBBS(nil, L"手机号码位数不对", 3000, "255 0 0")
+                            return false
+                        end
+
+                        if phonenumberExist then
+                            GameLogic.AddBBS(nil, L"手机号已存在", 3000, "255 0 0")
                             return false
                         end
 
@@ -245,12 +250,32 @@
                             return false
                         end
 
+                        if phonenumberExist then
+                            GameLogic.AddBBS(nil, L"手机号已存在", 3000, "255 0 0")
+                            return false
+                        end
+
                         RegisterModal.phonenumber = phonenumber
                         RegisterModal.phonecaptcha = phonecaptcha
                         RegisterModal.phonepassword = phonepassword
 
                         page:CloseWindow()
                         Mod.WorldShare.Utils.ShowWindow(360, 230, "Mod/WorldShare/cellar/RegisterModal/SetUsername.html", "RegisterModal/SetUsername")
+                    end
+
+                    phonenumberExist = true
+
+                    function check_phone_number()
+                        local phonenumber = page:GetValue("phonenumber")
+
+                        KeepworkServiceSession:CheckPhonenumberExist(phonenumber, function(bIsExist)
+                            if bIsExist then
+                                phonenumberExist = true
+                                GameLogic.AddBBS(nil, L"手机号已存在", 3000, "255 0 0")
+                            else
+                                phonenumberExist = false
+                            end
+                        end)
                     end
                 ]]>
             </script>
@@ -351,7 +376,12 @@
                     <pe:if condition="<%= RegisterModal.m_mode == 'phonenumber' %>">
                         <div style="margin-bottom:12px;">
                             <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:120px;') %>"><%= L"手机号：" %></div>
-                            <input type="text" class="bbs_text text_field" EmptyText='<%= L"请输入密码" %>' style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>" name="phonenumber" />
+                            <input type="text"
+                                   class="bbs_text text_field"
+                                   EmptyText='<%= L"请输入密码" %>'
+                                   style="<%= 'height: 30px;'  .. get_english_style('width:160px;') %>"
+                                   onfocusout="check_phone_number()"
+                                   name="phonenumber" />
                         </div>
                         <div style="margin-bottom:12px;">
                             <div style="<%='float:left;min-width:65px;' .. get_english_style('min-width:75px;') %>"><%= L"验证码：" %></div>

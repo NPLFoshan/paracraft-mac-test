@@ -66,13 +66,7 @@ function RegisterModal:GetServerList()
     return serverList
 end
 
-function RegisterModal:Register()
-    local RegisterModalPage = Mod.WorldShare.Store:Get('page/RegisterModal')
-
-    if not RegisterModalPage then
-        return false
-    end
-
+function RegisterModal:Register(page)
     local loginServer = KeepworkService:GetEnv()
 
     if not self.account or self.account == "" then
@@ -83,7 +77,7 @@ function RegisterModal:Register()
         return false
     end
 
-    if #self.phonenumber == 0 and not self.captcha or self.captcha == "" then
+    if #self.phonenumber == 0 and (not self.captcha or self.captcha == "") then
         return false
     end
 
@@ -98,6 +92,8 @@ function RegisterModal:Register()
     Mod.WorldShare.MsgBox:Show(L"正在注册，可能需要10-15秒的时间，请稍后...", 20000, L"链接超时", 500, 120)
 
     KeepworkServiceSession:Register(self.account, self.password, self.captcha, self.phonenumber, self.phonecaptcha, function(state)
+        Mod.WorldShare.MsgBox:Close()
+
         if state and state.id then
             if state.code then
                 GameLogic.AddBBS(nil, state.message, 5000, "0 0 255")
@@ -119,12 +115,12 @@ function RegisterModal:Register()
                 GameLogic.AddBBS(nil, L"注册成功", 5000, "0 255 0")
             end
 
-            RegisterModalPage:CloseWindow()
-            Mod.WorldShare.MsgBox:Close()
+            if page then
+                page:CloseWindow()
+            end
 
             if type(self.callback) == 'function' then
                 self.callback()
-                self.callback = nil
             end
 
             WorldList:RefreshCurrentServerList()
@@ -133,7 +129,6 @@ function RegisterModal:Register()
 
         GameLogic.AddBBS(nil, format("%s%s(%d)", L"注册失败，错误信息：", state.message, state.code), 5000, "255 0 0")
         Mod.WorldShare.MsgBox:Close()
-        self.callback = nil
     end)
 end
 

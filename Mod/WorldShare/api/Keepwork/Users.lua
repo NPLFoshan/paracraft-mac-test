@@ -153,3 +153,13 @@ function KeepworkUsersApi:ResetPassword(params, success, error, noTryStatus)
     KeepworkBaseApi:Post('/users/reset_password', params, { notTokenRequest = true }, success, error, noTryStatus)
 end
 
+-- url: /users?cellphone=<the phone number>
+-- method: GET
+-- return: object
+function KeepworkUsersApi:GetUserByPhonenumber(phonenumber, success, error)
+    if not phonenumber then
+        return false
+    end
+
+    KeepworkBaseApi:Get('/users?cellphone=' .. phonenumber, nil, nil, success, error)
+end

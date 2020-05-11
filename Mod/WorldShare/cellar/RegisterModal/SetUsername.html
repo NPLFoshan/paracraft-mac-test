@@ -28,7 +28,7 @@
 
                         RegisterModal.account = account
                         RegisterModal.password = RegisterModal.phonepassword
-                        RegisterModal:Register()
+                        RegisterModal:Register(page)
                     end
 
                     function show_notice()
@@ -82,7 +82,7 @@
                         <input type="text"
                                class="bbs_text text_field"
                                onfocusin="show_notice()"
-                                onfocusout="hide_notice()"
+                               onfocusout="hide_notice()"
                                EmptyText='<%= L"请输入账号" %>'
                                style="height: 30px;"
                                name="account" />

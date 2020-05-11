@@ -16,6 +16,7 @@ local LessonOrganizationsApi = NPL.load("(gl)Mod/WorldShare/api/Lesson/LessonOrg
 local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
 local GitGatewayService = NPL.load("../GitGatewayService.lua")
 local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
+local Validated = NPL.load("(gl)Mod/WorldShare/helper/Validated.lua")
 
 local Encoding = commonlib.gettable("commonlib.Encoding")
 
@@ -435,4 +436,28 @@ end
 
 function KeepworkServiceSession:ResetIndulge()
     self.gameTime = 0
+end
+
+function KeepworkServiceSession:CheckPhonenumberExist(phone, callback)
+    if not phone or not Validated:Phone(phone) then
+        return false
+    end
+
+    if type(callback) ~= "function" then
+        return false
+    end
+
+    KeepworkUsersApi:GetUserByPhonenumber(
+        phone,
+        function(data, err)
+            if data and #data > 0 then
+                callback(true)
+            else
+                callback(false)
+            end
+        end,
+        function() 
+            callback(false)
+        end
+    )
 end
