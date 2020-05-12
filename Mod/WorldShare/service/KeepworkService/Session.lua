@@ -50,10 +50,16 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
     local username = response["username"] or ""
     local nickname = response["nickname"] or ""
 
-    if not response.cellphone and not response.email then
+    if not response.realname then
         Mod.WorldShare.Store:Set("user/isVerified", false)
     else
         Mod.WorldShare.Store:Set("user/isVerified", true)
+    end
+
+    if not response.cellphone and not response.email then
+        Mod.WorldShare.Store:Set("user/isBind", false)
+    else
+        Mod.WorldShare.Store:Set("user/isBind", true)
     end
 
     if response.vip and response.vip == 1 then
@@ -216,6 +222,10 @@ function KeepworkServiceSession:GetPhoneCaptcha(phone, callback)
     KeepworkUsersApi:CellphoneCaptcha(phone, callback, callback)
 end
 
+function KeepworkServiceSession:ClassificationPhone(cellphone, captcha, callback)
+    KeepworkUsersApi:RealName(cellphone, captcha, callback, callback, { 400 })
+end
+
 function KeepworkServiceSession:BindPhone(cellphone, captcha, callback)
     if not cellphone or type(cellphone) ~= 'string' or not captcha or type(captcha) ~= 'string' then
         return false
@@ -224,12 +234,20 @@ function KeepworkServiceSession:BindPhone(cellphone, captcha, callback)
     KeepworkUsersApi:BindPhone(cellphone, captcha, callback, callback)
 end
 
+function KeepworkServiceSession:ClassificationAndBindPhone(cellphone, captcha, callback)
+    if not cellphone or type(cellphone) ~= 'string' or not captcha or type(captcha) ~= 'string' then
+        return false
+    end
+
+    KeepworkUsersApi:ClassificationAndBindPhone(cellphone, captcha, callback, callback)
+end
+
 function KeepworkServiceSession:GetEmailCaptcha(email, callback)
     if not email or type(email) ~= 'string' then
         return false
     end
 
-    KeepworkUsersApi:EmailCaptcha(email, callback)
+    KeepworkUsersApi:EmailCaptcha(email, callback, callback)
 end
 
 function KeepworkServiceSession:BindEmail(email, captcha, callback)
@@ -461,6 +479,30 @@ function KeepworkServiceSession:CheckUsernameExist(username, callback)
         username,
         function(data, err)
             if type(data) == 'table' then
+                callback(true)
+            else
+                callback(false)
+            end
+        end,
+        function(data, err)
+            callback(false)
+        end
+    )
+end
+
+function KeepworkServiceSession:CheckEmailExist(email, callback)
+    if type(email) ~= "string" then
+        return false
+    end
+
+    if type(callback) ~= "function" then
+        return false
+    end
+
+    KeepworkUsersApi:GetUserByEmail(
+        email,
+        function(data, err)
+            if type(data) == 'table' and #data > 0 then
                 callback(true)
             else
                 callback(false)

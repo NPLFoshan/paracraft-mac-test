@@ -68,23 +68,6 @@ function KeepworkUsersApi:Register(params, success, error, noTryStatus)
     KeepworkBaseApi:Post('/users/register', params, { notTokenRequest = true }, success, error, noTryStatus)
 end
 
--- url: /users/cellphone_captcha
--- method: POST
--- params:
---[[
-    token string 必须 token
-]]
--- return: object
-function KeepworkUsersApi:RealName(cellphone, captcha, success, error, noTryStatus)
-    local params = {
-        cellphone = cellphone,
-        captcha = captcha,
-        realname = true
-    }
-
-    KeepworkBaseApi:Post('/users/cellphone_captcha', params, nil, success, error, noTryStatus)
-end
-
 -- url: /users/svg_captcha?png=true
 -- method: GET
 -- params:
@@ -121,11 +104,46 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:BindPhone(cellphone, captcha, success, error)
+function KeepworkUsersApi:RealName(cellphone, captcha, success, error, noTryStatus)
     local params = {
         cellphone = cellphone,
         captcha = captcha,
         realname = true
+    }
+
+    KeepworkBaseApi:Post('/users/cellphone_captcha', params, nil, success, error, noTryStatus)
+end
+
+-- url: /users/cellphone_captcha
+-- method: POST
+-- params:
+--[[
+    token string 必须 token
+]]
+-- return: object
+function KeepworkUsersApi:BindPhone(cellphone, captcha, success, error)
+    local params = {
+        cellphone = cellphone,
+        captcha = captcha,
+        isBind = true
+    }
+
+    KeepworkBaseApi:Post('/users/cellphone_captcha', params , { notTokenRequest = false }, success, error)
+end
+
+-- url: /users/cellphone_captcha
+-- method: POST
+-- params:
+--[[
+
+]]
+-- return: object
+function KeepworkUsersApi:ClassificationAndBindPhone(cellphone, captcha, success, error)
+    local params = {
+        cellphone = cellphone,
+        captcha = captcha,
+        realname = true,
+        isBind = true
     }
 
     KeepworkBaseApi:Post('/users/cellphone_captcha', params , { notTokenRequest = false }, success, error)
@@ -189,4 +207,16 @@ function KeepworkUsersApi:GetUserByUsernameBase64(username, success, error)
     local usernameBase64 = Encoding.to_base64(NPL.ToJson({username = username}))
 
     KeepworkBaseApi:Get('/users/PP' .. usernameBase64, nil, nil, success, error)
+end
+
+function KeepworkUsersApi:GetUserByEmail(email, success, error)
+    if type(email) ~= "string" then
+        return false
+    end
+
+    if #email == 0 then
+        return false
+    end
+
+    KeepworkBaseApi:Get('/users?email=' .. email, nil, nil, success, error)
 end

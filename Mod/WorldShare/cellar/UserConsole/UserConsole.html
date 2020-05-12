@@ -235,8 +235,9 @@
                 end
 
                 function register()
-                    local RegisterModal = NPL.load("(gl)Mod/WorldShare/cellar/RegisterModal/RegisterModal.lua")
-                    RegisterModal:ShowPage()
+                    RegisterModal:ShowPage(function()
+                        WorldList:RefreshCurrentServerList()
+                    end)
                 end
 
                 function login()
@@ -419,6 +420,10 @@
 
                 function classification()
                     RegisterModal:ShowClassificationPage()
+                end
+
+                function is_verified()
+                    return Mod.WorldShare.Store:Get("user/isVerified") == true and true or false
                 end
             ]]>
         </script>
@@ -672,9 +677,11 @@
                             <div style="width:140px;color:#ffffff">
                                 <%= username() %>
                             </div>
-                            <div>
-                                <input type="button" style="margin-left:40px" class="mc_light_grey_button_with_fillet" onclick="classification" value='<%= L"实名认证"%>' />
-                            </div>
+                            <pe:if condition="<%= not is_verified() %>">
+                                <div>
+                                    <input type="button" style="margin-left:40px" class="mc_light_grey_button_with_fillet" onclick="classification" value='<%= L"实名认证"%>' />
+                                </div>
+                            </pe:if>
                             <div style="margin-top:10px">
                                 <input type="button"
                                        style="margin-left:20px"

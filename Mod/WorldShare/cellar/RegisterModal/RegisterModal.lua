@@ -137,12 +137,34 @@ function RegisterModal:Register(page)
     end)
 end
 
-function RegisterModal:Classification()
-    
+function RegisterModal:Classification(phonenumber, captcha, callback)
+    KeepworkServiceSession:ClassificationPhone(phonenumber, captcha, function(data, err)
+        if data.data then
+            GameLogic.AddBBS(nil, L"实名认证成功", 5000, "0 255 0")
+
+            if type(callback) == "function" then
+                callback()
+            end
+            return true
+        end
+
+        GameLogic.AddBBS(nil, format("%s%s(%d)", L"认证失败，错误信息：", data.message, data.code), 5000, "255 0 0")
+    end)
 end
 
-function RegisterModal:ClassificationAndBind()
+function RegisterModal:ClassificationAndBind(phonenumber, captcha, callback)
+    KeepworkServiceSession:ClassificationAndBindPhone(phonenumber, captcha, function(data, err)
+        if data.data then
+            GameLogic.AddBBS(nil, L"实名认证成功，手机号绑定成功", 5000, "0 255 0")
 
+            if type(callback) == "function" then
+                callback()
+            end
+            return true
+        end
+
+        GameLogic.AddBBS(nil, format("%s%s(%d)", L"认证失败，错误信息：", data.message, data.code), 5000, "255 0 0")
+    end)
 end
 
 function RegisterModal:Bind(method, ...)
@@ -163,21 +185,12 @@ function RegisterModal:Bind(method, ...)
         KeepworkServiceSession:BindPhone(phonenumber, phonecaptcha, function(data, err)
             Mod.WorldShare.MsgBox:Close()
 
-            if type(callback) == "function" then
-                callback();
-            end
-
-            if err == 409 then
-                GameLogic.AddBBS(nil, L"该手机号已绑定其他账号，每个手机号码仅可绑定一个账号。如果忘记账号，请使用手机号作为账号登录", 3000, "255 0 0")
-                return false
-            end
-
-            if data == 'true' and err == 200 then
+            if err == 200 and data.data then
                 GameLogic.AddBBS(nil, L"绑定成功", 3000, "0 255 0")
                 return true
             end
 
-            GameLogic.AddBBS(nil, L"绑定失败", 3000, "255 0 0")
+            GameLogic.AddBBS(nil, format("%s%s(%d)", L"绑定失败，错误信息：", data.message, data.code), 5000, "255 0 0")
         end)
 
         return true
