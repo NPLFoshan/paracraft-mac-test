@@ -24,6 +24,7 @@ RegisterModal.password = ""
 RegisterModal.phonenumber = ""
 RegisterModal.phonepassword = ""
 RegisterModal.phonecaptcha = ""
+RegisterModal.bindphone = nil
 
 function RegisterModal:ShowPage(callback)
     local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
@@ -39,6 +40,7 @@ function RegisterModal:ShowPage(callback)
     self.phonenumber = ""
     self.phonepassword = ""
     self.phonecaptcha = ""
+    self.bindphone = nil
 
     Mod.WorldShare.Utils.ShowWindow(360, 360, "Mod/WorldShare/cellar/RegisterModal/RegisterModal.html", "RegisterModal")
 end
@@ -49,6 +51,20 @@ end
 
 function RegisterModal:ShowBindingPage()
     Mod.WorldShare.Utils.ShowWindow(360, 480, "Mod/WorldShare/cellar/RegisterModal/Binding.html", "Binding")
+end
+
+function RegisterModal:ShowClassificationPage()
+    Mod.WorldShare.Utils.ShowWindow(
+        370,
+        280,
+        "Mod/WorldShare/cellar/RegisterModal/BindPhoneInAccountRegister.html",
+        "RegisterModal/BindPhoneInAccountRegister",
+        nil,
+        nil,
+        nil,
+        nil,
+        10
+    )
 end
 
 function RegisterModal:GetServerList()
@@ -89,9 +105,9 @@ function RegisterModal:Register(page)
         return false
     end
 
-    Mod.WorldShare.MsgBox:Show(L"正在注册，可能需要10-15秒的时间，请稍后...", 20000, L"链接超时", 500, 120)
+    Mod.WorldShare.MsgBox:Show(L"正在注册，请稍后...", 10000, L"链接超时", 500, 120)
 
-    KeepworkServiceSession:Register(self.account, self.password, self.captcha, self.phonenumber, self.phonecaptcha, function(state)
+    KeepworkServiceSession:Register(self.account, self.password, self.captcha, self.phonenumber, self.phonecaptcha, self.bindphone, function(state)
         Mod.WorldShare.MsgBox:Close()
 
         if state and state.id then
@@ -99,20 +115,10 @@ function RegisterModal:Register(page)
                 GameLogic.AddBBS(nil, state.message, 5000, "0 0 255")
             else
                 if self.m_mode == "account" then
-                    Mod.WorldShare.Utils.ShowWindow(
-                        370,
-                        280,
-                        "Mod/WorldShare/cellar/RegisterModal/BindPhoneInAccountRegister.html",
-                        "RegisterModal/BindPhoneInAccountRegister",
-                        nil,
-                        nil,
-                        nil,
-                        nil,
-                        10
-                    )
-                end
+                    self:ShowClassificationPage()
 
-                GameLogic.AddBBS(nil, L"注册成功", 5000, "0 255 0")
+                    GameLogic.AddBBS(nil, L"注册成功", 5000, "0 255 0")
+                end
             end
 
             if page then
@@ -123,13 +129,20 @@ function RegisterModal:Register(page)
                 self.callback()
             end
 
-            WorldList:RefreshCurrentServerList()
             return true
         end
 
         GameLogic.AddBBS(nil, format("%s%s(%d)", L"注册失败，错误信息：", state.message, state.code), 5000, "255 0 0")
         Mod.WorldShare.MsgBox:Close()
     end)
+end
+
+function RegisterModal:Classification()
+    
+end
+
+function RegisterModal:ClassificationAndBind()
+
 end
 
 function RegisterModal:Bind(method, ...)

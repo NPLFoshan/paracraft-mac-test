@@ -97,7 +97,7 @@ function KeepworkServiceSession:Logout()
     end
 end
 
-function KeepworkServiceSession:Register(username, password, captcha, cellphone, cellphoneCaptcha, callback)
+function KeepworkServiceSession:Register(username, password, captcha, cellphone, cellphoneCaptcha, isBind, callback)
     if not username or not password or not captcha then
         return false
     end
@@ -110,13 +110,30 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         return false
     end
 
-    local params = {
-        username = username,
-        password = password,
-        key = self.captchaKey,
-        captcha = captcha,
-        channel = 3
-    }
+    local params
+
+    if #cellphone == 11 then
+        -- certification
+        params = {
+            username = username,
+            password = password,
+            key = self.captchaKey,
+            captcha = captcha,
+            channel = 3,
+            cellphone,
+            cellphoneCaptcha,
+            isBind = isBind
+        }
+    else
+        -- no certification
+        params = {
+            username = username,
+            password = password,
+            key = self.captchaKey,
+            captcha = captcha,
+            channel = 3
+        }
+    end
 
     KeepworkUsersApi:Register(
         params,
@@ -127,7 +144,7 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
                     password,
                     function(loginData, err)
                         if err ~= 200 then
-                            registerData.message = L'注册成功，登录失败，实名认证失败'
+                            registerData.message = L'注册成功，登录失败'
                             registerData.code = 9
 
                             if type(callback) == 'function' then
@@ -149,35 +166,8 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
                                 }
                             )
 
-                            if #cellphone == 11 then
-                                KeepworkUsersApi:RealName(
-                                    {
-                                        cellphone = cellphone,
-                                        captcha = cellphoneCaptcha,
-                                        realname = true
-                                    },
-                                    function(validatedData, err)
-                                        if err == 200 then
-                                            if type(callback) == 'function' then
-                                                callback(registerData)
-                                            end
-                                            return true
-                                        end
-                                    end,
-                                    function(data, err)
-                                        registerData.message = '注册成功，实名认证失败'
-                                        registerData.code = 10
-
-                                        if type(callback) == 'function' then
-                                            callback(registerData)
-                                        end 
-                                    end,
-                                    { 400 }
-                                )
-                            else
-                                if type(callback) == 'function' then
-                                    callback(registerData)
-                                end 
+                            if type(callback) == 'function' then
+                                callback(registerData)
                             end
                         end)
                     end
@@ -231,11 +221,7 @@ function KeepworkServiceSession:BindPhone(cellphone, captcha, callback)
         return false
     end
 
-    KeepworkUsersApi:BindPhone({
-        cellphone = cellphone,
-        captcha = captcha,
-        isBind = true
-    }, callback, callback)
+    KeepworkUsersApi:BindPhone(cellphone, captcha, callback, callback)
 end
 
 function KeepworkServiceSession:GetEmailCaptcha(email, callback)
@@ -457,6 +443,30 @@ function KeepworkServiceSession:CheckPhonenumberExist(phone, callback)
             end
         end,
         function() 
+            callback(false)
+        end
+    )
+end
+
+function KeepworkServiceSession:CheckUsernameExist(username, callback)
+    if type(username) ~= "string" then
+        return false
+    end
+
+    if type(callback) ~= "function" then
+        return false
+    end
+
+    KeepworkUsersApi:GetUserByUsernameBase64(
+        username,
+        function(data, err)
+            if type(data) == 'table' then
+                callback(true)
+            else
+                callback(false)
+            end
+        end,
+        function(data, err)
             callback(false)
         end
     )

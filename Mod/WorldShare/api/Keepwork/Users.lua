@@ -8,6 +8,7 @@ use the lib:
 local KeepworkUsersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Users.lua")
 ------------------------------------------------------------
 ]]
+local Encoding = commonlib.gettable("System.Encoding.basexx")
 
 local KeepworkBaseApi = NPL.load('./BaseApi.lua')
 
@@ -74,7 +75,13 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:RealName(params, success, error, noTryStatus)
+function KeepworkUsersApi:RealName(cellphone, captcha, success, error, noTryStatus)
+    local params = {
+        cellphone = cellphone,
+        captcha = captcha,
+        realname = true
+    }
+
     KeepworkBaseApi:Post('/users/cellphone_captcha', params, nil, success, error, noTryStatus)
 end
 
@@ -114,7 +121,13 @@ end
     token string 必须 token
 ]]
 -- return: object
-function KeepworkUsersApi:BindPhone(params, success, error)
+function KeepworkUsersApi:BindPhone(cellphone, captcha, success, error)
+    local params = {
+        cellphone = cellphone,
+        captcha = captcha,
+        realname = true
+    }
+
     KeepworkBaseApi:Post('/users/cellphone_captcha', params , { notTokenRequest = false }, success, error)
 end
 
@@ -162,4 +175,18 @@ function KeepworkUsersApi:GetUserByPhonenumber(phonenumber, success, error)
     end
 
     KeepworkBaseApi:Get('/users?cellphone=' .. phonenumber, nil, nil, success, error)
+end
+
+function KeepworkUsersApi:GetUserByUsernameBase64(username, success, error)
+    if type(username) ~= "string" then
+        return false
+    end
+
+    if #username == 0 then
+        return false
+    end
+
+    local usernameBase64 = Encoding.to_base64(NPL.ToJson({username = username}))
+
+    KeepworkBaseApi:Get('/users/PP' .. usernameBase64, nil, nil, success, error)
 end

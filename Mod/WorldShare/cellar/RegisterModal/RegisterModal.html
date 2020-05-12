@@ -9,6 +9,8 @@
 
                     page = document:GetPageCtrl()
                     Mod.WorldShare.Store:Set('page/RegisterModal', page)
+                    accountExist = true
+                    phonenumberExist = true
 
                     KeepworkServiceSession:FetchCaptcha(function() page:Refresh(0.01) end)
 
@@ -33,6 +35,11 @@
                     end
 
                     function register()
+                        if accountExist then
+                            GameLogic.AddBBS(nil, L"用户名已存在", 3000, "255 0 0")
+                            return false
+                        end
+
                         local account = page:GetValue("account")
                         local password = page:GetValue("password")
                         local captcha = page:GetValue("captcha")
@@ -62,6 +69,9 @@
                         RegisterModal.password = password
                         RegisterModal.captcha = captcha
                         RegisterModal.agree = agree
+                        RegisterModal.phonenumber = ""
+                        RegisterModal.phonecaptcha = ""
+                        RegisterModal.bindphone = nil
 
                         RegisterModal:Register(page)
                     end
@@ -179,6 +189,21 @@
 
                     function hide_notice()
                         page:FindControl('notice').visible = false
+
+                        local username = page:GetValue("account")
+
+                        if not username or #username == 0 then
+                            return false
+                        end
+
+                        KeepworkServiceSession:CheckUsernameExist(username, function(bIsExist)
+                            if bIsExist then
+                                accountExist = true
+                                GameLogic.AddBBS(nil, L"用户名已存在", 3000, "255 0 0")
+                            else
+                                accountExist = false
+                            end
+                        end)
                     end
 
                     function set_personal_web(name, mcmlNode)
@@ -262,8 +287,6 @@
                         page:CloseWindow()
                         Mod.WorldShare.Utils.ShowWindow(360, 230, "Mod/WorldShare/cellar/RegisterModal/SetUsername.html", "RegisterModal/SetUsername")
                     end
-
-                    phonenumberExist = true
 
                     function check_phone_number()
                         local phonenumber = page:GetValue("phonenumber")
