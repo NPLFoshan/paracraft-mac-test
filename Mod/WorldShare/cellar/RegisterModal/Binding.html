@@ -94,8 +94,6 @@
                         })
 
                         KeepworkServiceSession:GetEmailCaptcha(page:GetValue("email"), function(data, err)
-                            echo(data, true)
-
                             if err ~= 200 then
                                 isClickedGetEmailCaptcha = false
                                 page:SetValue("getEmailCaptcha", L"获取验证码")
@@ -123,6 +121,11 @@
                         end
 
                         if m == "bindemail" then
+                            if emailExist then
+                                GameLogic.AddBBS(nil, L"手机号已存在", 3000, "255 0 0")
+                                return false
+                            end
+
                             local email = page:GetValue("email")
                             local emailcaptcha = page:GetValue("emailcaptcha")
 
