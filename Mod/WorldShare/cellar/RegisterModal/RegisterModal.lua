@@ -221,16 +221,12 @@ function RegisterModal:Bind(method, ...)
         KeepworkServiceSession:BindEmail(email, emailcaptcha, function(data, err)
             Mod.WorldShare.MsgBox:Close()
 
-            if type(callback) == "function" then
-                callback();
-            end
-
             if err == 409 then
                 GameLogic.AddBBS(nil, L"邮箱已被绑定", 3000, "255 0 0")
                 return false
             end
 
-            if data == 'true' and err == 200 then
+            if err == 200 and data.data then
                 GameLogic.AddBBS(nil, L"绑定成功", 3000, "0 255 0")
                 if type(callback) == "function" then
                     callback()
@@ -238,7 +234,7 @@ function RegisterModal:Bind(method, ...)
                 return true
             end
 
-            GameLogic.AddBBS(nil, L"绑定失败", 3000, "255 0 0")
+            GameLogic.AddBBS(nil, format("%s%s(%d)", L"绑定失败，错误信息：", data.message, data.code), 5000, "255 0 0")
         end)
 
         return true
