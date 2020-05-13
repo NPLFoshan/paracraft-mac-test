@@ -123,11 +123,9 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         params = {
             username = username,
             password = password,
-            key = self.captchaKey,
-            captcha = captcha,
+            captcha = cellphoneCaptcha,
             channel = 3,
-            cellphone,
-            cellphoneCaptcha,
+            cellphone = cellphone,
             isBind = isBind
         }
     else

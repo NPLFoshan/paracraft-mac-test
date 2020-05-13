@@ -107,7 +107,7 @@
 
                     function bind(m)
                         if m == "bindphone" then
-                            if false then
+                            if phonenumberExist then
                                 GameLogic.AddBBS(nil, L"手机号已存在", 3000, "255 0 0")
                                 return false
                             end

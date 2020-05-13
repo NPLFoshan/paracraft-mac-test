@@ -288,8 +288,18 @@
                         Mod.WorldShare.Utils.ShowWindow(360, 230, "Mod/WorldShare/cellar/RegisterModal/SetUsername.html", "RegisterModal/SetUsername")
                     end
 
-                    function check_phone_number()
-                        local phonenumber = page:GetValue("phonenumber")
+                    function check_phone_number(pn)
+                        local phonenumber
+                        
+                        if page:GetValue("phonenumber") and #page:GetValue("phonenumber") > 0 then
+                            phonenumber = page:GetValue("phonenumber")
+                        else
+                            phonenumber = pn
+                        end
+
+                        if not Validated:Phone(phonenumber) then
+                            return false
+                        end
 
                         KeepworkServiceSession:CheckPhonenumberExist(phonenumber, function(bIsExist)
                             if bIsExist then
@@ -300,6 +310,8 @@
                             end
                         end)
                     end
+
+                    check_phone_number(RegisterModal.phonenumber)
                 ]]>
             </script>
             <style type="text/mcss">

@@ -107,8 +107,13 @@ function RegisterModal:Register(page)
 
     Mod.WorldShare.MsgBox:Show(L"正在注册，请稍后...", 10000, L"链接超时", 500, 120)
 
-    KeepworkServiceSession:Register(self.account, self.password, self.captcha, self.phonenumber, self.phonecaptcha, self.bindphone, function(state)
+    KeepworkServiceSession:Register(self.account, self.password, self.captcha, self.phonenumber, self.phonecaptcha, self.bindphone, function(state, err)
         Mod.WorldShare.MsgBox:Close()
+
+        if err == 422 then
+            GameLogic.AddBBS(nil, L"未知错误", 5000, "0 255 0")
+            return false
+        end
 
         if state and state.id then
             if state.code then
@@ -132,7 +137,7 @@ function RegisterModal:Register(page)
             return true
         end
 
-        GameLogic.AddBBS(nil, format("%s%s(%d)", L"注册失败，错误信息：", state.message, state.code), 5000, "255 0 0")
+        GameLogic.AddBBS(nil, format("%s%s(%d)", L"注册失败，错误信息：", state.message or "", state.code or ""), 5000, "255 0 0")
         Mod.WorldShare.MsgBox:Close()
     end)
 end
@@ -187,6 +192,9 @@ function RegisterModal:Bind(method, ...)
 
             if err == 200 and data.data then
                 GameLogic.AddBBS(nil, L"绑定成功", 3000, "0 255 0")
+                if type(callback) == "function" then
+                    callback()
+                end
                 return true
             end
 
@@ -224,6 +232,9 @@ function RegisterModal:Bind(method, ...)
 
             if data == 'true' and err == 200 then
                 GameLogic.AddBBS(nil, L"绑定成功", 3000, "0 255 0")
+                if type(callback) == "function" then
+                    callback()
+                end
                 return true
             end
 
