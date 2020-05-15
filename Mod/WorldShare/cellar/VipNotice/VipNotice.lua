@@ -17,6 +17,7 @@ local VipNotice = NPL.export()
 
 function VipNotice:Init()
     if not KeepworkService:IsSignedIn() then
+        Mod.WorldShare.Store:Set("user/loginText", L"您需要登录并成为VIP用户，才能使用此功能")
         LoginModal:Init(function(bSuccesed)
             if bSuccesed then
                 self:CheckVip()
