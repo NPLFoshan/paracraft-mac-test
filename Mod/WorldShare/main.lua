@@ -158,8 +158,8 @@ function WorldShare:init()
 
     GameLogic.GetFilters():add_filter(
         "VipNotice",
-        function(bEnable)
-            VipNotice:Init()
+        function(bEnable, callback)
+            VipNotice:Init(callback)
             return true
         end
     )
