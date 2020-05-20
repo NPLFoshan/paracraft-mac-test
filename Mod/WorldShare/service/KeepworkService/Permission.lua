@@ -25,11 +25,12 @@ function KeepworkServicePermission:Authentication(AuthName, callback)
     KeepworkPermissionsApi:Check(
         self:GetAuth(AuthName),
         function(data, err)
-            echo(data, true)
-            echo(err, true)
+            if data and data.data == true then
+                if type(callback) == "function" then
+                    callback()
+                end
+            end
         end,
-        function()
-        
-        end
+        function(data, err) end
     )
 end
