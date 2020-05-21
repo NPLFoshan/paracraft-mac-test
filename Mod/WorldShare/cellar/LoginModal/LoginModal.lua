@@ -35,7 +35,7 @@ function LoginModal:Init(callback)
         Mod.WorldShare.Store:Set('user/AfterLogined', function(bIsSucceed)
             -- OnKeepWorkLogin
             GameLogic.GetFilters():apply_filters("OnKeepWorkLogin", bIsSucceed)
-            callbackFunc(bIsSucceed)
+            callback(bIsSucceed)
         end)
     end
     self:ShowPage()
@@ -101,6 +101,7 @@ function LoginModal:ClosePage()
 
     self.loginServer = nil
     self.account = nil
+    Mod.WorldShare.Store:Remove("user/loginText")
 
     LoginModalPage:CloseWindow()
 end

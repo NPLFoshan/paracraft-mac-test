@@ -14,6 +14,7 @@ local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain
 
 -- UI
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 
 -- service
 local KeepworkServicePermission = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Permission.lua")
@@ -39,6 +40,7 @@ function Server:ShowPage()
 
     LoginModal:CheckSignedIn(L"此功能需要特殊权限，请先登录", function(result)
         if result then
+            WorldList:RefreshCurrentServerList()
             KeepworkServicePermission:Authentication("OnlineLearning", Handle)
         end
     end)
