@@ -12,22 +12,36 @@ local Screen = commonlib.gettable("System.Windows.Screen")
 local SocketService = commonlib.gettable("Mod.WorldShare.service.SocketService")
 local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain")
 
+-- UI
+local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+
+-- service
+local KeepworkServicePermission = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Permission.lua")
+
 local Server = NPL.export()
 
 Server.seachFinished = false
 
 function Server:ShowPage()
-    local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/Server/Server.html", "Server", 0, 0, "_fi", false)
-
-    Screen:Connect("sizeChanged", self, self.OnScreenSizeChange, "UniqueConnection")
-    self.OnScreenSizeChange()
-
-    params._page.OnClose = function()
-        Mod.WorldShare.Store:Remove('page/Server')
-        Screen:Disconnect("sizeChanged", self, self.OnScreenSizeChange)
+    local function Handle()
+        local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/Server/Server.html", "Server", 0, 0, "_fi", false)
+    
+        Screen:Connect("sizeChanged", self, self.OnScreenSizeChange, "UniqueConnection")
+        self.OnScreenSizeChange()
+    
+        params._page.OnClose = function()
+            Mod.WorldShare.Store:Remove('page/Server')
+            Screen:Disconnect("sizeChanged", self, self.OnScreenSizeChange)
+        end
+    
+        self:GetOnlineList()
     end
 
-    self:GetOnlineList()
+    LoginModal:CheckSignedIn(L"此功能需要特殊权限，请先登录", function(result)
+        if result then
+            KeepworkServicePermission:Authentication("OnlineLearning", Handle)
+        end
+    end)
 end
 
 function Server.OnScreenSizeChange()

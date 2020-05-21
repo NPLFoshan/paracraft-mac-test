@@ -177,14 +177,11 @@ function WorldShare:init()
     GameLogic.GetFilters():add_filter(
         "KeepworkPermission",
         function(bEnabled, authName, callback)
-            if KeepworkServiceSession:IsSignedIn() then
-                KeepworkServicePermission:Authentication(authName, callback)
-            else
-                LoginModal:Init(function()
+            LoginModal:CheckSignedIn(L"此功能需要特殊权限，请先登录", function(result)
+                if result then
                     KeepworkServicePermission:Authentication(authName, callback)
-                end)
-            end
-
+                end
+            end)
             return true
         end
     )
