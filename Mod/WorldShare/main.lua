@@ -54,11 +54,10 @@ local WorldExitDialog = NPL.load("(gl)Mod/WorldShare/cellar/WorldExitDialog/Worl
 local PreventIndulge = NPL.load("(gl)Mod/WorldShare/cellar/PreventIndulge/PreventIndulge.lua")
 local Grade = NPL.load("(gl)Mod/WorldShare/cellar/Grade/Grade.lua")
 local VipNotice = NPL.load("(gl)Mod/WorldShare/cellar/VipNotice/VipNotice.lua")
-local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+local Permission = NPL.load("(gl)Mod/WorldShare/cellar/Permission/Permission.lua")
 
 -- service
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
-local KeepworkServicePermission = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Permission.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 
 -- helper
@@ -74,7 +73,7 @@ local WorldShare = commonlib.inherit(commonlib.gettable("Mod.ModBase"), commonli
 
 WorldShare:Property({"Name", "WorldShare", "GetName", "SetName", { auto = true }})
 WorldShare:Property({"Desc", "world share mod can share world to keepwork online", "GetDesc", "SetDesc", { auto = true }})
-WorldShare.version = '0.0.14'
+WorldShare.version = '0.0.15'
 
 if Config.defaultEnv == 'RELEASE' or Config.defaultEnv == 'STAGE' then
     System.options.isAB_SDK = true
@@ -176,12 +175,9 @@ function WorldShare:init()
     -- filter KeepworkPremission
     GameLogic.GetFilters():add_filter(
         "KeepworkPermission",
-        function(bEnabled, authName, callback)
-            LoginModal:CheckSignedIn(L"此功能需要特殊权限，请先登录", function(result)
-                if result then
-                    KeepworkServicePermission:Authentication(authName, callback)
-                end
-            end)
+        function(bEnabled, bOpenUIIfNot, authName, callback)
+            Permission:CheckPermission(bOpenUIIfNot, authName, callback)
+
             return true
         end
     )

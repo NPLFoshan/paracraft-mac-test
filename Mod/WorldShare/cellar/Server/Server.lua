@@ -15,35 +15,32 @@ local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain
 -- UI
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
-
--- service
-local KeepworkServicePermission = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Permission.lua")
+local Permission = NPL.load("(gl)Mod/WorldShare/cellar/Permission/Permission.lua")
 
 local Server = NPL.export()
 
 Server.seachFinished = false
 
 function Server:ShowPage()
-    local function Handle()
-        local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/Server/Server.html", "Server", 0, 0, "_fi", false)
-    
-        Screen:Connect("sizeChanged", self, self.OnScreenSizeChange, "UniqueConnection")
-        self.OnScreenSizeChange()
-    
-        params._page.OnClose = function()
-            Mod.WorldShare.Store:Remove('page/Server')
-            Screen:Disconnect("sizeChanged", self, self.OnScreenSizeChange)
+    local function Handle(result)
+        if result then
+            local params = Mod.WorldShare.Utils.ShowWindow(0, 0, "Mod/WorldShare/cellar/Server/Server.html", "Server", 0, 0, "_fi", false)
+
+            Screen:Connect("sizeChanged", self, self.OnScreenSizeChange, "UniqueConnection")
+            self.OnScreenSizeChange()
+        
+            params._page.OnClose = function()
+                Mod.WorldShare.Store:Remove('page/Server')
+                Screen:Disconnect("sizeChanged", self, self.OnScreenSizeChange)
+            end
+        
+            self:GetOnlineList()
         end
-    
-        self:GetOnlineList()
+
+        WorldList:RefreshCurrentServerList()
     end
 
-    LoginModal:CheckSignedIn(L"此功能需要特殊权限，请先登录", function(result)
-        if result then
-            WorldList:RefreshCurrentServerList()
-            KeepworkServicePermission:Authentication("OnlineLearning", Handle)
-        end
-    end)
+    Permission:CheckPermission(true, "OnlineLearning", Handle)
 end
 
 function Server.OnScreenSizeChange()

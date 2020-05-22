@@ -17,6 +17,8 @@ KeepworkServicePermission.AllAuth = {
     SchoolManagementSystem = "a_school_management_system",
     OnlineTeaching = "t_online_teaching",
     OnlineLearning = "s_online_learning",
+    WorldDataSaveAs = "vip_world_data_save_as",
+    SkinOfAllProtagonists = "vip_skin_of_all_protagonists",
 }
 
 function KeepworkServicePermission:GetAuth(authName)
