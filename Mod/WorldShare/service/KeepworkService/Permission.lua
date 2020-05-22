@@ -19,6 +19,8 @@ KeepworkServicePermission.AllAuth = {
     OnlineLearning = "s_online_learning",
     WorldDataSaveAs = "vip_world_data_save_as",
     SkinOfAllProtagonists = "vip_skin_of_all_protagonists",
+    PythonCodeBlock = "vip_python_code_block",
+    VideoPluginWatermarkRemoval = "vip_video_plugin_watermark_removal",
 }
 
 function KeepworkServicePermission:GetAuth(authName)
