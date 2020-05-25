@@ -200,6 +200,10 @@ function WorldShare:init()
 
     -- prevent indulage
     PreventIndulge:Init()
+
+    local SocketIOClient = NPL.load("(gl)script/ide/System/os/network/SocketIO/SocketIOClient.lua");
+    local client = SocketIOClient:new();
+    client:Connect_Polling("http://socket-dev.kp-para.cn")
 end
 
 function WorldShare:OnInitDesktop()
