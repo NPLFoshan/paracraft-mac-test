@@ -9,13 +9,20 @@ local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 ------------------------------------------------------------
 ]]
 
+-- service
 local KeepworkService = NPL.load("../KeepworkService.lua")
+local GitGatewayService = NPL.load("../GitGatewayService.lua")
+
+-- api
 local KeepworkUsersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Users.lua")
 local KeepworkKeepworksApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Keepworks.lua")
 local LessonOrganizationsApi = NPL.load("(gl)Mod/WorldShare/api/Lesson/LessonOrganizations.lua")
+local KeepworkSocketApi = NPL.load("(gl)Mod/WorldShare/api/Socket/Socket.lua")
+
+-- database
 local SessionsData = NPL.load("(gl)Mod/WorldShare/database/SessionsData.lua")
-local GitGatewayService = NPL.load("../GitGatewayService.lua")
-local Config = NPL.load("(gl)Mod/WorldShare/config/Config.lua")
+
+-- helper
 local Validated = NPL.load("(gl)Mod/WorldShare/helper/Validated.lua")
 
 local Encoding = commonlib.gettable("commonlib.Encoding")
@@ -23,6 +30,26 @@ local Encoding = commonlib.gettable("commonlib.Encoding")
 local KeepworkServiceSession = NPL.export()
 
 KeepworkServiceSession.captchaKey = ''
+KeepworkServiceSession.client = nil
+
+function KeepworkServiceSession:LongConnectionInit()
+    if self.client then
+        return false
+    end
+
+    self.client = KeepworkSocketApi:Connect()
+
+    self.client:AddEventListener("OnOpen", function(self)
+        commonlib.echo("===========OnOpen");
+    end, self.client)
+
+    self.client:AddEventListener("OnMsg", self.OnMsg, self.client)
+end
+
+function KeepworkServiceSession:OnMsg(msg)
+    echo("from keepwork service session on msg!!!!!!", true)
+    commonlib.echo(msg.data);
+end
 
 function KeepworkServiceSession:IsSignedIn()
     local token = Mod.WorldShare.Store:Get("user/token")
