@@ -380,7 +380,7 @@ function SyncMain:CheckWorldSize(callback)
     local filesTotal = LocalService:GetWorldSize(currentWorld.worldpath)
     local maxSize = 0
 
-    Permission:CheckPermission("OnlineWorldData50Mb", true, function(result)
+    Permission:CheckPermission("OnlineWorldData50Mb", false, function(result)
         if result then
             maxSize = 50 * 1024 * 1024
         else
@@ -388,7 +388,7 @@ function SyncMain:CheckWorldSize(callback)
         end
     
         if filesTotal > maxSize then
-            self:ShowBeyondVolume()
+            self:ShowBeyondVolume(result)
         else
             if type(callback) == "function" then
                 callback()

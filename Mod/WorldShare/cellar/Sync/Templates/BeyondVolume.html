@@ -31,6 +31,10 @@
                     return str
                 end
 
+                function is_show_vip_button()
+                    return bEnabled == "false"
+                end
+
                 function open_world_folder()
                     SyncMain:CloseBeyondVolumePage()
 
@@ -54,6 +58,9 @@
                         <%= get_beyond_msg() %>
                         <br />
                         <%= L"是否现在清理？" %>
+                        <pe:if condition="<%= is_show_vip_button() %>">
+                            <a href="https://keepwork.com/vip" style="color: #0f8165"><%= L"或者购买VIP?" %></a>
+                        </pe:if>
                     </div>
                     <br />
                     <div style="margin-top:30px;">
