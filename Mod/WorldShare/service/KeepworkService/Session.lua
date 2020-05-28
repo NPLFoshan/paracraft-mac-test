@@ -47,7 +47,6 @@ function KeepworkServiceSession:LongConnectionInit()
 end
 
 function KeepworkServiceSession:OnMsg(msg)
-    echo("from keepwork service session on msg!!!!!!", true)
     commonlib.echo(msg.data);
 end
 
@@ -65,13 +64,16 @@ function KeepworkServiceSession:GetDeviceRoomName()
     end
 
     local machineCode = SessionsData:GetDeviceUUID()
-    local username = Mod.WorldShare.Store:Get("user/username") or ""
+    local userId = Mod.WorldShare.Store:Get("user/userId") or ""
 
+    local sessionRoomName = "__session_" .. platform .. "_" .. machineCode .. "_" .. userId .. "__"
 
-    echo("platfrom", true)
-    echo(platform, true)
-    echo("machine code", true)
-    echo(machineCode, true)
+    return sessionRoomName
+end
+
+function KeepworkServiceSession:LoginSocket()
+    echo({ rooms = { self:GetDeviceRoomName() }}, true)
+    KeepworkSocketApi:SendMsg(self.client, "app/join", { rooms = { self:GetDeviceRoomName() }})
 end
 
 function KeepworkServiceSession:IsSignedIn()
@@ -170,7 +172,7 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
     )
 
     self:ResetIndulge()
-    self:GetDeviceRoomName()
+    self:LoginSocket()
 end
 
 function KeepworkServiceSession:Logout()
