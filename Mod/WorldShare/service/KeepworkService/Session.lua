@@ -51,6 +51,29 @@ function KeepworkServiceSession:OnMsg(msg)
     commonlib.echo(msg.data);
 end
 
+function KeepworkServiceSession:GetDeviceRoomName()
+    if not self:IsSignedIn() then
+        return false
+    end
+
+    local platform
+
+    if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'win32' then
+        platform = "PC"
+    else
+        platform = "MOBILE"
+    end
+
+    local machineCode = SessionsData:GetDeviceUUID()
+    local username = Mod.WorldShare.Store:Get("user/username") or ""
+
+
+    echo("platfrom", true)
+    echo(platform, true)
+    echo("machine code", true)
+    echo(machineCode, true)
+end
+
 function KeepworkServiceSession:IsSignedIn()
     local token = Mod.WorldShare.Store:Get("user/token")
 
@@ -58,7 +81,23 @@ function KeepworkServiceSession:IsSignedIn()
 end
 
 function KeepworkServiceSession:Login(account, password, callback)
-    KeepworkUsersApi:Login(account, password, callback, callback)
+    local machineCode = SessionsData:GetDeviceUUID()
+    local platform
+
+    if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'win32' then
+        platform = "PC"
+    else
+        platform = "MOBILE"
+    end
+
+    KeepworkUsersApi:Login(
+        account,
+        password,
+        platform,
+        machineCode,
+        callback,
+        callback
+    )
 end
 
 function KeepworkServiceSession:LoginWithToken(token, callback)
@@ -78,6 +117,7 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
         return false
     end
 
+    -- login success ↓
     local token = response["token"] or System.User.keepworktoken
     local userId = response["id"] or 0
     local username = response["username"] or ""
@@ -130,6 +170,7 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
     )
 
     self:ResetIndulge()
+    self:GetDeviceRoomName()
 end
 
 function KeepworkServiceSession:Logout()
