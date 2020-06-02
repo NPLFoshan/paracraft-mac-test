@@ -430,15 +430,17 @@
 
                 function OnDailyCheck()
                     LoginModal:CheckSignedIn(L"请先登录", function(result)
-                        if result then
-                            WorldList:RefreshCurrentServerList()
-                            local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-                            ParacraftLearningRoomDailyPage.AutoOpen(nil,nil,function()
-                                if Mod.WorldShare.Store:Get('world/isEnterWorld') then
-                                    UserConsole:ClosePage()
-                                end
-                            end);
-                        end
+                        Mod.WorldShare.Utils.SetTimeOut(function()
+                            if result then
+                                WorldList:RefreshCurrentServerList()
+                                local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+                                ParacraftLearningRoomDailyPage.AutoOpen(nil,nil,function()
+                                    if Mod.WorldShare.Store:Get('world/isEnterWorld') then
+                                        UserConsole:ClosePage()
+                                    end
+                                end);
+                            end
+                        end, 200)
                     end)
                 end
 
