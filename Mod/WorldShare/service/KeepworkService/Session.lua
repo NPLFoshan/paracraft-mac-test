@@ -40,14 +40,14 @@ function KeepworkServiceSession:LongConnectionInit()
     self.client = KeepworkSocketApi:Connect()
 
     self.client:AddEventListener("OnOpen", function(self)
-        commonlib.echo("===========OnOpen");
+        echo("from keepwork service session ===========OnOpen", true);
     end, self.client)
 
     self.client:AddEventListener("OnMsg", self.OnMsg, self.client)
 end
 
 function KeepworkServiceSession:OnMsg(msg)
-    commonlib.echo(msg.data);
+    echo(msg.data, true);
 end
 
 function KeepworkServiceSession:GetDeviceRoomName()
@@ -66,7 +66,7 @@ function KeepworkServiceSession:GetDeviceRoomName()
     local machineCode = SessionsData:GetDeviceUUID()
     local userId = Mod.WorldShare.Store:Get("user/userId") or ""
 
-    local sessionRoomName = "__session_" .. platform .. "_" .. machineCode .. "_" .. userId .. "__"
+    local sessionRoomName = "__kick_" .. platform .. "_" .. machineCode .. "_" .. userId .. "__"
 
     return sessionRoomName
 end

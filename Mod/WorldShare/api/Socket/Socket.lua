@@ -23,7 +23,6 @@ function SocketApi:Connect()
 end
 
 function SocketApi:SendMsg(client, url, params)
-    echo("send now!!!!!!!", true)
     if not client or not client.Send then
         return false
     end
