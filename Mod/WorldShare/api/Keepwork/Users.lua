@@ -37,6 +37,14 @@ function KeepworkUsersApi:Login(account, password, platform, machineCode, succes
     KeepworkBaseApi:Post("/users/login", params, nil, success, error, { 503, 400 })
 end
 
+-- url: /users/logout
+-- method: POST
+-- params: []
+-- return: object
+function KeepworkUsersApi:Logout(success, error)
+    KeepworkBaseApi:Post("/users/logout", nil, nil, success, error)
+end
+
 -- url: /users/profile
 -- method: POST
 -- params:

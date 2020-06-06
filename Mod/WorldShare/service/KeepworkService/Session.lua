@@ -30,24 +30,40 @@ local Encoding = commonlib.gettable("commonlib.Encoding")
 local KeepworkServiceSession = NPL.export()
 
 KeepworkServiceSession.captchaKey = ''
-KeepworkServiceSession.client = nil
 
-function KeepworkServiceSession:LongConnectionInit()
-    if self.client then
+function KeepworkServiceSession:LongConnectionInit(callback)
+    local connection = KeepworkSocketApi:Connect()
+
+    if not connection then
         return false
     end
 
-    self.client = KeepworkSocketApi:Connect()
+    connection:AddEventListener("OnOpen", function(self)
+        LOG.std("KeepworkServiceSession", "debug", "LongConnectionInit", "Connected client")
+    end, connection)
 
-    self.client:AddEventListener("OnOpen", function(self)
-        echo("from keepwork service session ===========OnOpen", true);
-    end, self.client)
-
-    self.client:AddEventListener("OnMsg", self.OnMsg, self.client)
+    connection:AddEventListener("OnMsg", self.OnMsg, connection)
+    connection.uiCallback = callback
 end
 
 function KeepworkServiceSession:OnMsg(msg)
-    echo(msg.data, true);
+    LOG.std("KeepworkServiceSession", "debug", "OnMsg", "data: %s", NPL.ToJson(msg.data))
+
+    if not msg or not msg.data then
+        return false
+    end
+
+    if msg.data.sio_pkt_name and msg.data.sio_pkt_name == "event" then
+        if msg.data.body and msg.data.body[1] == "app/msg" then
+            if msg.data.body[2] and msg.data.body[2].action == "kickOut" then
+                local connection = KeepworkSocketApi:GetConnection()
+
+                if type(connection.uiCallback) == "function" then
+                    connection.uiCallback("KICKOUT")
+                end
+            end
+        end
+    end
 end
 
 function KeepworkServiceSession:GetDeviceRoomName()
@@ -72,8 +88,13 @@ function KeepworkServiceSession:GetDeviceRoomName()
 end
 
 function KeepworkServiceSession:LoginSocket()
-    echo({ rooms = { self:GetDeviceRoomName() }}, true)
-    KeepworkSocketApi:SendMsg(self.client, "app/join", { rooms = { self:GetDeviceRoomName() }})
+    local token = Mod.WorldShare.Store:Get("user/token")
+
+    if not token then
+        return false
+    end
+
+    KeepworkSocketApi:SendMsg("app/join", { rooms = { self:GetDeviceRoomName() }, token = token })
 end
 
 function KeepworkServiceSession:IsSignedIn()
@@ -177,6 +198,7 @@ end
 
 function KeepworkServiceSession:Logout()
     if KeepworkService:IsSignedIn() then
+        KeepworkUsersApi:Logout()
         local Logout = Mod.WorldShare.Store:Action("user/Logout")
         Logout()
         self:ResetIndulge()
