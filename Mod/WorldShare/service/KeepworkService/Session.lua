@@ -43,11 +43,13 @@ function KeepworkServiceSession:LongConnectionInit(callback)
         return nil
     end
 
-    KpChatChannel.client = connection
-
-    KpChatChannel.client:AddEventListener("OnOpen",KpChatChannel.OnOpen,KpChatChannel);
-    KpChatChannel.client:AddEventListener("OnMsg",KpChatChannel.OnMsg,KpChatChannel);
-    KpChatChannel.client:AddEventListener("OnClose",KpChatChannel.OnClose,KpChatChannel);
+    if not KpChatChannel.client then
+        KpChatChannel.client = connection
+    
+        KpChatChannel.client:AddEventListener("OnOpen", KpChatChannel.OnOpen, KpChatChannel)
+        KpChatChannel.client:AddEventListener("OnMsg", KpChatChannel.OnMsg, KpChatChannel)
+        KpChatChannel.client:AddEventListener("OnClose", KpChatChannel.OnClose, KpChatChannel)
+    end
 
     connection:AddEventListener("OnOpen", function(self)
         LOG.std("KeepworkServiceSession", "debug", "LongConnectionInit", "Connected client")
