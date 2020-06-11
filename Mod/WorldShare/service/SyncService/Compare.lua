@@ -349,9 +349,6 @@ end
 function Compare:RefreshWorldList(callback)
     local localWorlds = LocalServiceWorld:GetWorldList()
 
-    echo("from compare refresh world list!!!!!", true)
-    echo(KeepworkService:IsSignedIn(), true)
-
     if not KeepworkService:IsSignedIn() then
         local currentWorldList = LocalServiceWorld:MergeInternetLocalWorldList(localWorlds)
 
