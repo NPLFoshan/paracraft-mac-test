@@ -210,6 +210,23 @@ function WorldShare:init()
     if System.os.GetPlatform() == "win32" then
         Cef3Manager:Init()
     end
+
+    -- init long tcp connection
+    KeepworkServiceSession:LongConnectionInit(function(result)
+        if type(result) ~= 'table' then
+            return false
+        end
+
+        if result.action == 'kickOut' then
+            local reason = 1
+
+            if result.payload and result.payload.reason then
+                reason = result.payload.reason
+            end
+
+            UserConsole:ShowKickOutPage(reason)
+        end
+    end)
 end
 
 function WorldShare:OnInitDesktop()
