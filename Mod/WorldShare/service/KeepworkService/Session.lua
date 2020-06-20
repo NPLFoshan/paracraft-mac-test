@@ -69,18 +69,18 @@ function KeepworkServiceSession:OnMsg(msg)
 
     if msg.data.sio_pkt_name and msg.data.sio_pkt_name == "event" then
         if msg.data.body and msg.data.body[1] == "app/msg" then
-            if msg.data.body[2] and msg.data.body[2].action == "kickOut" then
-                local connection = KeepworkSocketApi:GetConnection()
 
-                if type(connection.uiCallback) == "function" then
-                    connection.uiCallback("KICKOUT")
-                end
+            local connection = KeepworkSocketApi:GetConnection()
+
+            if type(connection.uiCallback) == "function" then
+                connection.uiCallback(msg.data.body[2])
             end
         end
     end
 end
 
-function KeepworkServiceSession:GetDeviceRoomName()
+
+function KeepworkServiceSession:LoginSocket()
     if not self:IsSignedIn() then
         return false
     end
@@ -94,24 +94,7 @@ function KeepworkServiceSession:GetDeviceRoomName()
     end
 
     local machineCode = SessionsData:GetDeviceUUID()
-    local userId = Mod.WorldShare.Store:Get("user/userId") or ""
-
-    local sessionRoomName = "__kick_" .. platform .. "_" .. machineCode .. "_" .. userId .. "__"
-
-    return sessionRoomName
-end
-
-function KeepworkServiceSession:LoginSocket()
-    local token = Mod.WorldShare.Store:Get("user/token")
-    local userId = Mod.WorldShare.Store:Get("user/userId")
-
-    if not token or not userId then
-        return false
-    end
-
-    local userRoom = '__user_' .. userId .. '__'
-
-    KeepworkSocketApi:SendMsg("app/join", { rooms = { userRoom, self:GetDeviceRoomName() } })
+    KeepworkSocketApi:SendMsg("app/login", { platform = platform, machineCode = machineCode })
 end
 
 function KeepworkServiceSession:IsSignedIn()
@@ -193,10 +176,10 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
         Mod.WorldShare.Store:Set("user/userType", 'plain')
     end
 
+    Mod.WorldShare.Store:Set('user/bLoginSuccessed', true)
+
     local Login = Mod.WorldShare.Store:Action("user/Login")
     Login(token, userId, username, nickname)
-
-    Mod.WorldShare.Store:Set('user/bLoginSuccessed', true)
 
     LessonOrganizationsApi:GetUserAllOrgs(
         function(data, err)
@@ -223,6 +206,7 @@ end
 function KeepworkServiceSession:Logout()
     if KeepworkService:IsSignedIn() then
         KeepworkUsersApi:Logout()
+        KeepworkSocketApi:SendMsg("app/logout", {})
         local Logout = Mod.WorldShare.Store:Action("user/Logout")
         Logout()
         self:ResetIndulge()
