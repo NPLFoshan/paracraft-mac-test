@@ -34,8 +34,6 @@ function KeepworkServicePermission:GetAuth(authName)
 end
 
 function KeepworkServicePermission:Authentication(authName, callback)
-
-
     if not self:GetAuth(authName) then
         if Mod.WorldShare.Store:Get("user/userType") == 'vip' then
             if type(callback) == "function" then
