@@ -31,6 +31,8 @@ function ThirdPartyLogin:Init(type)
 end
 
 function ThirdPartyLogin:GetUrl()
+    local redirect_uri = 'http://www.keepwork.com/p/third-login/设备类型/端口'
+
     if self.type == 'WECHAT' then
         return "https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect"
     end
