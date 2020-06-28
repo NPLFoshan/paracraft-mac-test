@@ -133,15 +133,7 @@ function KeepworkServiceSession:LoginWithToken(token, callback)
 end
 
 function KeepworkServiceSession:LoginResponse(response, err, callback)
-    if err == 400 then
-        Mod.WorldShare.MsgBox:Close()
-        GameLogic.AddBBS(nil, L"用户名或者密码错误", 3000, "255 0 0")
-        return false
-    end
-
-    if type(response) ~= "table" then
-        Mod.WorldShare.MsgBox:Close()
-        GameLogic.AddBBS(nil, L"服务器连接失败", 3000, "255 0 0")
+    if err ~= 200 or type(response) ~= "table" then
         return false
     end
 
@@ -177,6 +169,26 @@ function KeepworkServiceSession:LoginResponse(response, err, callback)
     end
 
     Mod.WorldShare.Store:Set('user/bLoginSuccessed', true)
+
+    local tokenExpire
+
+    if response.tokenExpire then
+        tokenExpire = os.time() + tonumber(response.tokenExpire)
+    end
+
+    if response.mode ~= 'auto' then
+        self:SaveSigninInfo(
+            {
+                account = username,
+                password = response.password,
+                loginServer = KeepworkService:GetEnv(),
+                token = token,
+                autoLogin = response.autoLogin,
+                rememberMe = response.rememberMe,
+                tokenExpire = tokenExpire
+            }
+        )
+    end
 
     local Login = Mod.WorldShare.Store:Action("user/Login")
     Login(token, userId, username, nickname)
@@ -269,18 +281,11 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
                             return false
                         end
 
-                        self:LoginResponse(loginData, err, function()
-                            self:SaveSigninInfo(
-                                {
-                                    account = username,
-                                    password = password,
-                                    token = loginData["token"] or "",
-                                    loginServer = KeepworkService:GetEnv(),
-                                    autoLogin = false,
-                                    rememberMe = false
-                                }
-                            )
+                        loginData.autoLogin = autoLogin
+                        loginData.rememberMe = rememberMe
+                        loginData.password = password
 
+                        self:LoginResponse(loginData, err, function()
                             if type(callback) == 'function' then
                                 callback(registerData)
                             end
@@ -296,7 +301,7 @@ function KeepworkServiceSession:Register(username, password, captcha, cellphone,
         end,
         function(data, err)
             if type(callback) == 'function' then
-                callback(data)
+                callback({ message = "", code = err})
             end
         end,
         { 400 }
@@ -444,10 +449,11 @@ function KeepworkServiceSession:CheckTokenExpire(callback)
     if not KeepworkService:IsSignedIn() then
         return false
     end
-    
+
     local token = Mod.WorldShare.Store:Get('user/token')
-    local tokeninfo = System.Encoding.jwt.decode(token)
-    local exp = tokeninfo.exp and tokeninfo.exp or 0
+    local info = self:LoadSigninInfo()
+
+    local tokenExpire = info and info.tokenExpire or 0
 
     local function ReEntry()
         self:Logout()
@@ -455,6 +461,9 @@ function KeepworkServiceSession:CheckTokenExpire(callback)
         local currentUser = self:LoadSigninInfo()
 
         if not currentUser or not currentUser.account or not currentUser.password then
+            if type(callback) == "function" then
+                callback(false)
+            end
             return false
         end
 
@@ -479,7 +488,7 @@ function KeepworkServiceSession:CheckTokenExpire(callback)
     end
 
     -- we will not fetch token if token is expire
-    if exp <= (os.time() + 1 * 24 * 3600) then
+    if tokenExpire <= (os.time() + 1 * 24 * 3600) then
         ReEntry()
         return false
     end
