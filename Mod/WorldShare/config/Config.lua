@@ -97,3 +97,33 @@ Config.socket = {
 }
 
 Config.RecommendedWorldList = 'https://git.keepwork.com/gitlab_rls_official/keepworkdatasource/raw/master/official/paracraft/RecommendedWorldList.md'
+
+Config.QQ = {
+  ONLINE = {
+    clientId = "101403344"
+  },
+  STAGE = {
+    clientId = "101403344"
+  },
+  RELEASE = {
+    clientId = "101403344"
+  },
+  LOCAL = {
+    clientId = "101403344"
+  },
+}
+
+Config.Wechat = {
+  ONLINE = {
+    clientId = ""
+  },
+  STAGE = {
+    clientId = ""
+  },
+  RELEASE = {
+    clientId = ""
+  },
+  LOCAL = {
+    clientId = ""
+  }
+}
