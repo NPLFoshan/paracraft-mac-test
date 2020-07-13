@@ -129,13 +129,19 @@
                         local username = mcmlNode:GetUIValue()
                         page:SetValue("account", username)
                     end
-
+                    
                     function login_with_wx()
-                        ThirdPartyLogin:Init("WECHAT")
+                        ThirdPartyLogin:Init("WECHAT", function()
+                            MainLogin:EnterUserConsole()
+                            WorldList:RefreshCurrentServerList()
+                        end)
                     end
 
                     function login_width_qq()
-                        ThirdPartyLogin:Init("QQ")
+                        ThirdPartyLogin:Init("QQ", function()
+                            MainLogin:EnterUserConsole()
+                            WorldList:RefreshCurrentServerList()
+                        end)
                     end
                 ]]>
             </script>
@@ -228,8 +234,8 @@
                                 <div style="width: 50px;height: 1px;background-color: #6d6d6e;float:left;margin-top: 10px;margin-left: 2px;"></div>
                             </div>
                             <div style="margin-top: 5px;margin-bottom: 5px;">
-                                <div onclick="login_with_wx()" style="width: 44px;height: 44px;background:url(textures/worldshare_32bits.png#245 135 44 44);float: left;margin-left: 35px;"></div>
-                                <div onclick="login_width_qq()" style="width: 44px;height: 44px;background:url(textures/worldshare_32bits.png#301 135 44 44);float: left;margin-left: 80x;"></div>
+                                <div onclick="login_with_wx()" style="width: 44px;height: 44px;background:url(textures/worldshare_32bits.png#245 135 44 44);float: left;margin-left: 98px;"></div>
+                                <!-- <div onclick="login_width_qq()" style="width: 44px;height: 44px;background:url(textures/worldshare_32bits.png#301 135 44 44);float: left;margin-left: 80x;"></div> -->
                             </div>
                         </div>
                         <div style="<%='text-align:left;margin-left:55px;' .. get_english_style('margin-left:15px;')%>">
@@ -241,12 +247,7 @@
                 </div>
             </pe:container>
             <!--persistent setting button-->
-            <pe:container alignment="_ctb" ClickThrough="true" style="position:relative;background:;margin-left:70px;width:400px;height:70px;">
-                <pe:if condition='<%= System.options.isDevEnv == false %>'>
-                    <pe:if  condition='<%= System.os.GetPlatform() ~= "ios" %>'>
-                        <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_big_button" style="margin-top:16px;color:#572712;font-size:14px;width:256px;height:36px;" onclick="OnOpenModulePage" />    
-                    </pe:if>        
-                </pe:if>
+            <pe:container alignment="_ctb" ClickThrough="true" style="position:relative;background:;margin-left:70px;width:400px;height:105px;">
                 <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
                 <pe:if condition='<%= System.options.isDevEnv == true %>'>
                     <div style="margin-left:-40px;margin-top:6px;font-size:14px;width:336px;height:36px;color:#FF3030;text-align:center;font-weight:bold">
@@ -255,9 +256,14 @@
                     </div>
                 </pe:if>
             </pe:container>
-            <pe:container alignment="_rb" ClickThrough="true" style="position:relative;background:;width:300px;height:90px;">
-                <input type="button" value='<%=L"语言..." %>' spacing="20" align="right" class="mc_big_button" style="position:relative;margin-top:1px;margin-right:10px;color:#572712;font-size:14px;height:36px;" onclick="OnChangeLanguagePage" />
-                <input type="button" value='<%=L"客服"%>' align="right" style="position:relative;margin-right:10px;margin-top:45px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCustomerService" />
+            <pe:container alignment="_rb" ClickThrough="true" style="position:relative;background:;width:300px;height:130px;">
+                <pe:if condition='<%= System.options.isDevEnv == false %>'>
+                    <pe:if  condition='<%= System.os.GetPlatform() ~= "ios" %>'>
+                        <input type="button" value='<%=L"插件管理"..GetModCountAsString() %>' class="mc_big_button" align="right" style="margin-right:10px;color:#572712;font-size:14px;min-width:120px;height:36px;" onclick="OnOpenModulePage" />    
+                    </pe:if>        
+                </pe:if>
+                <input type="button" value='<%=L"语言..." %>' spacing="20" align="right" class="mc_big_button" style="margin-top:5px;margin-right:10px;color:#572712;font-size:14px;min-width:120px;height:36px;" onclick="OnChangeLanguagePage" />
+                <input type="button" value='<%=L"客服"%>' align="right" style="margin-right:10px;margin-top:5px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCustomerService" />
                 <!-- <input type="button" value='<%=L"致谢"%>' align="right" style="position:relative;margin-right:10px;margin-top:45px;padding:5px;padding-left:10px;padding-right:10px;font-size:14px;font-weight:bold;color:#ffffffcc;background:url(Texture/whitedot.png);background-color:#00000080" onclick="OnClickCredits" /> -->
                 <!--<pe:if condition='<%=Rebranding:GetValue("donation")~="false"%>'>
                     <input type="button" value='<%=L"捐赠" %>' align="right" spacing="20" class="mc_light_grey_button_with_fillet" style="font-size:14px;height:36px;margin-right:20px" onclick="OnClickDonate" />
