@@ -117,7 +117,7 @@ function UserInfo:GetUserName()
 end
 
 -- for restart game
-function UserInfo:LoginWithToken()
+function UserInfo:LoginWithToken(callback)
     local usertoken = KeepworkServiceSession:GetCurrentUserToken()
 
     if type(usertoken) ~= "string" or #usertoken <= 0 then
@@ -151,6 +151,11 @@ function UserInfo:LoginWithToken()
                         Mod.WorldShare.MsgBox:Close()
 
                         WorldList:RefreshCurrentServerList()
+
+                        if type(callback) == 'function' then
+                            callback()
+                            return
+                        end
 
                         -- OnKeepWorkLogin
                         GameLogic.GetFilters():apply_filters("OnKeepWorkLogin", true)

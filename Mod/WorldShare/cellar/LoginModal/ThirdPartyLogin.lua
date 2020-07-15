@@ -14,6 +14,7 @@ ThirdPartyLogin:Init(type)
 -- get table lib
 local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer")
 local Cef3Manager = commonlib.gettable("Mod.WorldShare.service.Cef3Manager")
+local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin")
 
 -- service
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
@@ -30,6 +31,12 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
         return false
     end
 
+    if self.beShowed then
+        return false
+    end
+
+    self.beShowed = true
+
     local function Handle()
         self.thirdPartyType = thirdPartyType
         self.callback = callback
@@ -38,12 +45,24 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
             Mod.WorldShare.MsgBox:Show(L"请稍后...", nil, nil, nil, nil, 6)
 
             Mod.WorldShare.Utils.SetTimeOut(function()
+                Mod.WorldShare.MsgBox:Close()
+
+                self.beShowed = false
                 self:Init(thirdPartyType, callback)
             end, 1500)
             return false
         end
     
         self.needToWait = true
+
+        if System.os.GetPlatform() == 'win32' then
+            NplBrowserPlugin.OnCreatedCallback("thridpartylogin",function()
+                local ThirdPartyLoginPage = Mod.WorldShare.Store:Get('page/ThirdPartyLogin')
+                if ThirdPartyLoginPage then
+                    ThirdPartyLoginPage:Refresh(0)
+                end
+            end)
+        end
     
         local params = Mod.WorldShare.Utils.ShowWindow(400, 450, "Mod/WorldShare/cellar/LoginModal/ThirdPartyLogin.html", "ThirdPartyLogin", nil, nil, nil, nil, 6)
 
@@ -52,6 +71,8 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
             Mod.WorldShare.Store:Remove('page/ThirdPartyLogin')
             params._page:CallMethod("thridpartylogin", "SetVisible", false)
             Mod.WorldShare.Store:Unsubscribe("user/SetThirdPartyLoginAuthinfo")
+
+            self.beShowed = false
 
             Mod.WorldShare.Utils.SetTimeOut(function()
                 params._page:CallMethod("thridpartylogin", "Reload", "https://keepwork.com/zhanglei/empty/index")
@@ -62,13 +83,13 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
         Mod.WorldShare.Store:Subscribe("user/SetThirdPartyLoginAuthinfo", function()
             local authType = Mod.WorldShare.Store:Get("user/authType")
             local authCode = Mod.WorldShare.Store:Get("user/authCode")
-    
+
             KeepworkServiceSession:CheckOauthUserExisted(authType, authCode, function(bExisted, data)
                 params._page:CloseWindow()
-    
+
                 if bExisted then
                     Mod.WorldShare.Store:Set("user/token", data.token)
-    
+
                     if type(self.callback) == "function" then
                         self.callback()
                     end
@@ -78,7 +99,7 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
                     else
                         Mod.WorldShare.Store:Remove("user/authToken")
                     end
-    
+
                     Mod.WorldShare.MsgBox:Dialog(
                         "NoThirdPartyAccountNotice",
                         L"检测到该第三方账号还未绑定到账号，请绑定到已有账号或者新建账号进行绑定",
@@ -122,7 +143,7 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
             if not bStarted or not siteUrl then
                 return false
             end
-    
+
             self.port = siteUrl:match("%:(%d+)") or self.port
 
             if Cef3Manager.bLoaded then
@@ -143,7 +164,7 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
 end
 
 function ThirdPartyLogin:GetUrl()
-    local redirect_uri = Mod.WorldShare.Utils.EncodeURIComponent(KeepworkService:GetKeepworkUrl() .. '/p/third-login/')
+    local redirect_uri = Mod.WorldShare.Utils.EncodeURIComponent(KeepworkService:GetKeepworkUrl() .. '/p/third-login')
     local sysTag = ''
 
     if System.os.GetPlatform() == 'win32' then
