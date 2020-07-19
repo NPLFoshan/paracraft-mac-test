@@ -50,8 +50,6 @@ function MainLogin:Show()
         MainLoginPage:SetValue('rememberMe', PWDInfo.rememberMe or false)
         MainLoginPage:SetValue('password', PWDInfo.password or '')
         MainLoginPage:SetValue('showaccount', PWDInfo.account or '')
-
-        self.loginServer = PWDInfo.loginServer
         self.account = PWDInfo.account
     end
 
@@ -61,7 +59,7 @@ function MainLogin:Show()
         self.notFirstTimeShown = true
 
         if System.User.keepworktoken then
-            Mod.WorldShare.MsgBox:Show(L"正在登陆，请稍后...", 8000, L"链接超时", 300, 120)
+            Mod.WorldShare.MsgBox:Show(L"正在登录，请稍后...", 8000, L"链接超时", 300, 120)
 
             KeepworkServiceSession:LoginWithToken(
                 System.User.keepworktoken,
@@ -132,7 +130,7 @@ function MainLogin:LoginAction()
     end
 
 
-    Mod.WorldShare.MsgBox:Show(L"正在登陆，请稍后...", 8000, L"链接超时", 300, 120)
+    Mod.WorldShare.MsgBox:Show(L"正在登录，请稍后...", 8000, L"链接超时", 300, 120)
 
     local function HandleLogined()
         Mod.WorldShare.MsgBox:Close()
@@ -193,51 +191,55 @@ function MainLogin:EnterUserConsole()
 end
 
 function MainLogin:SetAutoLogin()
-    local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
+    local MainLoginPage = Mod.WorldShare.Store:Get("page/MainLogin")
 
-    if not LoginModalPage then
+    if not MainLoginPage then
         return false
     end
 
-    local autoLogin = LoginModalPage:GetValue("autoLogin")
-    local rememberMe = LoginModalPage:GetValue("rememberMe")
-    local password = LoginModalPage:GetValue("password")
-    self.loginServer = KeepworkService:GetEnv()
-    self.account = string.lower(LoginModalPage:GetValue("account"))
+    local autoLogin = MainLoginPage:GetValue("autoLogin")
+    local rememberMe = MainLoginPage:GetValue("rememberMe")
+    local account = MainLoginPage:GetValue("showaccount")
+    local password = MainLoginPage:GetValue("password")
 
     if autoLogin then
-        LoginModalPage:SetValue("rememberMe", true)
+        MainLoginPage:SetValue("rememberMe", true)
     else
-        LoginModalPage:SetValue("rememberMe", rememberMe)
+        MainLoginPage:SetValue("rememberMe", rememberMe)
     end
-    
-    LoginModalPage:SetValue("autoLogin", autoLogin)
-    LoginModalPage:SetValue("password", password)
+
+    MainLoginPage:SetValue("autoLogin", autoLogin)
+    MainLoginPage:SetValue("password", password)
+    MainLoginPage:SetValue("account", account)
+    MainLoginPage:SetValue("showaccount", account)
+    self.account = string.lower(account)
 
     self:Refresh()
 end
 
 function MainLogin:SetRememberMe()
-    local LoginModalPage = Mod.WorldShare.Store:Get("page/LoginModal")
+    local MainLoginPage = Mod.WorldShare.Store:Get("page/MainLogin")
 
-    if not LoginModalPage then
+    if not MainLoginPage then
         return false
     end
 
-    local loginServer = KeepworkService:GetEnv()
-    local password = LoginModalPage:GetValue("password")
-    local rememberMe = LoginModalPage:GetValue("rememberMe")
-    self.loginServer = KeepworkService:GetEnv()
-    self.account = string.lower(LoginModalPage:GetValue("account"))
+    local autoLogin = MainLoginPage:GetValue("autoLogin")
+    local password = MainLoginPage:GetValue("password")
+    local rememberMe = MainLoginPage:GetValue("rememberMe")
+    local account = MainLoginPage:GetValue("showaccount")
 
     if rememberMe then
-        LoginModalPage:SetValue("autoLogin", autoLogin)
+        MainLoginPage:SetValue("autoLogin", autoLogin)
     else
-        LoginModalPage:SetValue("autoLogin", false)
+        MainLoginPage:SetValue("autoLogin", false)
     end
 
-    LoginModalPage:SetValue("rememberMe", rememberMe)
-    LoginModalPage:SetValue("password", password)
+    MainLoginPage:SetValue("rememberMe", rememberMe)
+    MainLoginPage:SetValue("password", password)
+    MainLoginPage:SetValue("account", account)
+    MainLoginPage:SetValue("showaccount", account)
+    self.account = string.lower(account)
 
     self:Refresh()
 end
@@ -279,7 +281,6 @@ function MainLogin:SelectAccount(username)
         return false
     end
 
-    self.loginServer = session and session.loginServer or 'ONLINE'
     self.account = session and session.account or ''
 
     MainLoginPage:SetValue("autoLogin", session.autoLogin)
@@ -301,7 +302,6 @@ function MainLogin:RemoveAccount(username)
 
     if self.account == username then
         self.account = nil
-        self.loginServer = nil
 
         MainLoginPage:SetValue("autoLogin", false)
         MainLoginPage:SetValue("rememberMe", false)
