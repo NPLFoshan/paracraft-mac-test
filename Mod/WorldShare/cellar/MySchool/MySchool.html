@@ -94,6 +94,56 @@
                         return L"暂无"
                     end
                 end
+
+                function get_name()
+                    local cur_name = Eval('name')
+
+                    if not cur_name or cur_name == "" then
+                        return ""
+                    end
+
+                    if _guihelper.GetTextWidth(cur_name) > 150 then
+                        local function chsize(char)
+                            if not char then
+                                return 0
+                            elseif char > 240 then
+                                return 4
+                            elseif char > 225 then
+                                return 3
+                            elseif char > 192 then
+                                return 2
+                            else
+                                return 1
+                            end
+                        end
+
+                        local len = 0
+                        local count = 0
+                        local currentIndex = 1
+
+                        while currentIndex <= #text do
+                            local charsizenum = chsize(string.byte(text, currentIndex))
+
+                            currentIndex = currentIndex + charsizenum
+
+                            if len >= 25 then
+                                break
+                            end
+
+                            if charsizenum ~= 0 then
+                                count = count + 1
+
+                                if charsizenum >= 3 then
+                                    len = len + 3.2
+                                else
+                                    len = len + 1.5
+                                end
+                            end
+                        end
+
+                        text = UniString:new(text):sub(1, count).text .. '...'
+                    end
+                end
             ]]>
         </script>
         <style type="text/mcss">
@@ -131,7 +181,7 @@
                                                 <div style="width: 120px;height: 80px;background: url(textures/worldshare_32bits.png#287 346 170 99);"></div>
                                             </div>
                                             <div style="float:left; margin-left: 10px;margin-top: 10px;width: 95px;color: white">
-                                                <div><%= Eval('name') %></div>
+                                                <div><%= get_name() %></div>
                                                 <div><%= get_place(Eval('region')) %></div>
                                             </div>
                                         </div>
