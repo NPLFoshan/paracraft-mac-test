@@ -31,6 +31,14 @@ function ThirdPartyLogin:Init(thirdPartyType, callback)
         return false
     end
 
+    if thirdPartyType == 'APPLE' then
+        echo('third party type!!!!!!', true)
+
+        SignInWithApple.test()
+
+        return false
+    end
+
     if self.beShowed then
         if thirdPartyType == self.thirdPartyType then
             return false
