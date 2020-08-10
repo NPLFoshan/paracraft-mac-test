@@ -27,7 +27,7 @@ function KeepworkServiceWorld:GetWorldsList(callback)
         return false
     end
 
-    KeepworkWorldsApi:GetWorldList(10000, 1, callback)
+    KeepworkWorldsApi:GetWorldList(1000, 1, callback)
 end
 
 -- get world by worldname
