@@ -801,8 +801,14 @@
                         <%=L"正在刷新, 请稍候 ... " %>
                     </pe:if>
                     <pe:if style="margin-top:10px;font-weight:bold;color:#ffffff" condition="<%= not is_list_refreshing() %>">
-                        <pe:gridview RememberScrollPos="true" AllowPaging="false" VerticalScrollBarStep="50"
-                            DefaultNodeHeight="85" ItemsPerLine="1" name="gw_world_ds">
+                        <pe:gridview 
+                            RememberScrollPos="true"
+                            AllowPaging="true"
+                            pagesize="25"
+                            VerticalScrollBarStep="50"
+                            DefaultNodeHeight="85"
+                            ItemsPerLine="1"
+                            name="gw_world_ds">
                             <Columns>
                                 <!--selected-->
                                 <pe:if condition='<%= be_selected()%>'>
