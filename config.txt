@@ -1,1 +1,1 @@
-cmdline=noupdate="true" worldshareenv="STAGE" httpdebug="true" debug="main" mc="true" bootstrapper="script/apps/Aries/main_loop.lua" loadpackage="npl_packages/paracraft/;main_mobile_res.pkg"
+cmdline=noupdate="true" worldshareenv="RELEASE" isSchool="true" httpdebug="true" debug="main" mc="true" bootstrapper="script/apps/Aries/main_loop.lua" loadpackage="npl_packages/paracraft/;main_mobile_res.pkg;npl_packages/trunk/" dev="/Users/chenliao/Library/Containers/com.tatfook.paracraftmac/Data/Documents/Paracraft/files/"
