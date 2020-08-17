@@ -35,51 +35,18 @@ function Menu:Init(menuItems)
                 {Type = "Separator"},
                 {text = L"上传分享", name = "project.share", onclick = nil},
                 {Type = "Separator"},
-                {text = L"项目首页", name = "project.index", onclick = function() self:OpenUserOpusPage() end},
-                {text = L"项目作者", name = "project.author", onclick = function() self:OpenUserPage() end},
+                {text = L"项目首页", name = "project.index", onclick = nil},
+                {text = L"项目作者", name = "project.author", onclick = nil},
                 {Type = "Separator"},
-                {text = L"本地目录", name = "project.local", onclick = function() self:OpenOpusFolder() end},
-                {text = L"本地备份", name = "project.backup", onclick = function() self:OpusBackup() end},
+                {text = L"本地目录", name = "file.openworlddir", onclick = nil},
+                {text = L"本地备份", name = "file.worldrevision", onclick = nil},
                 {Type = "Separator"},
-                {text = L"项目设置", name = "project.setting", onclick = function() self:OpusSetting() end},
-                {text = L"成员管理", name = "project.member", onclick = function() self:MemberManager() end},
+                {text = L"项目设置", name = "project.setting", onclick = nil},
+                {text = L"成员管理", name = "project.member", onclick = nil},
                 {Type = "Separator"},
-                {text = L"申请加入", name = "project.apply", onclick = function() self:Apply() end}
+                {text = L"申请加入", name = "project.apply", onclick = nil}
             }
         }
 
     return menuItems
-end
-
-function Menu:Share()
-    echo(11111, true)
-    ShareWorld:Init()
-end
-
-function Menu:OpenUserOpusPage()
-
-end
-
-function Menu:OpenUserPage()
-
-end
-
-function Menu:OpenOpusFolder()
-
-end
-
-function Menu:OpusBackup()
-
-end
-
-function Menu:OpusSetting()
-
-end
-
-function Menu:MemberManager()
-
-end
-
-function Menu:Apply()
-
 end
