@@ -20,11 +20,14 @@ local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua
 -- UI
 local ShareWorld = NPL.load("(gl)Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua")
 local OpusSetting = NPL.load("(gl)Mod/WorldShare/cellar/OpusSetting/OpusSetting.lua")
+local MemberManager = NPL.load("(gl)Mod/WorldShare/cellar/MemberManager/MemberManager.lua")
 
 local MenuCommand = NPL.export()
 
 function MenuCommand:Init()
-    Commands["menu"].desc = Commands["menu"].desc .. "1111111"
+    Commands["menu"].desc = Commands["menu"].desc .. [[
+        from worldshare desc
+    ]]
 end
 
 function MenuCommand:Call(cmdName, cmdText, cmdParams)
@@ -43,9 +46,11 @@ function MenuCommand:Call(cmdName, cmdText, cmdParams)
         self:OpusSetting()
         return true
     elseif name == "project.member" then
-
+        self:MemberManager()
+        return true
     elseif name == "project.apply" then
-
+        self:Apply()
+        return true
     end
 
     return false
@@ -68,9 +73,9 @@ function MenuCommand:OpusSetting()
 end
 
 function MenuCommand:MemberManager()
-
+    MemberManager:Show()
 end
 
 function MenuCommand:Apply()
-
+    MemberManager:ShowApply()
 end
