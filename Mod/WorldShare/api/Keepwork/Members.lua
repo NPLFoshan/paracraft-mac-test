@@ -13,7 +13,7 @@ local KeepworkBaseApi = NPL.load('./BaseApi.lua')
 
 local KeepworkMembersApi = NPL.export()
 
--- url: /keepworks/svg_captcha?png=true
+-- url: //members?objectId={objectId}&objectType={objectType}
 -- method: GET
 -- params:
 --[[
@@ -27,4 +27,19 @@ function KeepworkMembersApi:Members(objectId, objectType, success, error)
     end
 
     KeepworkBaseApi:Get('/members?objectId=' .. objectId .. '&objectType=' .. objectType, nil, nil, success, error)
+end
+
+-- url: /members/:id
+-- method: DELETE
+-- params:
+--[[
+    id number necessary member table id
+]]
+-- return: object
+function KeepworkMembersApi:DeleteMembersId(id, success, error)
+    if not id then
+        return false
+    end
+
+    KeepworkBaseApi:Delete('/members/'.. id, nil, nil, success, error)
 end

@@ -11,10 +11,14 @@ local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkServ
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local Encoding = commonlib.gettable("commonlib.Encoding")
 
+-- service
 local KeepworkService = NPL.load("../KeepworkService.lua")
+
+-- api
 local KeepworkProjectsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Projects.lua")
 local KeepworkWorldsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Worlds.lua")
 local KeepworkMembersApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Members.lua")
+local KeepworkAppliesApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Applies.lua")
 
 local KeepworkServiceProject = NPL.export()
 
@@ -44,6 +48,21 @@ end
 -- get project members
 function KeepworkServiceProject:GetMembers(pid, callback)
     KeepworkMembersApi:Members(pid, 5, callback, callback)
+end
+
+-- handle apply
+function KeepworkServiceProject:HandleApply(id, isAllow, callback)
+    KeepworkAppliesApi:AppliesId(id, isAllow, callback, callback)
+end
+
+-- remove user from member
+function KeepworkServiceProject:RemoveUserFromMember(id, callback)
+    KeepworkMembersApi:DeleteMembersId(id, callback, callback)
+end
+
+-- get apply list
+function KeepworkServiceProject:GetApplyList(pid, callback)
+    KeepworkAppliesApi:Applies(pid, 5, 0, callback, callback)
 end
 
 -- get project id by worldname
