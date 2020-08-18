@@ -46,6 +46,25 @@
                     function remove_user(id)
                         MemberManager:RemoveUser(id)
                     end
+
+                    function add_users()
+                        local edit_member_list = page:GetValue('edit_member_list')
+
+                        if edit_member_list == "" then
+                            GameLogic.AddBBS(nil, L"至少输入一个用户名", 3000, "255 0 0")
+                            return false
+                        end
+
+                        edit_member_list = string.gsub(edit_member_list, "\r\n", "")
+
+                        local edit_member_list_array = {}
+
+                        for item in string.gmatch(edit_member_list, "[^,]+") do
+                            edit_member_list_array[#edit_member_list_array + 1] = item
+                        end
+
+                        MemberManager:AddUsers(edit_member_list_array)
+                    end
                 ]]>
             </script>
             <style type="type/mcss">
@@ -127,7 +146,7 @@
                                         <textarea name="edit_member_list" rows="5"></textarea>
                                     </div>
                                     <div style="margin-top: 20px;">
-                                        <input type="button" class="mc_light_grey_button_with_fillet" style="margin-left: 360px;;width: 90px;height: 35px;" value="<%= L'提交' %>" />
+                                        <input type="button" class="mc_light_grey_button_with_fillet" style="margin-left: 360px;;width: 90px;height: 35px;" value="<%= L'提交' %>" onclick="add_users"/>
                                     </div>
                                 </div>
                             </div>

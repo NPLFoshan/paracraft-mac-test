@@ -50,6 +50,19 @@ function KeepworkServiceProject:GetMembers(pid, callback)
     KeepworkMembersApi:Members(pid, 5, callback, callback)
 end
 
+-- add members
+function KeepworkServiceProject:AddMembers(pid, users, callback)
+    echo(1111, true)
+    echo(pid, true)
+    echo(users, true)
+    if not pid or type(users) ~= 'table' then
+        return false
+    end
+    echo(2222, true)
+
+    KeepworkMembersApi:Bulk(pid, 5, users, callback, callback)
+end
+
 -- handle apply
 function KeepworkServiceProject:HandleApply(id, isAllow, callback)
     KeepworkAppliesApi:AppliesId(id, isAllow, callback, callback)

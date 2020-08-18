@@ -35,11 +35,34 @@ end
 --[[
     id number necessary member table id
 ]]
--- return: object
+-- return: string
 function KeepworkMembersApi:DeleteMembersId(id, success, error)
     if not id then
         return false
     end
 
     KeepworkBaseApi:Delete('/members/'.. id, nil, nil, success, error)
+end
+
+-- url: /members/bulk
+-- method: POST
+-- params:
+--[[
+    objectId integer necessary
+    objectType integer necessary 枚举: 1,3,5 枚举备注: 1 site 3 group 5 project
+    memberIds integer [] not necessary item 类型: integer
+]]
+-- return: object
+function KeepworkMembersApi:Bulk(objectId, objectType, memberIds, success, error)
+    if not objectId or not objectType or not memberIds or #memberIds == 0 then
+        return false
+    end
+
+    local params = {
+        objectId = objectId,
+        objectType = objectType,
+        memberIds = memberIds
+    }
+
+    KeepworkBaseApi:Post('/members/bulk', params, nil, success, error)
 end

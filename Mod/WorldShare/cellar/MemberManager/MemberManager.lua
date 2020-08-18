@@ -12,12 +12,15 @@ local MemberManager = NPL.load("(gl)Mod/WorldShare/cellar/MemberManager/MemberMa
 
 --- service
 local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
+local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 
 local MemberManager = NPL.export()
 
 MemberManager.memberList = {}
 MemberManager.applyList = {}
 MemberManager.sel = 1
+MemberManager.addUsersHandleIndex = 0
+MemberManager.userIds = {}
 
 function MemberManager:Show()
     Mod.WorldShare.Utils.ShowWindow(500, 320, "(ws)MemberManager", "Mod.WorldShare.MemberManager")
@@ -113,5 +116,60 @@ function MemberManager:RemoveUser(id)
         GameLogic.AddBBS(nil, L"删除成功", 3000, "0 255 0")
 
         self:GetMembers()
+    end)
+end
+
+function MemberManager:AddUsers(users, recursive)
+    local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
+
+    if not currentWorld or not currentWorld.kpProjectId then
+        return false
+    end
+
+    if type(users) ~= 'table' or #users == 0 then
+        return false
+    end
+
+    if self.addUsersHandleIndex ~= 0 and not recursive then
+        return false
+    end
+
+    if #users == self.addUsersHandleIndex then
+        KeepworkServiceProject:AddMembers(currentWorld.kpProjectId, self.userIds, function(data, err)
+            if err ~= 200 then
+                GameLogic.AddBBS(nil, L"批量添加用户失败", 3000, "255 0 0")
+            else
+                GameLogic.AddBBS(nil, L"批量添加用户成功", 3000, "0 255 0")
+
+                local MemberManagerPage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.MemberManager')
+
+                if MemberManagerPage then
+                    MemberManagerPage:SetValue("edit_member_list", "")
+                    MemberManagerPage:Refresh(0.01)
+                end
+            end
+        end)
+
+        self.addUsersHandleIndex = 0
+        self.userIds = {}
+        return true
+    end
+
+    self.addUsersHandleIndex = self.addUsersHandleIndex + 1
+
+    KeepworkServiceSession:CheckUsernameExist(users[self.addUsersHandleIndex], function(bExisted, userinfo)
+        if not bExisted then
+            GameLogic.AddBBS(nil, format(L"用户名%s不存在，请查证", users[self.addUsersHandleIndex]), 3000, "255 0 0")
+            self.addUsersHandleIndex = 0
+            return false
+        end
+
+        if not userinfo or not userinfo.id then
+            return false
+        end
+
+        self.userIds[#self.userIds + 1] = userinfo.id
+
+        self:AddUsers(users, true)
     end)
 end
