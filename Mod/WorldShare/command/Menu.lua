@@ -26,8 +26,12 @@ local MenuCommand = NPL.export()
 
 function MenuCommand:Init()
     Commands["menu"].desc = Commands["menu"].desc .. [[
-        from worldshare desc
-    ]]
+/menu project.share
+/menu project.index
+/menu project.author
+/menu project.setting
+/menu project.apply
+]]
 end
 
 function MenuCommand:Call(cmdName, cmdText, cmdParams)
