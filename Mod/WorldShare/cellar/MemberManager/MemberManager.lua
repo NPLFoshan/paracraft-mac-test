@@ -10,6 +10,9 @@ local MemberManager = NPL.load("(gl)Mod/WorldShare/cellar/MemberManager/MemberMa
 ------------------------------------------------------------
 ]]
 
+-- UI
+local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+
 --- service
 local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
@@ -30,7 +33,11 @@ function MemberManager:Show()
 end
 
 function MemberManager:ShowApply()
-    Mod.WorldShare.Utils.ShowWindow(400, 260, "(ws)MemberManager/Apply.html", "Mod.WorldShare.MemberManager.Apply")
+    LoginModal:CheckSignedIn(L"请先登录!", function(bSucceed)
+        if bSucceed then
+            Mod.WorldShare.Utils.ShowWindow(400, 260, "(ws)MemberManager/Apply.html", "Mod.WorldShare.MemberManager.Apply")
+        end
+    end)
 end
 
 function MemberManager:GetApplyList()

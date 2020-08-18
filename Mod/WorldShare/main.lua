@@ -54,6 +54,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua
 
 -- include aries creator game areas
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ShareWorldPage.lua")
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenu.lua")
 
 -- include aries creator game network
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua")
@@ -78,6 +79,7 @@ local SocketService = commonlib.gettable("Mod.WorldShare.service.SocketService")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local Cef3Manager = commonlib.gettable("Mod.WorldShare.service.Cef3Manager")
+local DesktopMenu = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenu")
 
 -- UI
 local MainLogin = NPL.load("(gl)Mod/WorldShare/cellar/MainLogin/MainLogin.lua")
@@ -97,6 +99,7 @@ local Menu = NPL.load("(gl)Mod/WorldShare/cellar/Menu/Menu.lua")
 -- service
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
+local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 
 -- helper
 local Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
@@ -299,7 +302,23 @@ function WorldShare:OnWorldLoad()
     -- if enter with lesson method, we will not check revision
     if not curLesson then
         SyncMain:OnWorldLoad()
-    end   
+    end
+
+    Store:Subscribe("user/Logout", function()
+        Compare:RefreshWorldList(function()
+            Compare:GetCurrentWorldInfo(function()
+                DesktopMenu.LoadMenuItems(true)
+            end)
+        end)
+    end)
+
+    Store:Subscribe("user/Login", function()
+        Compare:RefreshWorldList(function()
+            Compare:GetCurrentWorldInfo(function()
+                DesktopMenu.LoadMenuItems(true)
+            end)
+        end)
+    end)
 end
 
 function WorldShare:OnLeaveWorld()
