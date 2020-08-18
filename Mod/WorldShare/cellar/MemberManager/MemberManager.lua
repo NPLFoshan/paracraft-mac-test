@@ -173,3 +173,19 @@ function MemberManager:AddUsers(users, recursive)
         self:AddUsers(users, true)
     end)
 end
+
+function MemberManager:Apply(message)    
+    KeepworkServiceProject:Apply(message, function(data, err)
+       if err == 200 then
+            GameLogic.AddBBS(nil, L"申请成功，等待项目创建者处理", 3000, "0 255 0")
+
+            local ApplyPage = Mod.WorldShare.Store:Get("page/Mod.WorldShare.MemberManager.Apply")
+
+            if ApplyPage then
+                ApplyPage:CloseWindow()
+            end
+       else
+            GameLogic.AddBBS(nil, L"申请失败", 3000, "255 0 0")
+       end
+    end)
+end

@@ -63,3 +63,33 @@ function KeepworkAppliesApi:AppliesId(id, isAllow, success, error)
 
     KeepworkBaseApi:Put("/applies/" .. id, { state = state }, nil, success, error)
 end
+
+-- url: /applies
+-- method: POST
+-- params:
+--[[
+    objectId integer necessary
+    objectType integer necessary 枚举: 5 mock: 5
+    applyType integer necessary 枚举: 0 mock: 0
+    applyId	integer necessary
+    legend string not necessary 最大长度: 255
+]]
+-- return: object
+function KeepworkAppliesApi:PostApplies(objectId, objectType, applyType, applyId, legend, success, error)
+    if not objectId or
+       not objectType or
+       not applyType or
+       not applyId then
+        return false
+    end
+
+    local params = {
+        objectId = objectId,
+        objectType = objectType,
+        applyType = applyType,
+        applyId = applyId,
+        legend = legend
+    }
+
+    KeepworkBaseApi:Post("/applies", params, nil, success, error)
+end
