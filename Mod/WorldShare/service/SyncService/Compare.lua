@@ -393,6 +393,7 @@ function Compare:RefreshWorldList(callback)
                     end
 
                     currentWorldList = searchWorldList
+                    LocalServiceWorld:SetInternetLocalWorldList(currentWorldList)
                 end
 
                 self.SortWorldList(currentWorldList)
