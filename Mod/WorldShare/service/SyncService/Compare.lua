@@ -385,9 +385,9 @@ function Compare:RefreshWorldList(callback)
                     local searchWorldList = {}
 
                     for key, item in ipairs(currentWorldList) do
-                        if item and item.text and string.match(item.text, searchText)then
+                        if item and item.text and string.match(string.lower(item.text), string.lower(searchText))then
                             searchWorldList[#searchWorldList + 1] = item
-                        elseif item and item.kpProjectId and string.match(item.kpProjectId, searchText) then
+                        elseif item and item.kpProjectId and string.match(string.lower(item.kpProjectId), string.lower(searchText)) then
                             searchWorldList[#searchWorldList + 1] = item
                         end
                     end
