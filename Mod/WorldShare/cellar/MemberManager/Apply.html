@@ -16,7 +16,6 @@
 
                         local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
                         local username = Mod.WorldShare.Store:Get('user/username')
-                        echo(currentEnterWorld, true)
 
                         if not currentEnterWorld or not currentEnterWorld.user or not currentEnterWorld.user.username then
                             return false
