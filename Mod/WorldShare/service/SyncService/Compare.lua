@@ -367,6 +367,23 @@ function Compare:RefreshWorldList(callback)
     if not KeepworkService:IsSignedIn() then
         local currentWorldList = LocalServiceWorld:MergeInternetLocalWorldList(localWorlds)
 
+        local searchText = Mod.WorldShare.Store:Get("world/searchText")
+
+        if type(searchText) == "string" and searchText ~= "" then
+            local searchWorldList = {}
+
+            for key, item in ipairs(currentWorldList) do
+                if item and item.text and string.match(string.lower(item.text), string.lower(searchText))then
+                    searchWorldList[#searchWorldList + 1] = item
+                elseif item and item.kpProjectId and string.match(string.lower(item.kpProjectId), string.lower(searchText)) then
+                    searchWorldList[#searchWorldList + 1] = item
+                end
+            end
+
+            currentWorldList = searchWorldList
+            LocalServiceWorld:SetInternetLocalWorldList(currentWorldList)
+        end
+
         self.SortWorldList(currentWorldList)
         Mod.WorldShare.Store:Set("world/compareWorldList", currentWorldList)
 
