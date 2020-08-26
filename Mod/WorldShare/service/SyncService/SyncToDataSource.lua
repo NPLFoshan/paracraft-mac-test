@@ -644,7 +644,8 @@ function SyncToDataSource:UpdateRecord(callback)
                             return false
                         end
 
-                        StorageFilesApi:List(function(listData, err)
+                        StorageFilesApi:List(data.key, function(listData, err)
+                            echo(listData, true)
                             if listData and type(listData.data) ~= 'table' then
                                 AfterHandlePreview()
                                 return false
@@ -658,7 +659,7 @@ function SyncToDataSource:UpdateRecord(callback)
                                     end
                                 end
                             end
-
+ 
                             AfterHandlePreview()
                         end)
                     end
