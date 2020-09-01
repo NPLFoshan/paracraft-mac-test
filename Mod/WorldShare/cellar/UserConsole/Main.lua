@@ -1,5 +1,5 @@
 --[[
-Title: login
+Title: UserConsole Page
 Author(s):  big, minor refactor by LiXizhi
 Date: 2017/4/11
 Desc: 
@@ -8,19 +8,18 @@ use the lib:
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 ------------------------------------------------------------
 ]]
+
+-- libs
 local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld")
 local RemoteWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld")
 local DownloadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.DownloadWorld")
 local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
 local GameMainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin")
-
-local WorldShare = commonlib.gettable("Mod.WorldShare")
 local ExplorerApp = commonlib.gettable("Mod.ExplorerApp")
-local Encoding = commonlib.gettable("commonlib.Encoding")
 
 -- UI
-local UserInfo = NPL.load("./UserInfo.lua")
-local WorldList = NPL.load("./WorldList.lua")
+local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
+local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 local HistoryManager = NPL.load("(gl)Mod/WorldShare/cellar/HistoryManager/HistoryManager.lua")
@@ -74,7 +73,7 @@ function UserConsole:ShowPage()
         return false
     end
 
-    local params = Mod.WorldShare.Utils.ShowWindow(850, 490, "Mod/WorldShare/cellar/UserConsole/UserConsole.html", "UserConsole")
+    local params = Mod.WorldShare.Utils.ShowWindow(850, 490, "(ws)UserConsole", "Mod.WorldShare.UserConsole")
 
     -- load last selected avatar if world is not loaded before.
     UserInfo:OnChangeAvatar()
