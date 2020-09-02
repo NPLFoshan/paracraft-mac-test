@@ -565,8 +565,80 @@
                         page:Refresh(0.01)
                     end
 
-                    function get_art_number()
-                        return ""
+                    function get_art_number(number)
+                        number = tostring(number)
+
+                        local returnString = ""
+
+                        for item in string.gmatch(number, ".") do
+                            if item == "1" then
+                                returnString = returnString .. "<img style='width: 11px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;108 287 11 18' />"
+                            end
+
+                            if item == "2" then
+                                returnString = returnString .. "<img style='width: 14px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;122 287 14 18' />"
+                            end
+
+                            if item == "3" then
+                                returnString = returnString .. "<img style='width: 11px;height: 20px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;139 286 11 20' />"
+                            end
+
+                            if item == "4" then
+                                returnString = returnString .. "<img style='width: 14px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;152 287 15 18' />"
+                            end
+                            
+                            if item == "5" then
+                                returnString = returnString .. "<img style='width: 14px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;170 287 15 19' />"
+                            end
+
+                            if item == "6" then
+                                returnString = returnString .. "<img style='width: 14px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;188 287 14 19' />"
+                            end
+
+                            if item == "7" then
+                                returnString = returnString .. "<img style='width: 14px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;204 287 14 18' />"
+                            end
+                                
+                            if item == "8" then
+                                returnString = returnString .. "<img style='width: 15px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;221 287 15 19' />"
+                            end
+                                
+                            if item == "9" then
+                                returnString = returnString .. "<img style='width: 13px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;257 287 13 19' />"
+                            end
+
+                            if item == "0" then
+                                returnString = returnString .. "<img style='width: 15px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;238 287 15 19' />"
+                            end
+                                
+                            if item == "." then
+                                returnString = returnString .. "<img style='width: 6px;height: 7px;margin-top: 11px;margin-right: 2px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;273 293 6 7' />"
+                            end
+                        end
+
+                        return returnString
+                    end
+
+                    function get_world_preview(worldpath)
+                        if not worldpath or type(worldpath) ~= "string" then
+                            return ""
+                        end
+                        
+                        return worldpath .. "preview.jpg"
+                    end
+
+                    function get_school_name()
+                        local user = Eval('user')
+
+                        if not user or type(user) ~= "table" then
+                            return "<%= '暂无' %>"
+                        end
+
+                        if user.school and user.school.name then
+                            return user.school.name
+                        else
+                            return "<%= '暂无' %>"
+                        end
                     end
                 ]]>
             </script>
@@ -810,12 +882,13 @@
                                     <!--selected-->
                                     <pe:if condition='<%= be_selected()%>'>
                                         <div name='<%=Eval("index")%>' class="share_selected_item" style="padding-top: 6px;padding-left: 4px;">
-                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -4px;margin-left: -4px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
-                                                <%= get_art_number("79")%>
+                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -4px;margin-left: -4px;padding-top: 4px;padding-left: 6px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
+                                                <%= get_art_number(math.random(100) .. "." .. math.random(10))%>
                                             </div>
                                             <div style="width: 248px;height: 248px;padding: 4px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#72 20 16 16:2 2 2 2)">
                                                 <div style="width: 240px;height: 130px;background-color: #afafaf;">
                                                     <div style="position: relative;width: 240px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
+                                                    <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview(Eval('worldpath')) .. ')' %>"></div>
                                                 </div>
                                                 <div style="position: relative; width: 32px;height: 32px;">
                                                     <pe:if condition='<%= get_world_status(1)%>'>
@@ -920,11 +993,12 @@
                                     <pe:if condition='<%= not be_selected() %>'>
                                         <div name='<%=Eval("index")%>' class="share_unselect_item" style="padding-left:8px;padding-top:8px;">
                                             <input type="button" style="position: relative;width:260px;height:260px;background:" name='<%=Eval("index")%>' onclick="switch_world" />
-                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -6.8px;margin-left: -8px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
-                                                79.6
+                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -6.8px;margin-left: -8px;padding-top: 4px;padding-left: 6px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
+                                                <%= get_art_number(math.random(100) .. "." .. math.random(10))%>
                                             </div>
                                             <div style="width: 240px;height: 130px;background-color: #afafaf;">
                                                 <div style="position: relative;width: 240px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
+                                                <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview(Eval('worldpath')) .. ')' %>"></div>
                                             </div>
                                             <div style="position: relative;width: 32px;height: 32px;">
                                                 <pe:if condition='<%= get_world_status(1) %>'>
@@ -990,14 +1064,18 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div align="right" class="share_world_info_button"  style="margin-right: 12px;width:30px;height:30px;">
+                                            <div style="margin-left: 20px;margin-top: 20px;float:left;font-size: 12px;">
+                                                <img style="width: 19px;height: 16px;margin-right: 5px;" src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#311 311 19 16" />
+                                                <%= get_school_name() %>
+                                            </div>
+                                            <div align="right" class="share_world_info_button"  style="margin-right: 12px;width:30px;height:30px;margin-top: -34px;">
                                                 <!-- ENTER -->
                                                 <input type="button"
-                                                       class="share_button"
-                                                       style="<%= get_share_button('enter') %>"
-                                                       onclick="enter"
-                                                       tooltip='<%=L"进入"%>'
-                                                       name='<%=Eval("index")%>' />
+                                                        class="share_button"
+                                                        style="<%= get_share_button('enter') %>"
+                                                        onclick="enter"
+                                                        tooltip='<%=L"进入"%>'
+                                                        name='<%=Eval("index")%>' />
                                             </div>
                                         </div>
                                     </pe:if>
