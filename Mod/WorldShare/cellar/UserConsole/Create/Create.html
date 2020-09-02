@@ -13,6 +13,7 @@
                     local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage")
 
                     -- UI
+                    local UserConsoleCreate = NPL.load("./Create.lua")
                     local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
                     local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
                     local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
@@ -42,6 +43,7 @@
                     local do_modify = false
                     local current_item_index = 1
                     local temp_modify_worldname = ''
+                    local current_menu_index = 1
 
                     function is_modifying()
                         return do_modify
@@ -549,8 +551,22 @@
                         end
                     end
 
+                    function is_current_menu_select(index)
+                        if tonumber(index) == tonumber(UserConsoleCreate.currentMenuSelectIndex) then
+                            return true
+                        else
+                            return false
+                        end
+                    end
+
                     function select_type(index)
-                        echo(index, true)
+                        UserConsoleCreate.currentMenuSelectIndex = index
+                        echo(UserConsoleCreate.currentMenuSelectIndex, true)
+                        page:Refresh(0.01)
+                    end
+
+                    function get_art_number()
+                        return ""
                     end
                 ]]>
             </script>
@@ -712,6 +728,12 @@
                         height = 30,
                         background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;175 100 32 26:12 13 12 12",
                         ["margin-right"] = 8,
+                    },
+                    menu_unselect = {
+                        width = 92,
+                        height = 30,
+                        background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;219 100 32 26:12 13 12 12",
+                        ["margin-right"] = 8,
                     }
                 }
             </style>
@@ -721,18 +743,45 @@
                 <div class="world_area">
                     <div style="height: 30px;margin-bottom: 3px;">
                         <div style="float:left;">
-                            <div class="menu_select" style="float:left">
-                                <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="1" onclick="select_type"/>
-                                <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#284 267 30 14)"></div>
-                            </div>
-                            <div class="menu_select" style="float:left">
-                                <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="2" onclick="select_type"/>
-                                <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#370 267 30 14)"></div>
-                            </div>
-                            <div class="menu_select" style="float:left">
-                                <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="3" onclick="select_type"/>
-                                <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#111 267 30 14)"></div>
-                            </div>
+                            <!-- --------------- -->
+                            <pe:if condition="<%= is_current_menu_select(1) %>">
+                                <div class="menu_select" style="float:left">
+                                    <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="1" onclick="select_type"/>
+                                    <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#284 267 30 14)"></div>
+                                </div>
+                            </pe:if>
+                            <pe:if condition="<%= not is_current_menu_select(1) %>">
+                                <div class="menu_unselect" style="float:left">
+                                    <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="1" onclick="select_type"/>
+                                    <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#328 267 30 14)"></div>
+                                </div>
+                            </pe:if>
+                            <!-- --------------- -->
+                            <pe:if condition="<%= is_current_menu_select(2) %>">
+                                <div class="menu_select" style="float:left">
+                                    <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="2" onclick="select_type"/>
+                                    <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#370 267 30 14)"></div>
+                                </div>
+                            </pe:if>
+                            <pe:if condition="<%= not is_current_menu_select(2) %>">
+                                <div class="menu_unselect" style="float:left">
+                                    <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="2" onclick="select_type"/>
+                                    <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#413 267 30 14)"></div>
+                                </div>
+                            </pe:if>
+                            <!-- --------------- -->
+                            <pe:if condition="<%= is_current_menu_select(3) %>">
+                                <div class="menu_select" style="float:left">
+                                    <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="2" onclick="select_type"/>
+                                    <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#111 267 30 14)"></div>
+                                </div>
+                            </pe:if>
+                            <pe:if condition="<%= not is_current_menu_select(3) %>">
+                                <div class="menu_unselect" style="float:left">
+                                    <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="3" onclick="select_type"/>
+                                    <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#154 267 30 14)"></div>
+                                </div>
+                            </pe:if>
                         </div>
                         <div style="float:left;margin-left:380px;height: 37px;width:130px;margin-top: -3px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#264 46 38 34:12 12 14 12)">
                             <input type="button"
@@ -743,7 +792,7 @@
                             <div style=""></div>
                         </div>
                     </div>
-                    <div style="height:400px;">
+                    <div style="height:430px;">
                         <pe:if style="margin-top:10px;font-weight:bold;color:#ffffff" condition="<%= is_list_refreshing() %>">
                             <%=L"正在刷新, 请稍候 ... " %>
                         </pe:if>
@@ -761,6 +810,9 @@
                                     <!--selected-->
                                     <pe:if condition='<%= be_selected()%>'>
                                         <div name='<%=Eval("index")%>' class="share_selected_item" style="padding-top: 6px;padding-left: 4px;">
+                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -4px;margin-left: -4px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
+                                                <%= get_art_number("79")%>
+                                            </div>
                                             <div style="width: 248px;height: 248px;padding: 4px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#72 20 16 16:2 2 2 2)">
                                                 <div style="width: 240px;height: 130px;background-color: #afafaf;">
                                                     <div style="position: relative;width: 240px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
@@ -809,18 +861,24 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div style="margin-left: 20px;font-size: 12px;base-font-size: 12px;color: #9e9e9e">
+                                                <div style="margin-left: 20px;font-size: 12px;base-font-size: 12px;color: #9e9e9e;margin-top: 6px;">
                                                     <div style="float:left">
-                                                        <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#383 181 16 12" style="width: 16px;height: 12px;" />
-                                                        111
+                                                        <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#383 181 16 12" style="width: 16px;height: 12px;margin-top: 4px;" />
+                                                        <div style="float:left;margin-left: 2px;">
+                                                            11111
+                                                        </div>
                                                     </div>
-                                                    <div style="float:left">
+                                                    <div style="float:left;margin-left: 8px;">
                                                         <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#358 177 16 16" style="width: 16px;height: 16px;" />
-                                                        111
+                                                        <div style="float:left;margin-left: 2px;">
+                                                            22222
+                                                        </div>
                                                     </div>
-                                                    <div style="float:left">
-                                                        <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#409 181 18 16" style="width: 18px;height: 16px;" />
-                                                        333
+                                                    <div style="float:left;margin-left: 8px;">
+                                                        <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#409 181 18 16" style="width: 18px;height: 16px;margin-top: 3px;" />
+                                                        <div style="float:left;margin-left: 2px;">
+                                                            3333
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="share_world_info_button" align="right" style="width: 170px;margin-right: -10px;">
@@ -862,6 +920,9 @@
                                     <pe:if condition='<%= not be_selected() %>'>
                                         <div name='<%=Eval("index")%>' class="share_unselect_item" style="padding-left:8px;padding-top:8px;">
                                             <input type="button" style="position: relative;width:260px;height:260px;background:" name='<%=Eval("index")%>' onclick="switch_world" />
+                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -6.8px;margin-left: -8px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
+                                                79.6
+                                            </div>
                                             <div style="width: 240px;height: 130px;background-color: #afafaf;">
                                                 <div style="position: relative;width: 240px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
                                             </div>
@@ -888,26 +949,45 @@
                                             <div style="margin-left: 20px;">
                                                 <div class="share_world_name">
                                                     <%= get_world_text() %>
-                                                    <%= '#' .. (Eval('kpProjectId') or '') %>
-                                                    <%= 'v' .. get_world_version() %>
-                                                    <pe:if condition='<%= Eval("project") and Eval("project")["visibility"] and tonumber(Eval("project")["visibility"]) == 1 %>'>
-                                                        <div style="float:left;margin-top:5px;margin-left:5px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#223 309 20 20);width: 14px;height: 14px;"></div>
-                                                    </pe:if>
+                                                    <span style="color: #9e9e9e;">
+                                                        #<%= Eval('kpProjectId') or '' %>
+                                                    </span>
                                                 </div>
+                                                <div style="float: left;text-singleline: true;width: 20px;font-size: 12px;base-font-size: 12px;color: #9e9e9e;margin-top:6px;">
+                                                    <%= 'v' .. get_world_version() %>
+                                                </div>
+                                                <pe:if condition='<%= Eval("project") and tonumber(Eval("project")["visibility"]) == 1 %>'>
+                                                    <div style="float:left;margin-top:5px;margin-left:5px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#223 309 20 20);width: 14px;height: 14px;"></div>
+                                                </pe:if>
                                             </div>
                                             <div style="margin-left: 20px;">
                                                 <div class="share_world_info">
-                                                    <span style="float:left;margin-left:0px;">
+                                                    <div style="float:left;width:188px;">
                                                         <%= get_world_date() %>
-                                                    </span>
-                                                    <pe:if condition='<%= not Eval("is_zip") %>'>
-                                                        <span style="float:left;margin-left:10px;">
-                                                            v<%= get_world_version() %>
-                                                        </span>
-                                                        <span style="float:left;margin-left:10px;">
-                                                            <%= get_world_size() %>
-                                                        </span>
-                                                    </pe:if>
+                                                    </div>
+                                                    <div style="float:left;">
+                                                        <%= get_world_size() %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="margin-left: 20px;font-size: 12px;base-font-size: 12px;color: #9e9e9e;margin-top: 6px;">
+                                                <div style="float:left">
+                                                    <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#383 181 16 12" style="width: 16px;height: 12px;margin-top: 4px;" />
+                                                    <div style="float:left;margin-left: 2px;">
+                                                        11111
+                                                    </div>
+                                                </div>
+                                                <div style="float:left;margin-left: 8px;">
+                                                    <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#358 177 16 16" style="width: 16px;height: 16px;" />
+                                                    <div style="float:left;margin-left: 2px;">
+                                                        22222
+                                                    </div>
+                                                </div>
+                                                <div style="float:left;margin-left: 8px;">
+                                                    <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#409 181 18 16" style="width: 18px;height: 16px;margin-top: 3px;" />
+                                                    <div style="float:left;margin-left: 2px;">
+                                                        3333
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div align="right" class="share_world_info_button"  style="margin-right: 12px;width:30px;height:30px;">
