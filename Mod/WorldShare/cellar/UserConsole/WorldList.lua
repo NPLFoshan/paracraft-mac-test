@@ -40,8 +40,6 @@ function WorldList:RefreshCurrentServerList(callback)
     self:SetRefreshing(true)
 
     Compare:RefreshWorldList(function(currentWorldList)
-        echo(currentWorldList, true)
-
         self:SetRefreshing(false)
 
         if UserConsolePage then

@@ -640,6 +640,48 @@
                             return "<%= '暂无' %>"
                         end
                     end
+
+                    function get_username()
+                        local user = Eval('user')
+
+                        if not user or type(user) ~= "table" then
+                            return "<%= '暂无' %>"
+                        end
+
+                        if user.username then
+                            return user.username
+                        else
+                            return "<%= '暂无' %>"
+                        end
+                    end
+
+                    function get_user_icon()
+                        local user = Eval('user')
+
+                        if not user or type(user) ~= "table" then
+                            return ""
+                        end
+
+                        local user_info = {}
+                        local count = 0
+
+                        if user.tLevel >= 1 then
+                            user_info.tLevel = 1
+                            count = count + 1
+                        end
+                            
+                        if user.student == 1 then
+                            user_info.student = 1
+                            count = count + 1
+                        end
+                            
+                        if user.vip == 1 then
+                            user_info.vip = 1
+                            count = count + 1
+                        end
+
+                        return KpUserTag.GetMcml(user_info)
+                    end
                 ]]>
             </script>
             <style type="text/mcss">
@@ -998,7 +1040,12 @@
                                             </div>
                                             <div style="width: 240px;height: 130px;background-color: #afafaf;">
                                                 <div style="position: relative;width: 240px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
-                                                <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview(Eval('worldpath')) .. ')' %>"></div>
+                                                <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview(Eval('worldpath')) .. ')' %>">
+                                                    <div style="width: 240px;height: 30px;margin-top: 100px;font-size: 12px;padding-top: 5px;padding-left: 4px;color: #ffffff;background-color: #000000a3">
+                                                        <%= get_user_icon() %>
+                                                        <%= get_username() %>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div style="position: relative;width: 32px;height: 32px;">
                                                 <pe:if condition='<%= get_world_status(1) %>'>
