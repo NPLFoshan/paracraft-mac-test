@@ -62,7 +62,7 @@ function UserConsole:CheckShowUserWorlds()
 end
 
 function UserConsole:ShowPage()
-    local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
+    local UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 
     if UserConsolePage then
         WorldList:RefreshCurrentServerList()
@@ -117,7 +117,7 @@ function UserConsole:EnterMainLogin()
 end
 
 function UserConsole:ClosePage()
-    local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
+    local UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 
     if UserConsolePage then
         if Mod.WorldShare.Store:Get('world/isEnterWorld') then
@@ -128,12 +128,12 @@ function UserConsole:ClosePage()
         UserConsolePage:CloseWindow()
         Mod.WorldShare.Store:Unsubscribe("user/Login")
         Mod.WorldShare.Store:Unsubscribe("user/Logout")
-        Mod.WorldShare.Store:Remove('page/UserConsole')
+        Mod.WorldShare.Store:Remove('page/Mod.WorldShare.UserConsole')
     end
 end
 
 function UserConsole:Refresh(time)
-    UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
+    UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 
     if UserConsolePage then
         UserConsolePage:Refresh(time or 0.01)
@@ -141,7 +141,7 @@ function UserConsole:Refresh(time)
 end
 
 function UserConsole:IsShowUserConsole()
-    if Mod.WorldShare.Store:Get('page/UserConsole') then
+    if Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole') then
         return true
     else
         return false
@@ -151,7 +151,7 @@ end
 function UserConsole.InputSearchContent()
     InternetLoadWorld.isSearching = true
 
-    local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
+    local UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 
     if UserConsolePage then
         UserConsolePage:Refresh(0.1)
@@ -526,7 +526,7 @@ function UserConsole:HandleWorldId(pid, refreshMode)
 end
 
 function UserConsole:WorldRename(currentItemIndex, tempModifyWorldname, callback)
-    local UserConsolePage = Mod.WorldShare.Store:Get('page/UserConsole')
+    local UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 
     if not UserConsolePage then
         return false

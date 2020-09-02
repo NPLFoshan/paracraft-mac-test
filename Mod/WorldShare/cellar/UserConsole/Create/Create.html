@@ -37,7 +37,6 @@
                     )
 
                     local page = document:GetPageCtrl()
-                    Mod.WorldShare.Store:Set('page/UserConsole', page)   
                     Mod.WorldShare.Store:Remove("world/searchText")
 
                     local do_modify = false
@@ -137,7 +136,7 @@
                     end
 
                     function header()
-                        return 'height:32px;\
+                        return 'height:34px;\
                                 margin:2px;\
                                 margin-top:5px;\
                                 margin-left:5px;\
@@ -545,6 +544,10 @@
                             page:FindControl('search_button').visible = false
                         end
                     end
+
+                    function select_type(index)
+                        echo(index, true)
+                    end
                 ]]>
             </script>
             <style type="text/mcss">
@@ -561,14 +564,6 @@
                         color = "#cccccc",
                         background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8",
                     },
-                    middle_line = {
-                        float  = "left",
-                        width  = 2,
-                        height = 450,
-                        ["margin-left"] = 0,
-                        ["margin-top"]  = 0,
-                        ["background-color"] = "#b7b2b2"
-                    },
                     user_area = {
                         float = "left",
                         width  = 158,
@@ -576,10 +571,10 @@
                     },
                     world_area = {
                         float = "left",
-                        width  = 340,
+                        width  = 840,
                         height = 450,
-                        ["padding-top"] = 10,
-                        ["padding-left"] = 10,
+                        ["padding-top"] = 5,
+                        ["padding-left"] = 20,
                         ["padding-right"] = 0,
                     },
                     events_area = {
@@ -597,20 +592,17 @@
                         background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;263 346 36 36:15 15 15 15",
                     },
                     share_selected_item = {
-                        ["margin-left"] = 0,
-                        ["margin-bottom"] = 5,
-                        ["padding-left"] = 2,
-                        ["padding-top"] = 4,
-                        width  = 295,
+                        ["margin-right"] = 10,
+                        width = 260,
                         height = 80,
                         background = "textures/worldshare_32bits.png;150 20 16 16:4 4 4 4"
                     },
                     share_unselect_item = {
+                        ["margin-right"] = 10,
                         ["margin-bottom"] = 20,
-                        ["padding-left"] = 2,
                         ["padding-top"] = 4,
-                        width  = 295,
-                        height = 69,
+                        width = 260,
+                        height = 80,
                         ["background-color"] = "#454340",
                     },
                     share_world_name = {
@@ -717,28 +709,29 @@
                         width = 297,
                         height = 70,
                         background = ''
+                    },
+                    menu_unselect = {
+
                     }
                 }
             </style>
             <kp:window width="850" height="490" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_chuangzao_32bits.png" onclose="close()">
-            <div class="default" style="<%= container() %>">
                 <div style="<%=header()%>" width="100%">
                 </div>
-                <div style="height:2px;" width="100%" class="mc_line"></div>
-                <div class="middle_line" />
                 <div class="world_area">
-                    <div style="width: 175px;margin-top: -5px;margin-bottom: 3px;margin-left: 140px;">
+                    <div style="height: 30px;margin-bottom: 5px;">
                         <div style="float:left;">
-                            <div style="height: 23px;width: 20px;background-color: #ffffff;float: left;margin-top: 1px;">
-                                <img src="Texture/3DMapSystem/common/searchIcon.png" style="width: 16px;height: 16px;margin-left: 2px;margin-top: 3px;" />
-                            </div>
-                            <input type="text" class="bbs_text" style="height: 25px;width: 140px;margin-left: -5px;" name="search_text" onchange="set_search_button" onfocusout="search" EmptyText='<%= L"搜索列表项目" %>' value="<%= get_last_serch_text() %>" />
+                            <input type="button" value="全部" class="" onclick="select_type(1)"/>
+                            <input type="button" value="在线" class="" onclick="select_type(2)"/>
+                            <input type="button" value="本地" class="" onclick="select_type(3)"/>
                         </div>
-                        <pe:container name="search_button" visible="false" style="display:none;position:relative;margin-top: -26px;background:">
-                            <input type="button" class="mc_light_grey_button_with_fillet" style="height: 23px;margin-left: 117px;" onclick="search" value="<%= L'确定' %>" />
-                        </pe:container>
+                        <input type="button"
+                            value='<%=L"创建世界" %>'
+                            style="float:left;margin-left:580px;min-width:120px"
+                            onclick="create_new_world()"
+                            class="common_button mc_light_grey_button_with_fillet" />
                     </div>
-                    <div style="height:360px;">
+                    <div style="height:400px;background-color: #ff0000;">
                         <pe:if style="margin-top:10px;font-weight:bold;color:#ffffff" condition="<%= is_list_refreshing() %>">
                             <%=L"正在刷新, 请稍候 ... " %>
                         </pe:if>
@@ -749,7 +742,8 @@
                                 pagesize="25"
                                 VerticalScrollBarStep="50"
                                 DefaultNodeHeight="85"
-                                ItemsPerLine="1"
+                                CellPadding="0"
+                                ItemsPerLine="3"
                                 name="gw_world_ds">
                                 <Columns>
                                     <!--selected-->
@@ -937,21 +931,7 @@
                             </pe:gridview>
                         </pe:if>
                     </div>
-                    <div style="margin-top:10x">
-                        <input type="button"
-                            value='<%=L"创建世界" %>'
-                            style="float:left;margin-left:80px;min-width:120px"
-                            onclick="create_new_world()"
-                            class="common_button mc_light_grey_button_with_fillet" />
-                        <input type="button"
-                            value='<%="..." %>'
-                            style="margin-left:10px;height:30px;min-width:30px"
-                            onclick="import_world()"
-                            class="flat_button"
-                            tooltip='<%=L"导入/导出..." %>' />
-                    </div>
                 </div>
-            </div>
             </kp:window>
         </pe:mcml>
     </body>
