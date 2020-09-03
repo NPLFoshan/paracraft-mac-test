@@ -68,34 +68,17 @@ function MainPage:ShowPage(callback)
         }
     )
 
-    local theme = 'theme1'
-    local params
-
-    if theme == 'theme1' then
-        params = Mod.WorldShare.Utils.ShowWindow(
-            0,
-            0,
-            "(ep)Theme/Theme1/MainPage.html",
-            "Mod.ExplorerApp.MainPage",
-            0,
-            0,
-            "_ct",
-            false,
-            2
-        )
-    else
-        params = Mod.WorldShare.Utils.ShowWindow(
-            0,
-            0,
-            "Mod/ExplorerApp/components/MainPage.html",
-            "Mod.ExplorerApp.MainPage",
-            0,
-            0,
-            "_fi",
-            false,
-            2
-        )
-    end
+    local params = Mod.WorldShare.Utils.ShowWindow(
+        0,
+        0,
+        "Mod/ExplorerApp/components/MainPage.html",
+        "Mod.ExplorerApp.MainPage",
+        0,
+        0,
+        "_fi",
+        false,
+        2
+    )
 
     params._page.OnClose = function()
         self.worksTree = {}
