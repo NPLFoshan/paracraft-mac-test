@@ -561,12 +561,40 @@
 
                     function select_type(index)
                         UserConsoleCreate.currentMenuSelectIndex = index
-                        echo(UserConsoleCreate.currentMenuSelectIndex, true)
-                        page:Refresh(0.01)
+
+                        if not index or (type(index) ~= 'string' and type(index) ~= 'number') then
+                            return false
+                        end
+
+                        index = tonumber(index)
+                        local statusFilter
+
+                        if index == 1 then
+                            WorldList:RefreshCurrentServerList(function() page:Refresh(0.01) end)
+                        elseif index == 2 then
+                            WorldList:RefreshCurrentServerList(function() page:Refresh(0.01) end, 'ONLINE')
+                        elseif index == 3 then
+                            WorldList:RefreshCurrentServerList(function() page:Refresh(0.01) end, 'LOCAL')
+                        end
                     end
 
-                    function get_art_number(number)
-                        number = tostring(number)
+                    function get_art_number()
+                        local project = Eval('project')
+
+                        if not project or
+                           type(project) ~= "table" or
+                           not project.rate or
+                           type(project.rate) ~= "number" or
+                           project.rate == 0 then
+                            return ""
+                        end
+
+                        local number = project.rate
+                        local n = math.floor(1)
+                        local fmt = '%.' .. n .. 'f'
+                        local nRet = tonumber(string.format(fmt, number))
+
+                        number = tostring(nRet)
 
                         local returnString = ""
 
@@ -620,11 +648,30 @@
                     end
 
                     function get_world_preview(worldpath)
-                        if not worldpath or type(worldpath) ~= "string" then
-                            return ""
+                        local status = Eval("status")
+
+                        if tonumber(status) == 2 then
+                            local project = Eval("project")
+
+                            if not project or
+                               type(project) ~= "table" or
+                               not project.extra or
+                               type(project.extra) ~= "table" or
+                               not project.extra.imageUrl or
+                               type(project.extra.imageUrl) ~= "string" then
+                                return ""
+                            end
+
+                            return project.extra.imageUrl
+                        else
+                            local worldpath = Eval('worldpath')
+
+                            if not worldpath or type(worldpath) ~= "string" then
+                                return ""
+                            end
+                            
+                            return worldpath .. "preview.jpg"
                         end
-                        
-                        return worldpath .. "preview.jpg"
                     end
 
                     function get_school_name()
@@ -681,6 +728,76 @@
                         end
 
                         return KpUserTag.GetMcml(user_info)
+                    end
+
+                    function get_project_views()
+                        local project = Eval('project')
+
+                        if not project or type(project) ~= "table" then
+                            return 0
+                        end
+
+                        if project.visit and type(project.visit) == "number" then
+                            return project.visit
+                        else
+                            return 0
+                        end
+                    end
+
+                    function get_project_thumbs()
+                        local project = Eval('project')
+
+                        if not project or type(project) ~= "table" then
+                            return 0
+                        end
+
+                        if project.star and type(project.star) == "number" then
+                            return project.star
+                        else
+                            return 0
+                        end
+                    end
+
+                    function get_project_comments()
+                        local project = Eval('comment')
+
+                        if not project or type(project) ~= "table" then
+                            return 0
+                        end
+
+                        if project.comment and type(project.comment) == "number" then
+                            return project.comment
+                        else
+                            return 0
+                        end
+                    end
+
+                    function has_rated()
+                        local project = Eval('project')
+
+                        if not project or type(project) ~= "table" then
+                            return false
+                        end
+
+                        if project.rate and type(project.rate) == "number" and project.rate > 0 then
+                            return true
+                        else
+                            return false
+                        end
+                    end
+
+                    function get_user_avatar()
+                        local user = Eval('user')
+
+                        if not user or type(user) ~= "table" then
+                            return ""
+                        end
+
+                        if user.portrait and type(user.portrait) == "string" then
+                            return "<div style='float: left;margin-left: 2px;margin-right: 2px;width: 18px;height: 18px;background-color: #ffffff'><img style='width: 18px;height: 18px;' src='" .. user.portrait .. "' /></div>"
+                        else
+                            return ""
+                        end
                     end
                 ]]>
             </script>
@@ -906,17 +1023,16 @@
                             <div style=""></div>
                         </div>
                     </div>
-                    <div style="height:430px;">
+                    <div style="height:400px;">
                         <pe:if style="margin-top:10px;font-weight:bold;color:#ffffff" condition="<%= is_list_refreshing() %>">
                             <%=L"正在刷新, 请稍候 ... " %>
                         </pe:if>
                         <pe:if style="margin-top:10px;font-weight:bold;color:#ffffff" condition="<%= not is_list_refreshing() %>">
                             <pe:gridview 
                                 RememberScrollPos="true"
-                                AllowPaging="true"
-                                pagesize="25"
+                                AllowPaging="false"
                                 VerticalScrollBarStep="80"
-                                DefaultNodeHeight="200"
+                                DefaultNodeHeight="260"
                                 CellPadding="0"
                                 ItemsPerLine="3"
                                 name="gw_world_ds">
@@ -924,13 +1040,18 @@
                                     <!--selected-->
                                     <pe:if condition='<%= be_selected()%>'>
                                         <div name='<%=Eval("index")%>' class="share_selected_item" style="padding-top: 6px;padding-left: 4px;">
-                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -4px;margin-left: -4px;padding-top: 4px;padding-left: 6px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
-                                                <%= get_art_number(math.random(100) .. "." .. math.random(10))%>
-                                            </div>
+                                            <pe:if condition="<%= has_rated() %>">
+                                                <div style="position: relative;width: 70px;height: 36px;margin-top: -4px;margin-left: -4px;padding-top: 4px;padding-left: 6px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
+                                                    <%= get_art_number()%>
+                                                </div>
+                                            </pe:if>
+                                            <pe:if condition='<%= Eval("project") and tonumber(Eval("project")["visibility"]) == 1 %>'>
+                                                <div style="position: relative;margin-left: 220px;width: 28px;height: 31px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#310 53 28 31)"></div>
+                                            </pe:if>
                                             <div style="width: 248px;height: 248px;padding: 4px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#72 20 16 16:2 2 2 2)">
                                                 <div style="width: 240px;height: 130px;background-color: #afafaf;">
                                                     <div style="position: relative;width: 240px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
-                                                    <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview(Eval('worldpath')) .. ')' %>"></div>
+                                                    <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview() .. ')' %>"></div>
                                                 </div>
                                                 <div style="position: relative; width: 32px;height: 32px;">
                                                     <pe:if condition='<%= get_world_status(1)%>'>
@@ -962,9 +1083,6 @@
                                                     <div style="float: left;text-singleline: true;width: 20px;font-size: 12px;base-font-size: 12px;color: #9e9e9e;margin-top:6px;">
                                                         <%= 'v' .. get_world_version() %>
                                                     </div>
-                                                    <pe:if condition='<%= Eval("project") and tonumber(Eval("project")["visibility"]) == 1 %>'>
-                                                        <div style="float:left;margin-top:5px;margin-left:5px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#223 309 20 20);width: 14px;height: 14px;"></div>
-                                                    </pe:if>
                                                 </div>
                                                 <div style="margin-left: 20px;">
                                                     <div class="share_world_info">
@@ -980,19 +1098,19 @@
                                                     <div style="float:left">
                                                         <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#383 181 16 12" style="width: 16px;height: 12px;margin-top: 4px;" />
                                                         <div style="float:left;margin-left: 2px;">
-                                                            11111
+                                                            <%= get_project_views() %>
                                                         </div>
                                                     </div>
                                                     <div style="float:left;margin-left: 8px;">
                                                         <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#358 177 16 16" style="width: 16px;height: 16px;" />
                                                         <div style="float:left;margin-left: 2px;">
-                                                            22222
+                                                            <%= get_project_thumbs() %>
                                                         </div>
                                                     </div>
                                                     <div style="float:left;margin-left: 8px;">
                                                         <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#409 181 18 16" style="width: 18px;height: 16px;margin-top: 3px;" />
                                                         <div style="float:left;margin-left: 2px;">
-                                                            3333
+                                                            <%= get_project_comments() %>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1035,12 +1153,17 @@
                                     <pe:if condition='<%= not be_selected() %>'>
                                         <div name='<%=Eval("index")%>' class="share_unselect_item" style="padding-left:8px;padding-top:8px;">
                                             <input type="button" style="position: relative;width:260px;height:260px;background:" name='<%=Eval("index")%>' onclick="switch_world" />
-                                            <div style="position: relative;width: 70px;height: 36px;margin-top: -6.8px;margin-left: -8px;padding-top: 4px;padding-left: 6px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
-                                                <%= get_art_number(math.random(100) .. "." .. math.random(10))%>
-                                            </div>
+                                            <pe:if condition="<%= has_rated() %>">
+                                                <div style="position: relative;width: 70px;height: 36px;margin-top: -6.8px;margin-left: -8px;padding-top: 4px;padding-left: 6px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
+                                                    <%= get_art_number()%>
+                                                </div>
+                                            </pe:if>
+                                            <pe:if condition='<%= Eval("project") and tonumber(Eval("project")["visibility"]) == 1 %>'>
+                                                <div style="position: relative;margin-left: 220px;width: 28px;height: 31px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#310 53 28 31)"></div>
+                                            </pe:if>
                                             <div style="width: 240px;height: 130px;background-color: #afafaf;">
                                                 <div style="position: relative;width: 240px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
-                                                <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview(Eval('worldpath')) .. ')' %>">
+                                                <div style="<%= 'width: 240px;height: 130px;background: url(' .. get_world_preview() .. ')' %>">
                                                     <div style="width: 240px;height: 30px;margin-top: 100px;font-size: 12px;padding-top: 5px;padding-left: 4px;color: #ffffff;background-color: #000000a3">
                                                         <%= get_user_icon() %>
                                                         <%= get_username() %>
@@ -1077,9 +1200,6 @@
                                                 <div style="float: left;text-singleline: true;width: 20px;font-size: 12px;base-font-size: 12px;color: #9e9e9e;margin-top:6px;">
                                                     <%= 'v' .. get_world_version() %>
                                                 </div>
-                                                <pe:if condition='<%= Eval("project") and tonumber(Eval("project")["visibility"]) == 1 %>'>
-                                                    <div style="float:left;margin-top:5px;margin-left:5px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#223 309 20 20);width: 14px;height: 14px;"></div>
-                                                </pe:if>
                                             </div>
                                             <div style="margin-left: 20px;">
                                                 <div class="share_world_info">
@@ -1095,19 +1215,19 @@
                                                 <div style="float:left">
                                                     <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#383 181 16 12" style="width: 16px;height: 12px;margin-top: 4px;" />
                                                     <div style="float:left;margin-left: 2px;">
-                                                        11111
+                                                        <%= get_project_views() %>
                                                     </div>
                                                 </div>
                                                 <div style="float:left;margin-left: 8px;">
                                                     <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#358 177 16 16" style="width: 16px;height: 16px;" />
                                                     <div style="float:left;margin-left: 2px;">
-                                                        22222
+                                                        <%= get_project_thumbs() %>
                                                     </div>
                                                 </div>
                                                 <div style="float:left;margin-left: 8px;">
                                                     <img src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#409 181 18 16" style="width: 18px;height: 16px;margin-top: 3px;" />
                                                     <div style="float:left;margin-left: 2px;">
-                                                        3333
+                                                        <%= get_project_comments() %>
                                                     </div>
                                                 </div>
                                             </div>

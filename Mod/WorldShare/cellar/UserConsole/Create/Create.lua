@@ -15,7 +15,6 @@ local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua"
 local UserConsoleCreate = NPL.export()
 
 UserConsoleCreate.currentMenuSelectIndex = 1
-
 function UserConsoleCreate:Show()
     local UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 

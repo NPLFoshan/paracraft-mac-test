@@ -34,7 +34,7 @@ local WorldList = NPL.export()
 
 WorldList.zipDownloadFinished = true
 
-function WorldList:RefreshCurrentServerList(callback)
+function WorldList:RefreshCurrentServerList(callback, statusFilter)
     local UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 
     self:SetRefreshing(true)
@@ -50,7 +50,7 @@ function WorldList:RefreshCurrentServerList(callback)
         if type(callback) == 'function' then
             callback()
         end
-    end)
+    end, statusFilter)
 end
 
 function WorldList.GetCurWorldInfo(infoType, worldIndex)

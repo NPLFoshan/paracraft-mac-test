@@ -27,7 +27,7 @@ local KeepworkServiceWorld = NPL.export()
 KeepworkServiceWorld.lockHeartbeat = false
 
 -- set world instance by pid 
-function KeepworkServiceWorld:SetWorldInstanceByPid(pid)
+function KeepworkServiceWorld:SetWorldInstanceByPid(pid, callback)
     self:GetWorldByProjectId(pid, function(data, err)
         if type(data) ~= 'table' or not data.worldName then
             return false
@@ -86,6 +86,10 @@ function KeepworkServiceWorld:SetWorldInstanceByPid(pid)
         }
 
         Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
+
+        if callback and type(callback) == 'function' then
+            callback()
+        end
     end)
 end
 
