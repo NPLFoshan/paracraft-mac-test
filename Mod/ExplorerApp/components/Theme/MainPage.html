@@ -1,10 +1,10 @@
-﻿<html>
+<html>
 <body>
 <pe:mcml>
     <script refresh="false" type="text/npl" src="MainPage.lua">
         <![CDATA[
-            MainPage = NPL.load("./MainPage.lua")
-            Sort = NPL.load("./Sort/Sort.lua")
+            MainPage = NPL.load("(gl)Mod/ExplorerApp/components/MainPage.lua")
+            Sort = NPL.load("(gl)Mod/ExplorerApp/components/Sort/Sort.lua")
             KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
             Store = NPL.load("(gl)Mod/WorldShare/store/Store.lua")
             UniString = commonlib.gettable("System.Core.UniString")
@@ -165,13 +165,11 @@
                 ['margin-left'] = 3
             },
             area = {
-                ["background-color"] = "#000000",
                 color = 'white'
             },
             strip = {
                 height = 45,
                 width = 960,
-                ['background-color'] = '#232223'
             },
             title = {
                 position = 'relative',
@@ -213,42 +211,37 @@
             },
             area_content = {
                 width = 960,
-                ['background-color'] = '#222222'
             },
             category_button = {
-                width = 100,
-                height = 28,
+                width = 92,
+                height = 30,
                 ['font-size'] = 13,
                 ['base-font-size'] = 13,
                 margin = 0,
                 padding = 0,
-                ['margin-top'] = 14,
                 ['margin-left'] = 10,
                 color = '#909399',
-                background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#3 95 106 32:8 8 8 8",
+                background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;219 100 32 26:12 13 12 12",
             },
             category_button_selected = {
-                width = 100,
-                height = 28,
+                width = 92,
+                height = 30,
                 ['font-size'] = 13,
                 ['base-font-size'] = 13,
                 margin = 0,
                 padding = 0,
-                ['margin-top'] = 14,
                 ['margin-left'] = 10,
                 color = '#ffffff',
-                background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#2 60 107 32:8 8 8 8",
-                ['font-weight'] = 'bold'
+                background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;175 100 32 26:12 13 12 12",
+                ['font-weight'] = 'bold' 
             },
-            sidebar = {
-                float = 'left',
-                width = 120,
-                ['background-color'] = '#4d4d4d'
+            menubar = {
+                width = 960,
+                height = 40,
             },
             list = {
                 float = 'left',
-                width = 840,
-                ['background-color'] = '#393939'
+                width = 960,
             },
             list_search_tool = {
 
@@ -262,13 +255,13 @@
             },
             list_search_bar = {
                 float = 'left',
-                ['margin-left'] = 280,
-                ['margin-top'] = 22,
+                ['margin-left'] = 590,
+                ['margin-top'] = 4,
                 textcolor = "#ffffff",
                 width = 316,
                 height = 30,
                 padding = 0,
-                background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#57 27 65 28:3 3 3 3",
+                background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#198 132 16 16:4 4 4 4",
             },
             list_search_bar_radius = {
                 position = 'relative',
@@ -285,8 +278,8 @@
             list_search_button = {
                 position = 'relative',
                 align = 'right',
-                color = "#cccccc",
-                background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;179 89 21 21:8 8 8 8",
+                color = "#000000",
+                background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#225 127 36 28:6 5 7 6",
                 height = 30,
                 width = 57,
                 ['text-align'] = 'center',
@@ -302,7 +295,7 @@
             },
             list_filter = {
                 float = 'left',
-                ['margin-top'] = 22,
+                ['margin-top'] = 0,
             },
             list_filter_button = {
                 color = "#cccccc",
@@ -438,76 +431,49 @@
             }
         }
     </style>
+    <kp:window width="960" height="490" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_tansuo_32bits.png" onclose="close()">
     <div class="area" name="area">
         <div class="strip" name="strip">
-            <div class="title"><%=L"探索"%></div>
-            <pe:if condition="<%=is_show_balance()%>">
-                <div class="balance">
-                    <div class="strip_icon_1"></div>
-                    <div class="strip_coins"><%=MainPage.playerBalance%></div>
-                    <input type="button" value='<%=L"投币"%>' class="strip_icon_2" onclick="set_coins"/>
+            <div class="list_search_bar" style="<%=get_english_style('width: 250px;')%>">
+                <input type="text" name="project_id" class="list_search_textfield" spacing="4" EmptyText='<%=L"请输入你搜索的内容"%>' rows="1" CaretColor="#FFFFFFFF" />
+                <div class="list_search_button">
+                    <%=L"搜索"%>
+                    <input type="button" class="list_search_button_click" DefaultButton="true" onclick="search()" />
                 </div>
-            </pe:if>
-            <div class="close" align="right">
-                <div onclick="close()" class="close_click"></div>
-                <div class="close_icon"></div>
-                <div class="close_word"><%=L"返回"%></div>
             </div>
         </div>
         <div class="area_content" name="area_content">
-            <div class="sidebar">
-                <pe:gridview name="categoryTree" DefaultNodeHeight="10" pagesize="100" ItemsPerLine="1" AllowPaging="false">
-                    <Columns>
-                        <div>
-                            <pe:if condition='<%= Eval("value") == MainPage.categorySelected.value %>'>
-                                <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
-                                    <input type="button" value='<%=Eval("enValue")%>' class="category_button_selected"/>
+            <div class="menubar">
+                <div style="float:left;width:820px;">
+                    <pe:gridview name="categoryTree" DefaultNodeHeight="10" pagesize="100" ItemsPerLine="8" AllowPaging="false">
+                        <Columns>
+                            <div style="float:left;width: 100px;">
+                                <pe:if condition='<%= Eval("value") == MainPage.categorySelected.value %>'>
+                                    <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
+                                        <input type="button" value='<%=Eval("enValue")%>' class="category_button_selected"/>
+                                    </pe:if>
+                                    <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
+                                        <input type="button" value='<%=Eval("value")%>' class="category_button_selected"/>
+                                    </pe:if>
                                 </pe:if>
-                                <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
-                                    <input type="button" value='<%=Eval("value")%>' class="category_button_selected"/>
+                                <pe:if condition='<%= Eval("value") ~= MainPage.categorySelected.value %>'>
+                                    <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
+                                        <input type="button" value='<%=Eval("enValue")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
+                                    </pe:if>
+                                    <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
+                                        <input type="button" value='<%=Eval("value")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
+                                    </pe:if>
                                 </pe:if>
-                            </pe:if>
-                            <pe:if condition='<%= Eval("value") ~= MainPage.categorySelected.value %>'>
-                                <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
-                                    <input type="button" value='<%=Eval("enValue")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
-                                </pe:if>
-                                <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
-                                    <input type="button" value='<%=Eval("value")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
-                                </pe:if>
-                            </pe:if>
-                        </div>
-                    </Columns>
-                    <PagerSettings Position="Bottom" height="1" />
-                    <PagerTemplate AutoHidePager="true">
-                        <form>
-                            <label name="page" style="height:18px;margin-left:59px;margin-top:-95px;color:#ffffff;" />
-                            <input type="button" name="pre"  invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"上一页"%>' style="margin-left:35px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;224 167 13 15" />
-                            <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"下一页"%>' style="margin-left:40px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#249 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 167 13 15" />
-                        </form>
-                    </PagerTemplate>
-                </pe:gridview>
+                            </div>
+                        </Columns>
+                    </pe:gridview>
+                </div>
+                <div class="list_filter" style="height: 40px;width: 80px;">
+                    <input class="list_filter_button" onclick="select_sort()" type="button" value='<%=get_cur_sort()%>' />
+                    <div class="sort_icon"></div>
+                </div>
             </div>
             <div class="list">
-                <div class=list_search_tool>
-                    <div class="downloaded_game" style="<%=get_english_style('width: 160px;')%>">
-                        <input name="downloaded_game_all" onclick="select_downloaded_category" value="all" style="margin-top:3px;margin-right: 3px;" type="radio" checked="checked"/>
-                        <div style="float:left;margin-right:5px;" for="downloaded_game_all"><%=L"全部"%></div>
-                        <input name="downloaded_game_local" onclick="select_downloaded_category" value="local" style="margin-top:3px;margin-right: 3px;" type="radio" />
-                        <div style="float:left" for="downloaded_game_local"><%=L"本地"%></div>
-                    </div>
-                    <div class="list_search_bar" style="<%=get_english_style('width: 250px;')%>">
-                        <div class="list_search_bar_radius"></div>
-                        <input type="text" name="project_id" class="list_search_textfield" spacing="4" EmptyText='<%=L"请输入项目ID"%>' rows="1" CaretColor="#FFFFFFFF" />
-                        <div class="list_search_button">
-                            <%=L"搜索"%>
-                            <input type="button" class="list_search_button_click" DefaultButton="true" onclick="search()" />
-                        </div>
-                    </div>
-                    <div class="list_filter">
-                        <input class="list_filter_button" onclick="select_sort()" type="button" value='<%=get_cur_sort()%>' />
-                        <div class="sort_icon"></div>
-                    </div>
-                </div>
                 <div class="list_content">
                     <pe:gridview RememberScrollPos="true" name="worksTree" style="position:relative;text-align:left" DefaultNodeHeight="180" pagesize="<%=get_page_size%>" ItemsPerLine="3" AllowPaging="false">
                         <Columns>
@@ -568,6 +534,7 @@
             </div>
         </div>
     </div>
+    </kp:window>
 </pe:mcml>
 </body>
 </html>
