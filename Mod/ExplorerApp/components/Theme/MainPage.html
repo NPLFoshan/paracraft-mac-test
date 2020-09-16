@@ -169,7 +169,7 @@
             },
             strip = {
                 height = 45,
-                width = 960,
+                width = 1100,
             },
             title = {
                 position = 'relative',
@@ -210,7 +210,7 @@
                 ['margin-top'] = 3
             },
             area_content = {
-                width = 960,
+                width = 1100,
             },
             category_button = {
                 width = 92,
@@ -236,12 +236,14 @@
                 ['font-weight'] = 'bold' 
             },
             menubar = {
-                width = 960,
-                height = 40,
+                float = "left",
+                width = 147,
+                height = 300,
+                ['margin-left'] = 10,
             },
             list = {
                 float = 'left',
-                width = 960,
+                width = 943,
             },
             list_search_tool = {
 
@@ -272,8 +274,7 @@
             list_search_textfield = {
                 width = 266,
                 height = 30,
-                background = '',
-                textcolor = '#ffffff'
+                background = ''
             },
             list_search_button = {
                 position = 'relative',
@@ -310,16 +311,15 @@
             work_item = {
                 height = 180,
                 width = 250,
-                ['background-color'] = '#ffffff',
                 ['margin-right'] = 10,
-                ['margin-bottom'] = 10
+                ['margin-bottom'] = 10,
+                background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;435 212 30 30:11 11 11 11",
             },
             work_item_info = {
                 position = 'relative',
                 height = 60,
                 width = 250,
                 top = 120,
-                ['background-color'] = '#4d4d4d',
                 ['padding-top'] = 13,
                 ['padding-left'] = 10,
                 ['padding-right'] = 10,
@@ -431,109 +431,108 @@
             }
         }
     </style>
-    <kp:window width="960" height="490" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_tansuo_32bits.png" onclose="close()">
-    <div class="area" name="area">
-        <div class="strip" name="strip">
-            <div class="list_search_bar" style="<%=get_english_style('width: 250px;')%>">
-                <input type="text" name="project_id" class="list_search_textfield" spacing="4" EmptyText='<%=L"请输入你搜索的内容"%>' rows="1" CaretColor="#FFFFFFFF" />
-                <div class="list_search_button">
-                    <%=L"搜索"%>
-                    <input type="button" class="list_search_button_click" DefaultButton="true" onclick="search()" />
+    <kp:window width="1100" height="630" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_tansuo_32bits.png" onclose="close()">
+        <div class="area" name="area">
+            <div class="strip" name="strip">
+                <div class="list_search_bar" style="<%=get_english_style('width: 250px;')%>">
+                    <input type="text" name="project_id" class="list_search_textfield" spacing="4" EmptyText='<%=L"请输入你搜索的内容"%>' rows="1"/>
+                    <div class="list_search_button">
+                        <%=L"搜索"%>
+                        <input type="button" class="list_search_button_click" DefaultButton="true" onclick="search()" />
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="area_content" name="area_content">
-            <div class="menubar">
-                <div style="float:left;width:820px;">
-                    <pe:gridview name="categoryTree" DefaultNodeHeight="10" pagesize="100" ItemsPerLine="8" AllowPaging="false">
-                        <Columns>
-                            <div style="float:left;width: 100px;">
-                                <pe:if condition='<%= Eval("value") == MainPage.categorySelected.value %>'>
-                                    <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
-                                        <input type="button" value='<%=Eval("enValue")%>' class="category_button_selected"/>
+            <div class="area_content" name="area_content">
+                <div class="menubar" style="background-color: #ff0000;">
+                    <div>
+                        <pe:gridview name="categoryTree" DefaultNodeHeight="10" pagesize="100" ItemsPerLine="8" AllowPaging="false">
+                            <Columns>
+                                <!-- <div style="float:left;width: 100px;">
+                                    <pe:if condition='<%= Eval("value") == MainPage.categorySelected.value %>'>
+                                        <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
+                                            <input type="button" value='<%=Eval("enValue")%>' class="category_button_selected"/>
+                                        </pe:if>
+                                        <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
+                                            <input type="button" value='<%=Eval("value")%>' class="category_button_selected"/>
+                                        </pe:if>
                                     </pe:if>
-                                    <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
-                                        <input type="button" value='<%=Eval("value")%>' class="category_button_selected"/>
+                                    <pe:if condition='<%= Eval("value") ~= MainPage.categorySelected.value %>'>
+                                        <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
+                                            <input type="button" value='<%=Eval("enValue")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
+                                        </pe:if>
+                                        <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
+                                            <input type="button" value='<%=Eval("value")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
+                                        </pe:if>
                                     </pe:if>
-                                </pe:if>
-                                <pe:if condition='<%= Eval("value") ~= MainPage.categorySelected.value %>'>
-                                    <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
-                                        <input type="button" value='<%=Eval("enValue")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
-                                    </pe:if>
-                                    <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
-                                        <input type="button" value='<%=Eval("value")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
-                                    </pe:if>
-                                </pe:if>
-                            </div>
-                        </Columns>
-                    </pe:gridview>
+                                </div> -->
+                            </Columns>
+                        </pe:gridview>
+                    </div>
+                    <div class="list_filter" style="height: 40px;width: 80px;">
+                        <input class="list_filter_button" onclick="select_sort()" type="button" value='<%=get_cur_sort()%>' />
+                        <div class="sort_icon"></div>
+                    </div>
                 </div>
-                <div class="list_filter" style="height: 40px;width: 80px;">
-                    <input class="list_filter_button" onclick="select_sort()" type="button" value='<%=get_cur_sort()%>' />
-                    <div class="sort_icon"></div>
-                </div>
-            </div>
-            <div class="list">
-                <div class="list_content">
-                    <pe:gridview RememberScrollPos="true" name="worksTree" style="position:relative;text-align:left" DefaultNodeHeight="180" pagesize="<%=get_page_size%>" ItemsPerLine="3" AllowPaging="false">
-                        <Columns>
-                            <div class="work_item">
-                                <input type="button" class="click" name='<%=Eval("index")%>' onclick="select_project" />
-                                <div class="radius"></div>
-                                <div style="<%=get_image(Eval('cover'))%>"></div>
-                                <div class="work_item_info">
-                                    <div class="work_item_info_left">
-                                        <div class="work_item_info_workname"><%=get_world_text(Eval("name"))%></div>
-                                        <div class="work_item_info_author"><%=Eval("username")%></div>
-                                    </div>
-                                    <div class="work_item_info_right">
-                                        <div class="project_id" name='<%=Eval("id")%>' tooltip="<%=get_project_url_text(Eval('id'))%>" onclick="go_project_web"><%= format('%s%d', L'项目ID:', Eval('id'))%></div>
-                                        <div class="item_button">
-                                            <pe:if condition="<%= Eval('downloaded') %>">
-                                                <div class="download">
-                                                    <input type="button" class="download_icon_click" tooltip="<%=L'已下载'%>" name='<%=Eval("index")%>' />
-                                                    <div class="download_icon"></div>
-                                                </div>
-                                            </pe:if>
-                                            <pe:if condition="<%= not Eval('downloaded') %>">
-                                                <div class="download">
-                                                    <input type="button" class="download_icon_click" name='<%=Eval("index")%>' onclick="download" />
-                                                    <div class="not_download_icon"></div>
-                                                </div>
-                                            </pe:if>
-                                            <pe:if condition="<%= Eval('favorite') %>">
-                                                <div class="favorite">
-                                                    <input type="button" class="favorite_icon_click" name='<%=Eval("index")%>' onclick="myfavorite" />
-                                                    <div class="favorite_icon"></div>
-                                                </div>
-                                            </pe:if>
-                                            <pe:if condition="<%= not Eval('favorite') %>">
-                                                <div class="favorite">
-                                                    <input type="button" class="favorite_icon_click" name='<%=Eval("index")%>' onclick="myfavorite" />
-                                                    <div class="not_favorite_icon"></div>
-                                                </div>
-                                            </pe:if>
+                <div class="list">
+                    <div class="list_content">
+                        <pe:gridview RememberScrollPos="true" name="worksTree" style="position:relative;text-align:left" DefaultNodeHeight="180" pagesize="<%=get_page_size%>" ItemsPerLine="3" AllowPaging="false">
+                            <Columns>
+                                <div class="work_item">
+                                    <input type="button" class="click" name='<%=Eval("index")%>' onclick="select_project" />
+                                    <div style="<%=get_image(Eval('cover'))%>"></div>
+                                    <div class="work_item_info">
+                                        <div class="work_item_info_left">
+                                            <div class="work_item_info_workname"><%=get_world_text(Eval("name"))%></div>
+                                            <div class="work_item_info_author"><%=Eval("username")%></div>
+                                        </div>
+                                        <div class="work_item_info_right">
+                                            <div class="project_id" name='<%=Eval("id")%>' tooltip="<%=get_project_url_text(Eval('id'))%>" onclick="go_project_web"><%= format('%s%d', L'项目ID:', Eval('id'))%></div>
+                                            <div class="item_button">
+                                                <pe:if condition="<%= Eval('downloaded') %>">
+                                                    <div class="download">
+                                                        <input type="button" class="download_icon_click" tooltip="<%=L'已下载'%>" name='<%=Eval("index")%>' />
+                                                        <div class="download_icon"></div>
+                                                    </div>
+                                                </pe:if>
+                                                <pe:if condition="<%= not Eval('downloaded') %>">
+                                                    <div class="download">
+                                                        <input type="button" class="download_icon_click" name='<%=Eval("index")%>' onclick="download" />
+                                                        <div class="not_download_icon"></div>
+                                                    </div>
+                                                </pe:if>
+                                                <pe:if condition="<%= Eval('favorite') %>">
+                                                    <div class="favorite">
+                                                        <input type="button" class="favorite_icon_click" name='<%=Eval("index")%>' onclick="myfavorite" />
+                                                        <div class="favorite_icon"></div>
+                                                    </div>
+                                                </pe:if>
+                                                <pe:if condition="<%= not Eval('favorite') %>">
+                                                    <div class="favorite">
+                                                        <input type="button" class="favorite_icon_click" name='<%=Eval("index")%>' onclick="myfavorite" />
+                                                        <div class="not_favorite_icon"></div>
+                                                    </div>
+                                                </pe:if>
+                                            </div>
                                         </div>
                                     </div>
+                                    <pe:if condition="<%= is_load_more_items(Eval('index')) %>">
+                                        <pe:custom oncreate="<%=lazy_load%>"></pe:custom>
+                                    </pe:if>
                                 </div>
-                                <pe:if condition="<%= is_load_more_items(Eval('index')) %>">
-                                    <pe:custom oncreate="<%=lazy_load%>"></pe:custom>
-                                </pe:if>
-                            </div>
-                        </Columns>
-                        <PagerSettings Position="Bottom" height="1" />
-                        <PagerTemplate AutoHidePager="true">
-                            <form>
-                                <label name="page" style="height:18px;margin-left:59px;margin-top:-95px;color:#ffffff;" />
-                                <input type="button" name="pre"  invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"上一页"%>' style="margin-left:35px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;224 167 13 15" />
-                                <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"下一页"%>' style="margin-left:40px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#249 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 167 13 15" />
-                            </form>
-                        </PagerTemplate>
-                    </pe:gridview>
+                            </Columns>
+                            <PagerSettings Position="Bottom" height="1" />
+                            <PagerTemplate AutoHidePager="true">
+                                <form>
+                                    <label name="page" style="height:18px;margin-left:59px;margin-top:-95px;color:#ffffff;" />
+                                    <input type="button" name="pre"  invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"上一页"%>' style="margin-left:35px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#224 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;224 167 13 15" />
+                                    <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"下一页"%>' style="margin-left:40px;margin-top:-93px;width:13px;height:15px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#249 149 13 15);" Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 149 13 15" Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;249 167 13 15" />
+                                </form>
+                            </PagerTemplate>
+                        </pe:gridview>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     </kp:window>
 </pe:mcml>
 </body>
