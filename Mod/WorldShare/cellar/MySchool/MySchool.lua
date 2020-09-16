@@ -21,7 +21,15 @@ function MySchool:Show()
     self.orgData = {}
 
     Mod.WorldShare.MsgBox:Show(L"请稍后...", nil, nil, nil, nil, 6)
-    local params = Mod.WorldShare.Utils.ShowWindow(600, 330, "Mod/WorldShare/cellar/MySchool/MySchool.html", "MySchool")
+
+    local worldsharebeat = ParaEngine.GetAppCommandLineByParam("worldsharebeat", nil)
+    local params
+
+    if worldsharebeat then
+        params = Mod.WorldShare.Utils.ShowWindow(600, 330, "(ws)Theme/MySchool/MySchool.html", "Mod.WorldShare.MySchool")
+    else
+        params = Mod.WorldShare.Utils.ShowWindow(600, 330, "(ws)MySchool", "Mod.WorldShare.MySchool")
+    end
 
     KeepworkServiceSchoolAndOrg:GetMyAllOrgsAndSchools(function(schoolData, orgData)
         Mod.WorldShare.MsgBox:Close()
@@ -105,8 +113,17 @@ function MySchool:ShowJoinSchool()
     self.curId = 0
     self.kind = nil
 
-    local params1 = Mod.WorldShare.Utils.ShowWindow(600, 420, "(ws)MySchool/JoinSchool.html", "Mod.WorldShare.JoinSchool", nil, nil, nil, false, 1)
-    local params2 = Mod.WorldShare.Utils.ShowWindow(380, 100, "(ws)MySchool/JoinSchoolResult.html", "Mod.WorldShare.JoinSchoolResult", nil, 50, nil, nil, 2)
+    local worldsharebeat = ParaEngine.GetAppCommandLineByParam("worldsharebeat", nil)
+    local params1
+    local params2
+
+    if worldsharebeat then
+        params1 = Mod.WorldShare.Utils.ShowWindow(600, 420, "(ws)Theme/MySchool/JoinSchool.html", "Mod.WorldShare.JoinSchool", nil, nil, nil, false, 1)
+        params2 = Mod.WorldShare.Utils.ShowWindow(380, 100, "(ws)Theme/MySchool/JoinSchoolResult.html", "Mod.WorldShare.JoinSchoolResult", nil, 20, nil, nil, 2)
+    else
+        params1 = Mod.WorldShare.Utils.ShowWindow(600, 420, "(ws)MySchool/JoinSchool.html", "Mod.WorldShare.JoinSchool", nil, nil, nil, false, 1)
+        params2 = Mod.WorldShare.Utils.ShowWindow(380, 100, "(ws)MySchool/JoinSchoolResult.html", "Mod.WorldShare.JoinSchoolResult", nil, 50, nil, nil, 2)
+    end
 
     self:GetProvinces(function(data)
         if type(data) ~= "table" then
@@ -140,7 +157,14 @@ function MySchool:RefreshJoinSchool()
 end
 
 function MySchool:ShowJoinInstitute()
-    local params = Mod.WorldShare.Utils.ShowWindow(600, 200, "Mod/WorldShare/cellar/MySchool/JoinInstitute.html", "JoinInstitute")
+    local worldsharebeat = ParaEngine.GetAppCommandLineByParam("worldsharebeat", nil)
+    local params
+
+    if worldsharebeat then
+        params = Mod.WorldShare.Utils.ShowWindow(600, 200, "(ws)Theme/MySchool/JoinInstitute.html", "Mod.WorldShare.JoinInstitute")
+    else
+        params = Mod.WorldShare.Utils.ShowWindow(600, 200, "(ws)MySchool/JoinInstitute.html", "Mod.WorldShare.JoinInstitute")
+    end
 end
 
 function MySchool:ShowRecordSchool()
@@ -191,7 +215,14 @@ function MySchool:ShowRecordSchool()
     self.curId = 0
     self.kind = nil
 
-    local params = Mod.WorldShare.Utils.ShowWindow(600, 300, "Mod/WorldShare/cellar/MySchool/RecordSchool.html", "RecordSchool")
+    local worldsharebeat = ParaEngine.GetAppCommandLineByParam("worldsharebeat", nil)
+    local params
+
+    if worldsharebeat then
+        params = Mod.WorldShare.Utils.ShowWindow(600, 300, "(ws)Theme/MySchool/RecordSchool.html", "Mod.WorldShare.RecordSchool")
+    else
+        params = Mod.WorldShare.Utils.ShowWindow(600, 300, "(ws)MySchool/RecordSchool.html", "Mod.WorldShare.RecordSchool")
+    end
 
     self:GetProvinces(function(data)
         if type(data) ~= "table" then
