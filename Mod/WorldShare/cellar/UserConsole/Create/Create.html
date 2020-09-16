@@ -809,6 +809,22 @@
                             return ""
                         end
                     end
+
+                    function get_share_world_info_button_style()
+                        local count = 6
+
+                        if not can_be_sync() then
+                            count = count - 1
+                        end
+
+                        if not Eval('hasPid') then
+                            count = count - 1
+                        end
+
+                        local width = count * (36 + 6)
+
+                        return width .. 'px'
+                    end
                 ]]>
             </script>
             <style type="text/mcss">
@@ -1188,7 +1204,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="share_world_info_button" align="right" style="<%= 'width: ' .. (Eval('hasPid') and '255px' or '215px') .. ';margin-right: -10px;' %>">
+                                                <div class="share_world_info_button" align="right" style="<%= 'width: ' .. get_share_world_info_button_style() .. ';margin-right: -10px;' %>">
                                                     <pe:if condition="<%= Eval('hasPid') %>">
                                                         <input type="button"
                                                                class="share_button"
