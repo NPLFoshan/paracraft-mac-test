@@ -688,13 +688,13 @@
                         local user = Eval('user')
 
                         if not user or type(user) ~= "table" then
-                            return "<%= '暂无' %>"
+                            return ""
                         end
 
                         if user.school and user.school.name then
                             return user.school.name
                         else
-                            return "<%= '暂无' %>"
+                            return ""
                         end
                     end
 
@@ -710,6 +710,16 @@
                         else
                             return "<%= '暂无' %>"
                         end
+                    end
+
+                    function has_username()
+                        local user = Eval('user')
+
+                        if not user or type(user) ~= "table" or not user.username then
+                            return false
+                        end
+
+                        return true
                     end
 
                     function get_user_icon()
@@ -1056,7 +1066,7 @@
                                 <!-- --------------- -->
                                 <pe:if condition="<%= is_current_menu_select(3) %>">
                                     <div class="menu_select" style="float:left">
-                                        <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="2" onclick="select_type"/>
+                                        <input type="button" style="position: relative;width: 92px;height: 30px;background:" name="3" onclick="select_type"/>
                                         <div style="width: 30px;height: 14px;margin-left: 30px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#111 267 30 14)"></div>
                                     </div>
                                 </pe:if>
@@ -1268,10 +1278,12 @@
                                             <div style="width: 260px;height: 130px;background-color: #afafaf;">
                                                 <div style="position: relative;width: 260px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
                                                 <div style="<%= 'width: 260px;height: 130px;background: url(' .. get_world_preview() .. ')' %>">
-                                                    <div style="width: 260px;height: 30px;margin-top: 100px;font-size: 12px;padding-top: 5px;padding-left: 4px;color: #ffffff;background-color: #000000a3">
-                                                        <%= get_user_icon() %>
-                                                        <%= get_username() %>
-                                                    </div>
+                                                    <pe:if condition="<%= has_username() %>">
+                                                        <div style="width: 260px;height: 30px;margin-top: 100px;font-size: 12px;padding-top: 5px;padding-left: 4px;color: #ffffff;background-color: #000000a3">
+                                                            <%= get_user_icon() %>
+                                                            <%= get_username() %>
+                                                        </div>
+                                                    </pe:if>
                                                 </div>
                                             </div>
                                             <div style="position: relative;width: 32px;height: 32px;">
