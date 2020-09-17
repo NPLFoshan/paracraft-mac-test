@@ -28,6 +28,23 @@
             end
 
             function select_category(index)
+                if index == 'newest' then
+                    Mod.WorldShare.Store:Set("explorer/selectSortIndex", 3)
+                    MainPage.curPage = 1
+                    MainPage:SetWorksTree({ value = 'all' }, Mod.WorldShare.Store:Getter('explorer/GetSortKey'))
+                    return
+                end
+            
+                if index == 'hottest' then
+                    Mod.WorldShare.Store:Set("explorer/selectSortIndex", 4)
+                    MainPage.curPage = 1
+                    MainPage:SetWorksTree({ value = 'all' }, Mod.WorldShare.Store:Getter('explorer/GetSortKey'))
+                    return
+                end
+
+                select_value = nil
+
+                Mod.WorldShare.Store:Set("explorer/selectSortIndex", 1)
                 MainPage.curPage = 1
                 MainPage:SetWorksTree(MainPage.remoteCategoryTree[index], Mod.WorldShare.Store:Getter('explorer/GetSortKey'))
             end
@@ -133,6 +150,64 @@
                     return styleStr
                 end
             end
+
+            function get_menubar_button_value()
+                local value = Eval('value')
+
+                if value == '单人' then
+                    return '<img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#104 234 29 15" />'
+                end
+
+                if value == '多人' then
+                    return '<img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#179 234 29 15" />'
+                end
+                    
+                if value == '动画' then
+                    return '<img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#141 234 29 15" />'
+                end
+                    
+                if value == '解谜' then
+                    return '<img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#254 234 29 15" />'
+                end
+
+                if value == '校园' then
+                    return '<img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#329 234 29 15" />'
+                end
+
+                if value == '教学' then
+                    return '<img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#216 234 29 15" />'
+                end
+
+                if value == '编程' then
+                    return '<img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#65 234 29 15" />'
+                end
+
+                return value
+            end
+
+            function get_menubar_button_style(value)
+                if value and global_type(value) == 'string' then
+                    if value == 'newest' then
+                        if Mod.WorldShare.Store:Get("explorer/selectSortIndex") == 3 then
+                            return true
+                        end
+                    end
+
+                    if value == 'hottest' then
+                        if Mod.WorldShare.Store:Get("explorer/selectSortIndex") == 4 then
+                            return true
+                        end
+                    end
+
+                    return false
+                end
+
+                if Eval("value") == MainPage.categorySelected.value then
+                    return 'menubar_button_selected'
+                else
+                    return 'menubar_button'
+                end
+            end
         ]]>
     </script>
     <style type="text/mcss">
@@ -212,34 +287,26 @@
             area_content = {
                 width = 1100,
             },
-            category_button = {
-                width = 92,
-                height = 30,
-                ['font-size'] = 13,
-                ['base-font-size'] = 13,
-                margin = 0,
-                padding = 0,
-                ['margin-left'] = 10,
-                color = '#909399',
-                background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;219 100 32 26:12 13 12 12",
-            },
-            category_button_selected = {
-                width = 92,
-                height = 30,
-                ['font-size'] = 13,
-                ['base-font-size'] = 13,
-                margin = 0,
-                padding = 0,
-                ['margin-left'] = 10,
-                color = '#ffffff',
-                background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;175 100 32 26:12 13 12 12",
-                ['font-weight'] = 'bold' 
-            },
             menubar = {
                 float = "left",
                 width = 147,
-                height = 300,
+                height = 500,
                 ['margin-left'] = 10,
+                ['margin-top'] = 10,
+            },
+            menubar_button = {
+                width = 140,
+                height = 40,
+                background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#336 125 32 32:10 10 10 10",
+                ['margin-left'] = 4,
+                ['margin-bottom'] = 6,
+            },
+            menubar_button_selected = {
+                width = 140,
+                height = 40,
+                background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#299 125 32 32:10 10 10 10",
+                ['margin-left'] = 4,
+                ['margin-bottom'] = 6,
             },
             list = {
                 float = 'left',
@@ -443,28 +510,48 @@
                 </div>
             </div>
             <div class="area_content" name="area_content">
-                <div class="menubar" style="background-color: #ff0000;">
+                <div class="menubar">
                     <div>
-                        <pe:gridview name="categoryTree" DefaultNodeHeight="10" pagesize="100" ItemsPerLine="8" AllowPaging="false">
+                        <pe:if condition="<%= get_menubar_button_style('newest') %>">
+                            <div class="menubar_button_selected">
+                                <div style="position: relative;">
+                                    <img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#367 234 29 15" />
+                                </div>
+                                <input type="button" style="position: relative;width: 140px;height: 40px;background: ;" name="newest" onclick="select_category()" />
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%= not get_menubar_button_style('newest') %>">
+                            <div class="menubar_button">
+                                <div style="position: relative;">
+                                    <img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#367 234 29 15" />
+                                </div>
+                                <input type="button" style="position: relative;width: 140px;height: 40px;background: ;" name="newest" onclick="select_category()" />
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%= get_menubar_button_style('hottest') %>">
+                            <div class="menubar_button_selected">
+                                <div style="position: relative;">
+                                    <img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#292 234 29 15" />
+                                </div>
+                                <input type="button" style="position: relative;width: 140px;height: 40px;background: ;" name="hottest" onclick="select_category()" />
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%= not get_menubar_button_style('hottest') %>">
+                            <div class="menubar_button">
+                                <div style="position: relative;">
+                                    <img style="width: 29px;height: 15px;margin-left: 55px;margin-top:13px;" src="Texture/Aries/Creator/keepwork/explorer_32bits.png#292 234 29 15" />
+                                </div>
+                                <input type="button" style="position: relative;width: 140px;height: 40px;background: ;" name="hottest" onclick="select_category()" />
+                            </div>
+                        </pe:if>
+                        <pe:gridview name="categoryTree" DefaultNodeHeight="10" pagesize="100" ItemsPerLine="1" AllowPaging="false">
                             <Columns>
-                                <!-- <div style="float:left;width: 100px;">
-                                    <pe:if condition='<%= Eval("value") == MainPage.categorySelected.value %>'>
-                                        <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
-                                            <input type="button" value='<%=Eval("enValue")%>' class="category_button_selected"/>
-                                        </pe:if>
-                                        <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
-                                            <input type="button" value='<%=Eval("value")%>' class="category_button_selected"/>
-                                        </pe:if>
-                                    </pe:if>
-                                    <pe:if condition='<%= Eval("value") ~= MainPage.categorySelected.value %>'>
-                                        <pe:if condition='<%= global_type(Eval("enValue")) == "string" %>'>
-                                            <input type="button" value='<%=Eval("enValue")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
-                                        </pe:if>
-                                        <pe:if condition='<%= global_type(Eval("enValue")) ~= "string" %>'>
-                                            <input type="button" value='<%=Eval("value")%>' name="<%= Eval('index') %>" onclick="select_category" class="category_button"/>
-                                        </pe:if>
-                                    </pe:if>
-                                </div> -->
+                                <div class="<%= get_menubar_button_style() %>" style="text-align: center;">
+                                    <div style="position: relative;">
+                                        <%= get_menubar_button_value() %>
+                                    </div>
+                                    <input type="button" style="position: relative;width: 140px;height: 40px;background: ;" name="<%= Eval('index') %>" onclick="select_category()" />
+                                </div>
                             </Columns>
                         </pe:gridview>
                     </div>
