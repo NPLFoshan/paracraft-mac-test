@@ -358,6 +358,8 @@ function MainPage:SetWorksTree(categoryItem, sort)
         sort,
         { page = self.curPage },
         function(data, err)
+            echo(data, true)
+
             Mod.WorldShare.MsgBox:Close()
 
             if type(data) ~= 'table' or type(data.hits) ~= 'table' or err ~= 200 then

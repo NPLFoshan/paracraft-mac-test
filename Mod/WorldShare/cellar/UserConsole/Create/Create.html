@@ -7,7 +7,6 @@
                     local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua")
                     local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua")
 
-
                     local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld")
                     local UniString = commonlib.gettable("System.Core.UniString")
                     local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage")
@@ -1366,12 +1365,12 @@
                                     </pe:if>
                                 </Columns>
                                 <EmptyDataTemplate>
-                                    <div style="margin:10px;font-weight:bold;color:#ffffff">
+                                    <div style="margin:10px;font-weight:bold;">
                                         <%=L"暂无存档，请创建" %>
                                     </div>
                                 </EmptyDataTemplate>
                                 <FetchingDataTemplate>
-                                    <div style="margin-top:10px;font-weight:bold;color:#ffffff">
+                                    <div style="margin-top:10px;font-weight:bold;">
                                         <%=L"正在搜索, 请稍候 ... " %>
                                     </div>
                                 </FetchingDataTemplate>
