@@ -8,8 +8,12 @@ use the lib:
 local LocalServiceWorld = NPL.load("(gl)Mod/WorldShare/service/LocalService/World.lua")
 ------------------------------------------------------------
 ]]
-local LocalService = NPL.load("../LocalService")
 
+-- service
+local LocalService = NPL.load("../LocalService")
+local KeepworkServiceSession = NPL.load("../KeepworkService/Session.lua")
+
+-- libs
 local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision")
 local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
@@ -26,8 +30,24 @@ function LocalServiceWorld:GetWorldList()
 
     -- not main world filter
     for key, item in ipairs(localWorlds) do
-        if item and item.foldername and not string.match("foldername_main", "_main$") then
-            filterLocalWorlds[#filterLocalWorlds + 1] = item
+        if KeepworkServiceSession:IsSignedIn() then
+            local username = Mod.WorldShare.Store:Get('user/username')
+
+            if item and item.foldername then
+                local matchFoldername = string.match(item.foldername, "(.+)_main$")
+
+                if matchFoldername then
+                    if matchFoldername == username then
+                        filterLocalWorlds[#filterLocalWorlds + 1] = item
+                    end
+                else
+                    filterLocalWorlds[#filterLocalWorlds + 1] = item
+                end
+            end
+        else
+            if item and item.foldername and not string.match(item.foldername, "_main$") then
+                filterLocalWorlds[#filterLocalWorlds + 1] = item
+            end
         end
     end
 
