@@ -10,6 +10,8 @@ local VipNotice = NPL.load("(gl)Mod/WorldShare/cellar/Vip/GetVipMemberByCode/Get
 ------------------------------------------------------------
 ]]
 
+local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
+
 local GetVipMemberByCode = NPL.export()
 
 function GetVipMemberByCode:Show()
@@ -17,5 +19,36 @@ function GetVipMemberByCode:Show()
 end
 
 function GetVipMemberByCode:Activation()
-    
+    local GetVipMemberByCodePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.Vip.GetVipMemberByCode')
+
+    if not GetVipMemberByCodePage then
+        return false
+    end
+
+    local code = GetVipMemberByCodePage:GetValue("code") or ""
+
+    KeepworkServiceSession:ActiveVipByCode(code, function(data, err)
+        if err == 200 then
+            GetVipMemberByCodePage:CloseWindow()
+
+            if data and type(data) == 'table' and data.message then
+                GameLogic.AddBBS(nil, L"激活成功", 3000, "0 255 0")
+            end
+
+            return
+        end
+
+        if data and type(data) == 'table' and data.message then
+            GameLogic.AddBBS(nil, format(L"激活失败，原因：%s（%d）", data.message, err), 3000, "255 0 0")
+        end
+
+        if data and type(data) == "string" then
+            local dataParams = {}
+            NPL.FromJson(data, dataParams)
+
+            if dataParams and type(dataParams) == 'table' and dataParams.message then
+                GameLogic.AddBBS(nil, format(L"激活失败，原因：%s（%d）", dataParams.message, err), 3000, "255 0 0")
+            end
+        end
+    end)
 end
