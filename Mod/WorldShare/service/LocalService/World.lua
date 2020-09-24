@@ -22,6 +22,17 @@ function LocalServiceWorld:GetWorldList()
     local localWorlds = LocalLoadWorld.BuildLocalWorldList(true)
     local sharedWorldList = self:GetSharedWorldList()
 
+    local filterLocalWorlds = {}
+
+    -- not main world filter
+    for key, item in ipairs(localWorlds) do
+        if item and item.foldername and not string.match("foldername_main", "_main$") then
+            filterLocalWorlds[#filterLocalWorlds + 1] = item
+        end
+    end
+
+    localWorlds = filterLocalWorlds
+
     for key, item in ipairs(sharedWorldList) do
         localWorlds[#localWorlds + 1] = item
     end
