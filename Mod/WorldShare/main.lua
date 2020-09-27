@@ -307,6 +307,8 @@ function WorldShare:init()
             UserConsole:ShowKickOutPage(reason)
         end
     end)
+
+    WorldShareCommand:Init()
 end
 
 function WorldShare:OnInitDesktop()
@@ -316,8 +318,6 @@ function WorldShare:OnLogin()
 end
 
 function WorldShare:OnWorldLoad()
-    WorldShareCommand:Init()
-
     Store:Set('world/isEnterWorld', true)
 
     UserConsole:ClosePage()
