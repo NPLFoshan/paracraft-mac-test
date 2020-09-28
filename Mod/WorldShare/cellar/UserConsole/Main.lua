@@ -62,6 +62,14 @@ function UserConsole:CheckShowUserWorlds()
 end
 
 function UserConsole:ShowPage()
+    local Create = NPL.load('./Create/Create.lua')
+
+    Create:Show()
+    
+    if true then
+        return
+    end
+
     local UserConsolePage = Mod.WorldShare.Store:Get('page/Mod.WorldShare.UserConsole')
 
     if UserConsolePage then
