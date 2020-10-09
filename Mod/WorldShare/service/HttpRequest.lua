@@ -291,8 +291,6 @@ function HttpRequest:PostFields(url, params, headers, success, error)
         postfields = postfields .. boundaryLine
     end
 
-    echo(postfields, true)
-
     headers = headers or {}
 
     headers['User-Agent'] = "paracraft"
