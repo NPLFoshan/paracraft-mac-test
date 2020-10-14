@@ -11,6 +11,8 @@ local CubeMapRender = NPL.load("(gl)Mod/WorldShare/render/CubeMap.lua")
 
 -- lib
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
+local Screen = commonlib.gettable("System.Windows.Screen")
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager")
 
 local CubeMapRender = NPL.export()
 
@@ -83,4 +85,44 @@ function CubeMapRender:Generate(worldpath, callback)
             callback()
         end
     end, 3500)
+end
+
+function CubeMapRender:RenderCubeMapImage(filepath)
+    local tempfile = Mod.WorldShare.Utils.GetTempFolderFullPath() .. "cubemap_render.jpg"
+
+    CommandManager:RunCommand("/hide tips")
+    ParaUI.GetUIObject("root").visible = false;
+    ParaUI.ShowCursor(false);
+    ParaScene.EnableMiniSceneGraph(false);
+    ParaEngine.ForceRender();ParaEngine.ForceRender();
+
+    local viewport = ViewportManager:GetSceneViewport()
+    viewport:SetPosition("_ctt", 0, 0, Screen:GetHeight(), Screen:GetHeight())
+
+    Mod.WorldShare.Utils.SetTimeOut(function()
+        ParaMovie.TakeScreenShot(tempfile, Screen:GetWidth(), Screen:GetHeight())
+
+        viewport:SetPosition("_fi", 0,0,0,0)
+
+        CommandManager:RunCommand("/hide tips")
+        ParaUI.GetUIObject("root").visible = true;
+        ParaUI.ShowCursor(true);
+        ParaScene.EnableMiniSceneGraph(true);
+        
+        local _width = Screen:GetWidth();
+        local _height = Screen:GetHeight();
+
+        local r = ParaUI.GetUIObject("root");
+
+        local c = ParaUI.CreateUIObject("container", "RenderCubMapImage", "_lt", -(_width - _height), 0, _width + (_width - _height) * 2, _height);
+        c.background = tempfile
+        c.zorder = 10
+        
+        r:AddChild(c)
+
+        Mod.WorldShare.Utils.SetTimeOut(function()
+            ParaMovie.TakeScreenShot((filepath), _height, _height)
+            ParaUI.DestroyUIObject(c)
+        end, 100)
+    end, 100)
 end
