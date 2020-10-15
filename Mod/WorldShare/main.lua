@@ -295,6 +295,10 @@ function WorldShare:init()
     end)
 
     WorldShareCommand:Init()
+
+    self.InitAfterGeneratePanoramaFunc = function()
+        
+    end
 end
 
 function WorldShare:OnInitDesktop()
@@ -327,8 +331,12 @@ function WorldShare:OnWorldLoad()
             Compare:GetCurrentWorldInfo()
         end)
     end)
+
+    GameLogic.GetCodeGlobal():RegisterTextEvent("after_generate_panorams", self.InitAfterGeneratePanoramaFunc)
 end
 
 function WorldShare:OnLeaveWorld()
     Store:Remove("world/currentWorld")
+
+    GameLogic.GetCodeGlobal():UnregisterTextEvent("after_generate_panorams", self.InitAfterGeneratePanoramaFunc)
 end
