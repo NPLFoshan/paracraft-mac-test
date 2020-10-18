@@ -2,8 +2,10 @@
     <body>
         <pe:mcml>
             <script type="text/npl">
-                function close()
+                local page = document:GetPageCtrl()
 
+                function close()
+                    page:CloseWindow()
                 end
             </script>
             <kp:window width="600" height="200" onclose="close()">
