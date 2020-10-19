@@ -25,7 +25,10 @@
 
                     function start_shooting()
                         close()
-                        Panorama:StartShooting()
+                        
+                        Panorama:StartShooting(function()
+                            Panorama:ShowPreview()
+                        end)
                     end
                 ]]>
             </script>

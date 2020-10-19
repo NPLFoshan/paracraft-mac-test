@@ -35,13 +35,24 @@ function Panorama:ShowCreate()
 end
 
 function Panorama:ShowPreview()
-    local params = Mod.WorldShare.Utils.ShowWindow(600, 420, "(ws)Panorama/Preview.html", "Mod.WorldShare.Panorama.Preview")
+    local params = Mod.WorldShare.Utils.ShowWindow(500, 653, "(ws)Panorama/Preview.html", "Mod.WorldShare.Panorama.Preview")
+
+    if params._page then
+        params._page:CallMethod("panorama_preview", "SetVisible", bShow ~= false) 
+        params._page.OnClose = function()
+            if params._page then
+                params._page:CallMethod("panorama_preview", "SetVisible", false)
+            end
+        end
+    end
 end
 
 function Panorama:ShowShare()
-    local params = Mod.WorldShare.Utils.ShowWindow(600, 420, "(ws)Panorama/Share.html", "Mod.WorldShare.Panorama.Share")
+    local params = Mod.WorldShare.Utils.ShowWindow(520, 392, "(ws)Panorama/Share.html", "Mod.WorldShare.Panorama.Share")
 end
 
-function Panorama:StartShooting()
-    self:ShowPreview()
+function Panorama:StartShooting(callback)
+    if callback and type(callback) == 'function' then
+        callback()
+    end
 end
