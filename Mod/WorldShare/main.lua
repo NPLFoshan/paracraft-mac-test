@@ -295,11 +295,6 @@ function WorldShare:init()
     end)
 
     WorldShareCommand:Init()
-
-    self.InitAfterGeneratePanoramaFunc = function()
-        echo('generate successful!!!', true)
-        GameLogic.AddBBS(nil, L"生成全景图完成", 3000, "0 255 0")
-    end
 end
 
 function WorldShare:OnInitDesktop()
@@ -332,12 +327,8 @@ function WorldShare:OnWorldLoad()
             Compare:GetCurrentWorldInfo()
         end)
     end)
-
-    GameLogic.GetCodeGlobal():RegisterTextEvent("after_generate_panorama", self.InitAfterGeneratePanoramaFunc)
 end
 
 function WorldShare:OnLeaveWorld()
     Store:Remove("world/currentWorld")
-
-    GameLogic.GetCodeGlobal():UnregisterTextEvent("after_generate_panorama", self.InitAfterGeneratePanoramaFunc)
 end
