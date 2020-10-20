@@ -157,5 +157,5 @@ function KeepworkProjectsApi:ShareWxacode(projectId, success, error)
         return false
     end
 
-    KeepworkBaseApi:Post('/projects/shareWxacode', { projectId = projectid }, nil, success, error)
+    KeepworkBaseApi:Post('/projects/shareWxacode', { projectId = projectId }, nil, success, error)
 end

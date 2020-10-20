@@ -14,6 +14,7 @@ local KeepworkServicePanorama = NPL.export()
 -- api
 local StoragePanoramasApi = NPL.load("(gl)Mod/WorldShare/api/Storage/Panoramas.lua")
 local QiniuRootApi = NPL.load("(gl)Mod/WorldShare/api/Qiniu/Root.lua")
+local KeepworkProjectsApi = NPL.load("(gl)Mod/WorldShare/api/Keepwork/Projects.lua")
 
 -- service
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
@@ -71,6 +72,33 @@ function KeepworkServicePanorama:Upload(callback, recursive)
             end)
         end,
         function()
+            callback(false)
+        end
+    )
+end
+
+function KeepworkServicePanorama:GenerateMiniProgramCode(callback)
+    if not callback or type(callback) ~= 'function' then
+        return false
+    end
+    
+    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+
+    if not currentEnterWorld or not currentEnterWorld.kpProjectId then
+        return false
+    end
+
+    KeepworkProjectsApi:ShareWxacode(
+        currentEnterWorld.kpProjectId,
+        function(data, err)
+            if err ~= 200 or not data or not data.wxacode then
+                callback(false)
+                return
+            end
+
+            callback(true, data.wxacode)
+        end,
+        function(data, err)
             callback(false)
         end
     )

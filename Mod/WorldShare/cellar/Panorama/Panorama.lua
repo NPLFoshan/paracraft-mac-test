@@ -62,7 +62,15 @@ function Panorama:ShowPreview()
 end
 
 function Panorama:ShowShare()
-    local params = Mod.WorldShare.Utils.ShowWindow(520, 392, "(ws)Panorama/Share.html", "Mod.WorldShare.Panorama.Share")
+    KeepworkServicePanorama:GenerateMiniProgramCode(function(bSucceed, wxacode)
+        if not bSucceed then
+            GameLogic.AddBBS(nil, 3000, L"生成小程序二维码失败", "255 0 0")
+            return
+        end
+
+        self.wxacodeUrl = wxacode
+        local params = Mod.WorldShare.Utils.ShowWindow(520, 392, "(ws)Panorama/Share.html", "Mod.WorldShare.Panorama.Share")
+    end)
 end
 
 function Panorama:StartShooting()
@@ -71,10 +79,9 @@ function Panorama:StartShooting()
             local entityPlayer = EntityManager.GetFocus()
             local x, y, z = entityPlayer:GetBlockPos()
         
-            -- GameLogic.GetCodeGlobal():RegisterTextEvent("after_generate_panorama", self.AfterGeneratePanorama)
+            GameLogic.GetCodeGlobal():RegisterTextEvent("after_generate_panorama", self.AfterGeneratePanorama)
 
-            -- CommandManager:Run(format("/panorama %d,%d,%d", x, y, z))
-            self:FinishShooting()
+            CommandManager:Run(format("/panorama %d,%d,%d", x, y, z))
         end
 
     end,
@@ -87,7 +94,7 @@ end
 
 function Panorama:FinishShooting()
     GameLogic.AddBBS(nil, L"生成全景图完成", 3000, "0 255 0")
-    -- GameLogic.GetCodeGlobal():UnregisterTextEvent("after_generate_panorama", self.AfterGeneratePanorama)
+    GameLogic.GetCodeGlobal():UnregisterTextEvent("after_generate_panorama", self.AfterGeneratePanorama)
 
     Mod.WorldShare.MsgBox:Show(L"正在上传全景图，请稍后...", 30000, L"分享失败", 320, 120)
     self:UploadPanoramaPhoto(function(bSucceed)
