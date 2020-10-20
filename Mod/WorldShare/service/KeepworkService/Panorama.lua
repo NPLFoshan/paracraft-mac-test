@@ -60,7 +60,7 @@ function KeepworkServicePanorama:Upload(callback, recursive)
 
             local content = LocalService:GetFileContent(self.basePath .. filename)
 
-            QiniuRootApi:Upload(data.data.token, data.data.key, filename, content, function(data, err)
+            QiniuRootApi:Upload(data.data.token, data.data.key, data.data.key, content, function(data, err)
                 if err ~= 200 or not data or not data.data or not data.data.url then
                     callback(false)
                     return

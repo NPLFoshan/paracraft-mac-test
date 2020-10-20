@@ -62,7 +62,10 @@ function Panorama:ShowPreview()
 end
 
 function Panorama:ShowShare()
+    Mod.WorldShare.MsgBox:Show(L"正在生成小程序二维码...", 8000)
     KeepworkServicePanorama:GenerateMiniProgramCode(function(bSucceed, wxacode)
+        Mod.WorldShare.MsgBox:Close()
+
         if not bSucceed then
             GameLogic.AddBBS(nil, 3000, L"生成小程序二维码失败", "255 0 0")
             return
