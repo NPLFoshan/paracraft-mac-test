@@ -273,7 +273,7 @@ function HttpRequest:PostFields(url, params, headers, success, error)
     end
 
     local boundaryLine = "--WebKitFormBoundary" .. self.boundary .. "\n"
-    local postfields = ""
+    local postfields = "" .. boundaryLine
 
     
     for key, item in ipairs(params) do

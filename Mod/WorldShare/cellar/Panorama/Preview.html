@@ -21,6 +21,10 @@
                         close()
                         Panorama:ShowCreate()
                     end
+
+                    function get_share_url()
+                        return Panorama.shareUrl
+                    end
                 ]]>
             </script>
             <kp:window width="500" height="653" onclose="close()">
@@ -35,7 +39,7 @@
                             enabledResize="true"
                             width="274"
                             height="593"
-                            url="http://rls.kp-para.cn/wx/Pannellum/93"
+                            url="<%= get_share_url() %>"
                             style="background:url()"
                         />
                     </div>

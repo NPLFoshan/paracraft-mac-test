@@ -20,6 +20,8 @@ local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua
 
 -- service
 local KeepworkServicePanorama = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Panorama.lua")
+local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
+local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 
 local Panorama = NPL.export()
 
@@ -88,13 +90,69 @@ function Panorama:FinishShooting()
     -- GameLogic.GetCodeGlobal():UnregisterTextEvent("after_generate_panorama", self.AfterGeneratePanorama)
 
     Mod.WorldShare.MsgBox:Show(L"正在上传全景图，请稍后...", 30000, L"分享失败", 320, 120)
-    self:UploadPanoramaPhoto(function(data)
+    self:UploadPanoramaPhoto(function(bSucceed)
         Mod.WorldShare.MsgBox:Close()
+
+        if not bSucceed then
+            return
+        end
+
+        local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+
+        self.shareUrl = KeepworkService:GetKeepworkUrl() .. "/wx/Pannellum/" .. currentEnterWorld.kpProjectId
+
+        self:ShowPreview()
     end)
 end
 
 function Panorama:UploadPanoramaPhoto(callback)
-    KeepworkServicePanorama:Upload(function(data, err)
-        echo(data, true)
+    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+
+    if not currentEnterWorld or not currentEnterWorld.kpProjectId then
+        return false
+    end
+
+    if not callback or type(callback) ~= 'function' then
+        return false
+    end
+
+    KeepworkServiceProject:GetProject(currentEnterWorld.kpProjectId, function(data, err)
+        if err ~= 200 or not data or not data.id or not data.userId then
+            GameLogic.AddBBS(nil, L"项目不存在", 3000, "255 0 0")
+            callback(false)
+            return
+        end
+
+        local userId = Mod.WorldShare.Store:Get('user/userId')
+
+        if data.userId ~= userId then
+            GameLogic.AddBBS(nil, L"此项目不属于你，不能分享", 3000, "255 0 0")
+            callback(false)
+            return
+        end
+
+        KeepworkServicePanorama:Upload(function(bSucceed, fileArray)
+            if not bSucceed then
+                GameLogic.AddBBS(nil, L"上传全景图失败", 3000, "255 0 0")
+                callback(false)
+                return
+            end
+
+            local params = {
+                extra = {
+                    cubeMap = fileArray
+                }
+            }
+
+            KeepworkServiceProject:UpdateProject(currentEnterWorld.kpProjectId, params, function(data, err)
+                if err ~= 200 then
+                    GameLogic.AddBBS(nil, L"上传全景图失败", 3000, "255 0 0")
+                    callback(false)
+                end
+
+                callback(true)
+            end)
+        end)
     end)
+
 end

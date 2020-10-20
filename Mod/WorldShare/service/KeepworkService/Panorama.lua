@@ -15,16 +15,63 @@ local KeepworkServicePanorama = NPL.export()
 local StoragePanoramasApi = NPL.load("(gl)Mod/WorldShare/api/Storage/Panoramas.lua")
 local QiniuRootApi = NPL.load("(gl)Mod/WorldShare/api/Qiniu/Root.lua")
 
-KeepworkServicePanorama.updateIndex = 0
+-- service
+local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 
-function KeepworkServicePanorama:Upload(callback)
+KeepworkServicePanorama.uploadIndex = 0
+KeepworkServicePanorama.fileArray = {}
+KeepworkServicePanorama.basePath = Mod.WorldShare.Utils.GetRootFolderFullPath() .. "Screen Shots/"
+
+function KeepworkServicePanorama:Upload(callback, recursive)
+    if not callback or type(callback) ~= 'function' then
+        return false
+    end
+
+    if self.uploadIndex ~= 0 and not recursive then
+        return false
+    end
+
     local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
 
     if not currentEnterWorld or not currentEnterWorld.kpProjectId then
         return false
     end
 
+    local filename = self.uploadIndex .. ".jpg"
     local projectId = currentEnterWorld.kpProjectId
 
-    StoragePanoramasApi:UploadToken(projectId, "0.jpg", callback, callback)
+    if self.uploadIndex > 5 then
+        -- return
+        callback(true, self.fileArray)
+        self.uploadIndex = 0
+        self.fileArray = {}
+        return
+    end
+
+    StoragePanoramasApi:UploadToken(
+        projectId,
+        filename,
+        function(data, err)
+            if err ~= 200 or not data or not data.data then
+                callback(false)
+                return
+            end
+
+            local content = LocalService:GetFileContent(self.basePath .. filename)
+
+            QiniuRootApi:Upload(data.data.token, data.data.key, filename, content, function(data, err)
+                if err ~= 200 or not data or not data.data or not data.data.url then
+                    callback(false)
+                    return
+                end
+
+                self.uploadIndex = self.uploadIndex + 1
+                self.fileArray[#self.fileArray + 1] = data.data.url
+                self:Upload(callback, true)
+            end)
+        end,
+        function()
+            callback(false)
+        end
+    )
 end
