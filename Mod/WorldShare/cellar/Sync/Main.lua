@@ -51,7 +51,7 @@ function SyncMain:ShowNewVersionFoundPage(callback)
 end
 
 function SyncMain:ShowStartSyncPage(useOffline)
-    SyncMain:ShowDialog("Mod/WorldShare/cellar/Sync/Templates/StartSync.html?useOffline=" .. (useOffline and "true" or "false"), "Mod.WorldShare.StartSync")
+    SyncMain:ShowDialog("Mod/WorldShare/cellar/Theme/Sync/StartSync.html?useOffline=" .. (useOffline and "true" or "false"), "Mod.WorldShare.StartSync")
 end
 
 function SyncMain:SetStartSyncPage()
