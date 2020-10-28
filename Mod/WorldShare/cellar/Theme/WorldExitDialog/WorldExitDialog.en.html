@@ -233,8 +233,8 @@
         <style type="text/mcss" src="Mod/WorldShare/cellar/Theme/Mcss/Theme1.mcss">
             {
                 button1 = {
-                    width = 140,
-                    height = 28
+                    width = 100,
+                    height = 32
                 },
                 button2 = {
                     width = 140,
@@ -243,7 +243,7 @@
                     color = '#ffffff'
                 },
                 star_area = {
-                    ['margin-top'] = 15,
+                    ['margin-top'] = 0,
                     ['margin-left'] = 50
                 },
                 dialog_container = {
@@ -255,7 +255,7 @@
                 }
             }
         </style>
-        <kp:window width="610" height="400" onclose="on_click_cancel()">
+        <kp:window width="610" height="420" onclose="on_click_cancel()">
             <div class="dialog_container">
                 <div class="dialog_header">
                     <div style="position: relative;margin-top: 9px;margin-left: 8px;color: white;">
@@ -263,33 +263,35 @@
                     </div>
                 </div>
                 <div>
-                    <div style="padding:20px;padding-bottom:5px;color:#ffffff">
-                        <div>
+                    <div style="padding:20px;padding-top: 5px;padding-bottom:5px;color:#ffffff;">
+                        <div style="margin-bottom: 5px;">
                             <pe:if condition='<%= System.os.GetPlatform() == "win32" %>'>
-                                <input type="button" class="mc_light_grey_button_with_fillet" style='height: 30px;width: 95px;' value='<%= L"短视频分享" %>' onclick="share_short_video()" />
-                                <input type="button" class="mc_light_grey_button_with_fillet" style='height: 30px;width: 95px;margin-left: 10px;' value='<%= L"全景图分享" %>' onclick="share_panorama()" />
+                                <input type="button" class="theme1_gray_button" style='height: 30px;width: 95px;' value='<%= L"短视频分享" %>' onclick="share_short_video()" />
+                                <div class="theme1_black_button" style="float:left;width: 110px;height: 35px;padding-top: 4px;">
+                                    <input type="button" style='position: relative;width: 110px;height: 35px;background: url()' value='' onclick="share_panorama()" />
+                                    <img style="width: 20px;height: 21px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#950 216 20 21);margin-left: 10px;margin-top: 1px;" />
+                                    <%= L"全景图分享" %>
+                                </div>
                             </pe:if>
                             <pe:if condition='<%= System.os.GetPlatform() ~= "win32" %>'>
-                                <input type="button" class="mc_light_grey_button_with_fillet" style='height: 30px;width: 95px;' value='<%= L"全景图分享" %>' onclick="share_panorama()" />
+                                <div class="theme1_black_button" style="float:left;width: 110px;height: 35px;padding-top: 4px;">
+                                    <input type="button" style='position: relative;width: 110px;height: 35px;background: url()' value='' onclick="share_panorama()" />
+                                    <img style="width: 20px;height: 21px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#950 216 20 21);margin-left: 10px;margin-top: 1px;" />
+                                    <%= L"全景图分享" %>
+                                </div>
                             </pe:if>
                         </div>
-                        <div>
-                            <div style="float:left">
+                        <div style="width: 571px;padding: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#660 273 32 32:8 8 8 8);">
+                            <div style="float:left;width: 280px;height: 185px;">
+                                <div zorder="2" style="position: relative; width: 280px;height: 185px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#614 273 32 32:8 8 8 8);"></div>
                                 <img name="ShareWorldImage" zorder="1" width="280" height="185" onclick="snapshot()" tooltip='<%= L"重新截图" %>' />
-                                <div style="margin-top:3px;height:20px;">
-                                    <pe:if condition="<%= not GameLogic.IsReadOnly() %>">
-                                        <a style="font-size:12px;color:#1456b4;max-width:120px;text-singleline:false;background: url()" onclick="snapshot()">
-                                            <%=L"重新截图" %>
-                                        </a>
-                                    </pe:if>
-                                </div>
                             </div>
                             <div style="float:right;padding-left:28px;">
                                 <div style="margin-top:-5px;margin-bottom: 20px;">
                                     <span style="color: #000000"><%= "项目ID：" %></span>
-                                    <input type="button" style="float:left;color:#ffffff;" class="mc_blue_button_with_fillet" value="<%= get_project_id() %>" onclick="open_keepwork_project()" tooltip='<%= L"点击访问作品项目页面" %>' />&nbsp;
+                                    <input type="button" style="float:left;height: 25px;" class="theme1_baby_bule_button" value="<%= get_project_id() %>" onclick="open_keepwork_project()" tooltip='<%= L"点击访问作品项目页面" %>' />&nbsp;
                                     <pe:if condition="<%= not GameLogic.IsReadOnly() and (not has_project_id() or is_user_world()) %>">
-                                        <input type="button" class="mc_light_grey_button_with_fillet" style="font-size: 12px;" value="<%= L'上传' %>" onclick="on_click_share_world()"/>
+                                        <input type="button" class="theme1_black_button" style="font-size: 12px;width: 40px;height: 25px;" value="<%= L'上传' %>" onclick="on_click_share_world()"/>
                                     </pe:if>
                                 </div>
                                 <div>
@@ -300,12 +302,12 @@
                                     </div>
                                     <pe:if condition="<%= get_platform() ~= 'android' and get_platform() ~= 'ios' %>">
                                         <div style="float:right;">
-                                            <div style="margin-bottom: 12px;">
-                                                <input type="button" class="button1 mc_light_grey_button_with_fillet" value="<%= L'本地目录' %>" onclick="on_open_world_dir()" tooltip='<%= L"点击打开所在目录" %>'/>
+                                            <div style="margin-bottom: 6px;">
+                                                <input type="button" class="button1 theme1_baby_bule_button" tooltip='<%= L"点击打开所在目录" %>' value="<%= L'本地目录' %>" onclick="on_open_world_dir()" />
                                             </div>
                                             <pe:if condition="<%= not GameLogic.IsReadOnly() %>">
-                                                <div style="margin-bottom: 12px;">
-                                                    <input type="button" class="button1 mc_light_grey_button_with_fillet" tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' value="<%= L'历史版本' %>" onclick="on_click_revision()" />
+                                                <div style="margin-bottom: 6px;">
+                                                    <input type="button" class="button1 theme1_lime_button" tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' value="<%= L'历史版本' %>" onclick="on_click_revision()" />
                                                 </div>
                                             </pe:if>
                                         </div>
@@ -327,10 +329,10 @@
                                             <pe:repeat DataSource="<%=get_star()%>">
                                                 <pe:repeatitem>
                                                     <pe:if condition="<%=Eval('selected') == true %>">
-                                                        <div style="float:left;margin-right: 10px;background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#175 130 54 51:0 0 0 0);width: 25px;height: 25px;" name='<%=Eval("index")%>' onclick="set_star"></div>
+                                                        <div style="float:left;margin-right: 10px;background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#810 208 42 38);width: 25px;height: 25px;" name='<%=Eval("index")%>' onclick="set_star"></div>
                                                     </pe:if>
                                                     <pe:if condition="<%=Eval('selected') == false %>">
-                                                        <div style="float:left;margin-right: 10px;background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#110 130 54 51:0 0 0 0);width: 25px;height: 25px;" name='<%=Eval("index")%>' onclick="set_star"></div>
+                                                        <div style="float:left;margin-right: 10px;background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#858 208 42 38);width: 25px;height: 25px;" name='<%=Eval("index")%>' onclick="set_star"></div>
                                                     </pe:if>
                                                 </pe:repeatitem>
                                             </pe:repeat>
@@ -340,19 +342,26 @@
                             </div>
                         </div>
                     </div>
-                    <div style="padding-left:20px;padding-right: 20px;color:#000000">
-                        <div style="margin-top:20x;base-font-size:15px;font-size:15px;">
+                    <div style="padding-left:30px;color:#000000">
+                        <div style="margin-top:3px;height:20px;">
+                            <pe:if condition="<%= not GameLogic.IsReadOnly() %>">
+                                <a style="font-size:12px;color:#1456b4;max-width:120px;text-singleline:false;background: url()" onclick="snapshot()">
+                                    <%=L"重新截图" %>
+                                </a>
+                            </pe:if>
+                        </div>
+                        <div style="margin-top:5x;base-font-size:15px;font-size:15px;">
                             <%= L"您上次保存世界是:"%> <span style="color:#ff6a00"><%=format(L"%d秒前", get_elapsed_unsaved_seconds())%></span>
                         </div>
-                        <div style="margin-top:25x;">
+                        <div style="margin-top:10x;">
                             <pe:if condition="<%= GameLogic.IsReadOnly() %>">
-                                <input type="button" onclick="save_as()" value='<%=L"另存为..." %>' class="mc_big_button" style="min-width:155px;height:35px;" />
+                                <input type="button" onclick="save_as()" value='<%=L"另存为..." %>' class="theme1_orange_button" style="min-width:155px;height:45px;" />
                             </pe:if>
                             <pe:if condition="<%= not GameLogic.IsReadOnly() %>">
-                                <input type="button" onclick="on_click_save_and_exit()" value='<%=L"保存并退出" %>' class="theme1_orange_button" style="min-width:155px;height:35px;" />
+                                <input type="button" onclick="on_click_save_and_exit()" value='<%=L"保存并退出" %>' class="theme1_orange_button" style="min-width:155px;height:50px;" />
                             </pe:if>
-                            <input type="button" onclick="on_click_exit_without_save()" value='<%=L"直接退出" %>' class="theme1_gray_button" style="margin-left:45px;min-width:155px;height:35px;" />
-                            <input type="button" onclick="on_click_cancel()" value='<%=L"取消" %>' class="theme1_gray_button" style="margin-left:45x;min-width:155px;height:35px;" />
+                            <input type="button" onclick="on_click_exit_without_save()" value='<%=L"直接退出" %>' class="theme1_gray_button" style="margin-left:45px;min-width:155px;height:50px;" />
+                            <input type="button" onclick="on_click_cancel()" value='<%=L"取消" %>' class="theme1_gray_button" style="margin-left:45x;min-width:155px;height:50px;" />
                         </div>
                     </div>
                 </div>
