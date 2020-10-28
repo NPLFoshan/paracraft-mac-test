@@ -633,6 +633,12 @@ function SyncToDataSource:UpdateRecord(callback)
                     return false
                 end
 
+                if not self.currentWorld or
+                   not self.currentWorld.kpProjectId or
+                   not lastCommitSha then
+                    return false
+                end
+
                 QiniuRootApi:Upload(
                     data.token,
                     data.key,
