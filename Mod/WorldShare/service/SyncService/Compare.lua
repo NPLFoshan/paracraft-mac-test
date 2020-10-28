@@ -119,7 +119,6 @@ function Compare:CompareRevision()
         return false
     end
 
-    echo(currentWorld.worldpath, true)
     local currentRevision = WorldRevision:new():init(currentWorld.worldpath):Checkout()
     local remoteRevision = 0
 
@@ -127,10 +126,6 @@ function Compare:CompareRevision()
         self.createRevisionTimes = 0
 
         local function CompareRevision(currentRevision, remoteRevision)
-            echo("------------------------", true)
-            echo(currentRevision, true)
-            echo(remoteRevision, true)
-
             if remoteRevision == 0 then
                 currentWorld.status = 1
                 Mod.WorldShare.Store:Set("world/currentWorld", currentWorld)
