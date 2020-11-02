@@ -9,12 +9,16 @@ local EventTrackingService = NPL.load("(gl)Mod/WorldShare/service/EventTracking.
 ------------------------------------------------------------
 ]]
 
+-- libs
+local ParaWorldAnalytics = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua")
+
+-- api
 local EventGatewayEventsApi = NPL.load("(gl)Mod/WorldShare/api/EventGateway/Events.lua")
 
 local EventTrackingService = NPL.export()
 
 function EventTrackingService:Send(action, value, otherParams)
-    echo('from event tracking service!!!!!!', true)
+    ParaWorldAnalytics:Send()
 
     echo(action, true)
     echo(value, true)

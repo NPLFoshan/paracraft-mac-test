@@ -299,6 +299,7 @@ function WorldShare:init()
                 reason = result.payload.reason
             end
 
+            Mod.WorldShare.Store:Action("user/Logout")()
             UserConsole:ShowKickOutPage(reason)
         end
     end)
