@@ -103,6 +103,7 @@ local Menu = NPL.load("(gl)Mod/WorldShare/cellar/Menu/Menu.lua")
 -- service
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
+local EventTrackingService = NPL.load("(gl)Mod/WorldShare/service/EventTracking.lua")
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 
 -- helper
@@ -260,6 +261,14 @@ function WorldShare:init()
         "menu_command",
         function(bEnable, cmdName, cmdText, cmdParams)
             return MenuCommand:Call(cmdName, cmdText, cmdParams)
+        end
+    )
+
+    -- filter user behavior
+    GameLogic:GetFilters():add_filter(
+        "user_behavior",
+        function(action, value, otherParams)
+            EventTrackingService:Send(action, value, otherParams)
         end
     )
 
