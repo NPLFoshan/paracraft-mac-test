@@ -281,6 +281,9 @@ function WorldShare:init()
     -- prevent indulage
     PreventIndulge:Init()
 
+    -- event tracking init
+    EventTrackingService:Init()
+
     -- init cef3 for windows
     if System.os.GetPlatform() == "win32" then
         Cef3Manager:Init()

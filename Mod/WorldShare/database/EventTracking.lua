@@ -19,31 +19,37 @@ local EventTrackingDatabase = NPL.export()
         userId = 1,
         unitinfo = {
             {
-                localId = '123-ddd-111', -- uuid
-                action = 'editWorld',
-                userId = 1,
-                projectId = 1,
-                beginAt = 12345678,
-                endAt = 0,
-                duration = 0,
-                traceId = 123, -- apiTraceId
+                action = "testEvent",
+                packet = {
+                    localId = '123-ddd-111', -- uuid
+                    userId = 1,
+                    projectId = 1,
+                    beginAt = 12345678,
+                    endAt = 0,
+                    duration = 0,
+                    traceId = 123,
+                }
             },
             {
-                localId = '123-ddd-111', -- uuid
-                action = 'editWorld'
-                userId = 1,
-                projectId = 1,
-                beginAt = 12345678,
-                endAt = 12345678,
-                duration = 30000,
-                traceId = 123, -- apiTraceId
+                action = "testEvent",
+                packet = {
+                    localId = '123-ddd-111', -- uuid
+                    userId = 1,
+                    projectId = 1,
+                    beginAt = 12345678,
+                    endAt = 12345678,
+                    duration = 30000,
+                    traceId = 123,
+                }
             },
             {
-                localId = 'uuu-999-8888', -- uuid
-                action = 'createUser',
-                userId = 1,
-                currentAt = 1234567,
-                traceId = 888
+                action = "testEvent",
+                packet = {
+                    localId = 'uuu-999-8888', -- uuid
+                    userId = 1,
+                    currentAt = 1234567,
+                    traceId = 888
+                }
             }
         }
     },
@@ -51,11 +57,14 @@ local EventTrackingDatabase = NPL.export()
         userId = 2,
         unitinfo = {
             {
-                localId = 'ppp-0000-7777', -- uuid
-                action = 'createUser',
-                userId = 1,
-                currentAt = 1234567,
-                traceId = 888
+                action = "testEvent",
+                packet = {
+                    localId = 'ppp-0000-7777', -- uuid
+                    action = 'createUser',
+                    userId = 1,
+                    currentAt = 1234567,
+                    traceId = 888
+                }
             }
         }
     }
@@ -73,21 +82,20 @@ function EventTrackingDatabase:SaveAllData(allData)
     return playerController:SaveLocalData("event_tracking", allData, true)
 end
 
-function EventTrackingDatabase:PutPacket(userId, packet)
-    if not userId or not packet then
+function EventTrackingDatabase:PutPacket(userId, action, packet)
+    if not userId or not action or not packet then
         return false
     end
 
     local allData = self:GetAllData()
 
-    echo('from event tracking database add packet!!!!!!', true)
-    echo(allData, true)
     local beUserExisted = false
     local currentUser
 
     for key, item in ipairs(allData) do
-        if item and item.userId and tonumber(item.userId) == tonumbner(userId) then
+        if item and item.userId and tonumber(item.userId) == tonumber(userId) then
             beUserExisted = true
+            currentUser = item
             break
         end
     end
@@ -97,10 +105,8 @@ function EventTrackingDatabase:PutPacket(userId, packet)
             userId = tonumber(userId),
             unitinfo = {}
         }
-    end
 
-    if not packet and not packet.action then
-        return false
+        allData[#allData + 1] = currentUser
     end
 
     -- check packet action exist
@@ -108,7 +114,7 @@ function EventTrackingDatabase:PutPacket(userId, packet)
     local currentUnitinfo
 
     for key, item in ipairs(currentUser.unitinfo) do
-        if item and item.action and item.action == packet.action then
+        if item and item.action and item.action == action then
             beActionExisted = true
             currentUnitinfo = item
             break
@@ -116,13 +122,18 @@ function EventTrackingDatabase:PutPacket(userId, packet)
     end
 
     if not beActionExisted then
-        currentUser.unitinfo[#currentUser.unitinfo + 1] = packet
+        currentUser.unitinfo[#currentUser.unitinfo + 1] = {
+            action = action,
+            packet = packet
+        }
     else
         -- update record
         for key, value in pairs(packet) do
-            for cKey, cValue in pairs(currentUnitinfo) do
+            for cKey, cValue in pairs(currentUnitinfo.packet) do
                 if key == cKey then
-                    currentUnitinfo[cKey] = value
+                    if cKey ~= 'traceId' then
+                        currentUnitinfo.packet[cKey] = value
+                    end
                 end
             end
         end
@@ -131,8 +142,8 @@ function EventTrackingDatabase:PutPacket(userId, packet)
     return self:SaveAllData(allData)
 end
 
-function EventTrackingDatabase:RemovePacket(userId, packet)
-    if not userId or not packet or not packet.action then
+function EventTrackingDatabase:RemovePacket(userId, action, packet)
+    if not userId or not packet or not action then
         return false
     end
 
@@ -144,7 +155,7 @@ function EventTrackingDatabase:RemovePacket(userId, packet)
             local currentUnitinfo = commonlib.Array:new(aItem.unitinfo)
 
             for uKey, uItem in ipairs(currentUnitinfo) do
-                if uItem and uItem.action == packet.action then
+                if uItem and uItem.action == action then
                     currentUnitinfo:remove(uKey)
                 end
             end
@@ -162,4 +173,46 @@ function EventTrackingDatabase:RemovePacket(userId, packet)
     else
         return false
     end
+end
+
+function EventTrackingDatabase:GetPacket(userId, action)
+    if not userId or not action then
+        return false
+    end
+
+    local allData = self:GetAllData()
+
+    for aKey, aItem in ipairs(allData) do
+        if aItem.userId == userId then
+            if aItem.unitinfo and type(aItem.unitinfo) == 'table' then
+                for uKey, uItem in ipairs(aItem.unitinfo) do
+                    if uItem.action == action then
+                        return uItem.packet
+                    end
+                end
+            end
+        end
+    end
+
+    return nil
+end
+
+function EventTrackingDatabase:ClearUselessCache()
+    local allData = self:GetAllData()
+
+    for aKey, aItem in ipairs(allData) do
+        local currentUnitinfo = commonlib.Array:new(aItem.unitinfo)
+
+        for cKey, cItem in ipairs(currentUnitinfo) do
+            if cItem and cItem.packet then
+                if cItem.packet.endAt and cItem.packet.endAt == 0 then
+                    currentUnitinfo:remove(cKey)
+                end
+            end
+        end
+        
+        aItem.unitinfo = currentUnitinfo
+    end
+
+    return self:SaveAllData(allData)
 end

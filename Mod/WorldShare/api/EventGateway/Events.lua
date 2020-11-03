@@ -24,6 +24,12 @@ local EventGatewayEventsApi = NPL.export()
 ]]
 -- return: object
 function EventGatewayEventsApi:Send(category, action, data, extra, success, error)
+    local params = {
+        category = category,
+        action = action,
+        data = data
+    }
+
     EventGatewayBaseApi:Post('/events/send', params, nil, success, error)
 end
 
