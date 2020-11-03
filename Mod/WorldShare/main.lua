@@ -148,7 +148,7 @@ function WorldShare:init()
             if Mod.WorldShare.Utils.IsEnglish() then
                 Mod.WorldShare.MsgBox:Show(L"checking for updates...", nil, nil, nil, nil, nil, "_ct")
             else
-                Mod.WorldShare.MsgBox:Show(L"正在检查更新， 请稍后...", nil, nil, nil, nil, nil, "_ct")
+                Mod.WorldShare.MsgBox:Show(L"正在检查更新， 请稍候...", nil, nil, nil, nil, nil, "_ct")
             end
         end
     )

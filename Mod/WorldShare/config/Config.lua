@@ -72,10 +72,10 @@ Config.esGatewayList = {
 }
 
 Config.eventGatewayList = {
-  ONLINE = "https://api.keepwork.com/event-gateway/",
-  STAGE = "http://api-dev.kp-para.cn/event-gateway/",
-  RELEASE = "http://api-rls.kp-para.cn/event-gateway/",
-  LOCAL = "http://api-dev.kp-para.cn/event-gateway/",
+  ONLINE = "https://api.keepwork.com/event-gateway",
+  STAGE = "http://api-dev.kp-para.cn/event-gateway",
+  RELEASE = "http://api-rls.kp-para.cn/event-gateway",
+  LOCAL = "http://api-dev.kp-para.cn/event-gateway",
 }
 
 Config.lessonList = {

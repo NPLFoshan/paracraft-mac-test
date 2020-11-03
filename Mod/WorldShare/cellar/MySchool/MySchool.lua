@@ -22,7 +22,7 @@ function MySchool:Show(callback)
     self.callback = callback
     self.searchText = ""
 
-    Mod.WorldShare.MsgBox:Show(L"请稍后...", nil, nil, nil, nil, 6)
+    Mod.WorldShare.MsgBox:Show(L"请稍候...", nil, nil, nil, nil, 6)
 
     local params = Mod.WorldShare.Utils.ShowWindow(600, 380, "(ws)Theme/MySchool/MySchool.html", "Mod.WorldShare.MySchool")
 

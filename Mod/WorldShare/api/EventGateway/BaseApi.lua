@@ -15,7 +15,7 @@ local BaseApi = NPL.load("../BaseApi.lua")
 local EventGatewayBaseApi = NPL.export()
 
 function EventGatewayBaseApi:GetApi()
-    return Config.evnetGatewayList[BaseAPi:GetEnv()] or ""
+    return Config.eventGatewayList[BaseApi:GetEnv()] or ""
 end
 
 -- private

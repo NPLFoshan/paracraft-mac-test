@@ -56,7 +56,7 @@ function Progress:Init(syncInstance)
 
     self.current = 0
     self.total = 0
-    self.msg = L"同步中，请稍后..."
+    self.msg = L"同步中，请稍候..."
     self.finish = false
     self.broke = false
 
@@ -117,7 +117,7 @@ function Progress:Cancel(callback)
 
     self.syncInstance:SetBroke(true)
 
-    Mod.WorldShare.MsgBox:Show(L"正在等待上次同步完成，请稍后...", nil, nil, 380, 130, 11)
+    Mod.WorldShare.MsgBox:Show(L"正在等待上次同步完成，请稍候...", nil, nil, 380, 130, 11)
 
     self.broke = true
     self.finish = true
@@ -179,7 +179,7 @@ function Progress:UpdateDataBar(current, total, msg)
     self.msg = msg
 
     if not msg then
-        self.msg = L"同步中，请稍后..."
+        self.msg = L"同步中，请稍候..."
     end
 
     LOG.std("Progress", "debug", "Progress", format("Totals : %s , Current : %s, Status : %s", self.total, self.current, self.msg))
