@@ -124,6 +124,8 @@ function EventTrackingService:Send(type, action, ...)
             end
         )
     end
+
+    return dataPacket
 end
 
 function EventTrackingService:Loop()

@@ -267,8 +267,8 @@ function WorldShare:init()
     -- filter user behavior
     GameLogic:GetFilters():add_filter(
         "user_behavior",
-        function(action, value, otherParams)
-            EventTrackingService:Send(action, value, otherParams)
+        function(type, action)
+            EventTrackingService:Send(type, action)
         end
     )
 
