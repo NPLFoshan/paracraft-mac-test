@@ -5,7 +5,7 @@ Date: 2017.4.17
 Desc: 
 use the lib:
 ------------------------------------------------------------
-local Progress = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Progress.lua")
+local Progress = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Progress/Progress.lua")
 ------------------------------------------------------------
 ]]
 
@@ -104,7 +104,10 @@ function Progress:ClosePage()
 
     if ProgressPage then
         ProgressPage:CloseWindow()
-        self.syncInstance:Close()
+
+        if self.syncInstance then
+            self.syncInstance:Close()
+        end
     end
 end
 

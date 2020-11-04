@@ -19,6 +19,7 @@
 
                 function finish()
                     return Progress:GetFinish()
+                    -- return true
                 end
 
                 function broke()
@@ -98,9 +99,11 @@
                     <pe:if condition="<%= broke() %>">
                         <%= msg() %>
                     </pe:if>
-                    <div style="margin-top:30px;">
-                        <pe:progressbar name="progressbar"  block_bg_autosize = "true" Minimum="0" Maximum="<%= get_bar_maximun() %>" Value="<%= get_bar_current() %>"/>
-                    </div>
+                    <pe:if condition="<%= not finish() %>">
+                        <div style="margin-top:30px;">
+                            <pe:progressbar name="progressbar"  block_bg_autosize = "true" Minimum="0" Maximum="<%= get_bar_maximun() %>" Value="<%= get_bar_current() %>"/>
+                        </div>
+                    </pe:if>
                 </div>
             </kp:window>
         </div>
