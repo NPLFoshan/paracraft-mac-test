@@ -49,8 +49,15 @@ local Theme1 = NPL.load("(gl)Mod/WorldShare/cellar/Theme/Mcss/Main.lua")
         background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#205 162 32 16:5 5 5 5",
         textcolor = "#000000",
     },
-    theme_black_textfield = {
+    theme1_black_textfield = {
         background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png#477 182 16 16:4 4 4 4",
         textcolor = "#ffffff",
+    },
+    theme1_gray_container_background = {
+        background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png#660 273 32 32:8 8 8 8",
+    },
+    theme1_gray_image_mask = {
+        position = 'relative',
+        background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png#614 273 32 32:8 8 8 8",
     }
 }

@@ -30,7 +30,7 @@ function ShareWorld:Init(bEnabled, callback)
     local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     if GameLogic.IsReadOnly() or not currentWorld or currentWorld.is_zip then
-        _guihelper.MessageBox(L"此世界不支持分享")
+        -- todo: show qr code
         return false
     end
 
@@ -78,7 +78,7 @@ function ShareWorld:Init(bEnabled, callback)
 end
 
 function ShareWorld:ShowPage()
-    local params = Mod.WorldShare.Utils.ShowWindow(640, 415, "Mod/WorldShare/cellar/ShareWorld/ShareWorld.html", "ShareWorld")
+    local params = Mod.WorldShare.Utils.ShowWindow(640, 415, "Mod/WorldShare/cellar/Theme/ShareWorld/ShareWorld.html", "ShareWorld")
 
     params._page.OnClose = function()
         Mod.WorldShare.Store:Remove('page/ShareWorld')
