@@ -143,7 +143,7 @@ function EventTrackingDatabase:PutPacket(userId, action, packet)
 end
 
 function EventTrackingDatabase:RemovePacket(userId, action, packet)
-    if not userId or not packet or not action then
+    if not userId or not action or not packet then
         return false
     end
 
@@ -157,6 +157,7 @@ function EventTrackingDatabase:RemovePacket(userId, action, packet)
             for uKey, uItem in ipairs(currentUnitinfo) do
                 if uItem and uItem.action == action then
                     currentUnitinfo:remove(uKey)
+                    break
                 end
             end
 
@@ -164,8 +165,6 @@ function EventTrackingDatabase:RemovePacket(userId, action, packet)
             beRemoveSuccessed = true
             break
         end
-
-        break
     end
 
     if beRemoveSuccessed then

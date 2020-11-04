@@ -9,15 +9,21 @@ local ShareWorld = NPL.load("(gl)Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua
 ShareWorld:Init()
 -------------------------------------------------------
 ]]
+
+-- libs
 local PackageShareWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.Areas.ShareWorldPage")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
+-- UI
 local SyncMain = NPL.load("(gl)Mod/WorldShare/cellar/Sync/Main.lua")
 local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
+local Panorama = NPL.load("(gl)Mod/WorldShare/cellar/Panorama/Panorama.lua")
+
+-- service
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
 local LocalService = NPL.load("(gl)Mod/WorldShare/service/LocalService.lua")
 local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
@@ -30,7 +36,7 @@ function ShareWorld:Init(bEnabled, callback)
     local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     if GameLogic.IsReadOnly() or not currentWorld or currentWorld.is_zip then
-        -- todo: show qr code
+        Panorama:ShowShare(false)
         return false
     end
 

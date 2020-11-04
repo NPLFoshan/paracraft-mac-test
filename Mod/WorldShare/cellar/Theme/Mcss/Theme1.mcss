@@ -22,6 +22,7 @@ local Theme1 = NPL.load("(gl)Mod/WorldShare/cellar/Theme/Mcss/Main.lua")
     theme1_lime_button = {
         background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png#765 209 38 40:12 10 12 13",
         ["text-offset-y"] = -2,
+        ["text-offset-x"] = -1,
     },
     theme1_orange_button = {
         background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png#576 198 38 64:12 10 12 15",
@@ -40,7 +41,7 @@ local Theme1 = NPL.load("(gl)Mod/WorldShare/cellar/Theme/Mcss/Main.lua")
         ['text-offset-y'] = -2,
         color = "#ffffff",
     },
-    theme1_white_textfiled = {
+    theme1_white_textfield = {
         background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#198 132 16 16:4 4 4 4",
         textcolor = "#000000",
         padding = 0,
