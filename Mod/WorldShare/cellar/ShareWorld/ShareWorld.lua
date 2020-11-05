@@ -21,7 +21,6 @@ local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
 local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
 local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList.lua")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
-local Panorama = NPL.load("(gl)Mod/WorldShare/cellar/Panorama/Panorama.lua")
 
 -- service
 local Compare = NPL.load("(gl)Mod/WorldShare/service/SyncService/Compare.lua")
@@ -36,7 +35,7 @@ function ShareWorld:Init(bEnabled, callback)
     local currentWorld = Mod.WorldShare.Store:Get("world/currentWorld")
 
     if GameLogic.IsReadOnly() or not currentWorld or currentWorld.is_zip then
-        Panorama:ShowShare(false)
+        self:ShowWorldCode(currentWorld.kpProjectId)
         return false
     end
 
@@ -213,4 +212,22 @@ function ShareWorld:UpdateImage(bRefreshAsset)
 
         self:Refresh()
     end
+end
+
+function ShareWorld:ShowWorldCode(projectId)
+    Mod.WorldShare.MsgBox:Show(L"请稍候...")
+
+    KeepworkServiceProject:GenerateMiniProgramCode(
+        projectId,
+        function(bSucceed, wxacode)
+            Mod.WorldShare.MsgBox:Close()
+
+            if not bSucceed then
+                GameLogic.AddBBS(nil, L"生成二维码失败", 3000, "255 0 0")
+                return false
+            end
+
+            Mod.WorldShare.Utils.ShowWindow(520, 305, "Mod/WorldShare/cellar/ShareWorld/Code.html?wxacode=".. wxacode or "", "Mod.WorldShare.ShareWorld.Code")
+        end
+    )
 end

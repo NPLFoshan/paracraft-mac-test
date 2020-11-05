@@ -306,7 +306,7 @@ function SyncMain:SyncToDataSource(callback)
     
             WorldList:RefreshCurrentServerList()
         end)
-    
+
         -- load sync progress UI
         Progress:Init(syncInstance)
     end
