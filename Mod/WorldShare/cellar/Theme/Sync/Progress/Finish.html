@@ -16,19 +16,6 @@
                     return wxacode
                 end
 
-                function msg()
-                    return Progress:GetMsg()
-                end
-
-                function finish()
-                    -- return Progress:GetFinish()
-                    return true
-                end
-
-                function broke()
-                    return Progress:GetBroke()
-                end
-
                 function copy()
                     Progress:Copy(KeepworkService:GetShareUrl())
                 end
@@ -53,28 +40,20 @@
                     ParaGlobal.ShellExecute("open", url, "", "", 1)
                 end
 
-                function get_bar_maximun()
-                    return Progress.total
-                end
-
-                function get_bar_current()
-                    return Progress.current
-                end
-
                 function close()
                     Progress:CloseFinishPage()
                 end
 
                 function is_show_panorama_button()
                     local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
-                    lcoal currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+                    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
 
                     if not currentWorld or not currentWorld.kpProjectId or
                        not currentEnterWorld or not currentEnterWorld.kpProjectId then
                         return false
                     end
 
-                    if tonumber(currentWorld.kpProjectId) == tonumber(currentEnterWorld,.kpProjectId) then
+                    if tonumber(currentWorld.kpProjectId) == tonumber(currentEnterWorld.kpProjectId) then
                         return true
                     else
                         return false
@@ -82,6 +61,7 @@
                 end
 
                 function show_panorama()
+                    close()
                     Panorama:ShowCreate(true)
                 end
              ]]>
@@ -123,10 +103,11 @@
                                 <div style="margin-top: 15px;margin-left: 200px;width: 100px;height: 100px;background-color: #ffffff;">
                                     <img style="width: 100px;height: 100px;" src="<%= get_wxacode() %>" />
                                 </div>
-                                <pe:if condition="<%= %>"></pe:if>
-                                <div style="margin-top: 15px;margin-left: 185px;">
-                                    <input type="button" class="theme1_orange_button" style="height: 45px;width: 130px" value="<%= L'拍摄全景图' %>" onclick="show_panorama"/>
-                                </div>
+                                <pe:if condition="<%= is_show_panorama_button() %>">
+                                    <div style="margin-top: 15px;margin-left: 185px;">
+                                        <input type="button" class="theme1_orange_button" style="height: 45px;width: 130px" value="<%= L'拍摄全景图' %>" onclick="show_panorama"/>
+                                    </div>
+                                </pe:if>
                             </div>
                         </div>
                     </div>
