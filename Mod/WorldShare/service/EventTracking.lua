@@ -37,6 +37,11 @@ EventTrackingService.map = {
             edit = 'click.world.edit',
             play = 'click.world.play',
         },
+        minimap = {
+            paraworldlist = 'click.minimap.paraworldlist',
+            localworldinfo = 'click.minimap.localworldinfo',
+            spawnpoint = 'click.minimap.spawnpoint',
+        },
         dock = {
             character = 'click.dock.character',
             bag = 'click.dock.bag',
@@ -49,6 +54,12 @@ EventTrackingService.map = {
             system = 'click.dock.system',
             vip = 'click.dock.vip',
             mall = 'click.dock.mall',
+            competition = 'click.dock.competition',
+            checkin = 'click.dock.checkin',
+            weekquest = 'click.dock.weekquest',
+            codewar = 'click.dock.codewar',
+            webkeepworkhome = 'click.dock.webkeepworkhome',
+            usertip = 'click.dock.usertip',
         },
         task = {
             program = 'click.task.program',
