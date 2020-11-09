@@ -26,6 +26,42 @@ local EventTrackingService = NPL.export()
 EventTrackingService.firstInit = false
 EventTrackingService.timeInterval = 10000 -- 10 seconds
 EventTrackingService.currentLoop = nil
+EventTrackingService.map = {
+    duration = {
+        world = {
+            stay = 'duration.world.stay'
+        },
+    },
+    click = {
+        world = {
+            edit = 'click.world.edit',
+            play = 'click.world.play',
+        },
+        dock = {
+            character = 'click.dock.character',
+            bag = 'click.dock.bag',
+            work = 'click.dock.work',
+            explore = 'click.dock.explore',
+            study = 'click.dock.study',
+            home = 'click.dock.home',
+            friends = 'click.dock.friends',
+            school = 'click.dock.school',
+            system = 'click.dock.system',
+            vip = 'click.dock.vip',
+            mall = 'click.dock.mall',
+        },
+        task = {
+            program = 'click.task.program',
+            animation = 'click.task.animation',
+            CAD = 'click.task.CAD',
+            language = 'click.task.language',
+            math = 'click.task.math',
+            english = 'click.task.english',
+            science = 'click.task.science',
+            humanities = 'click.task.humanities'
+        }
+    }
+}
 
 function EventTrackingService:Init()
     if self.firstInit then
@@ -83,15 +119,45 @@ function EventTrackingService:GenerateDataPacket(type, userId, action)
     end
 end
 
+function EventTrackingService:GetAction(action)
+    if not action or type(action) ~= 'string' then
+        return false
+    end
+
+    local cur
+
+    for item in string.gmatch(action, "[^%.]+") do
+        if not cur then
+            cur = self.map[item]
+        else
+            if type(cur) == 'table' then
+                cur = cur[item]
+            end
+        end
+
+        if not cur then
+            return false
+        end
+
+        if type(cur) == 'string' then
+            return cur
+        end
+    end
+end
+
 -- type: 1 is one click event, 2 is duration event
 function EventTrackingService:Send(type, action, ...)
     if not KeepworkServiceSession:IsSignedIn() then
         return false
     end
 
-    -- ParaWorldAnalytics:Send()
-
     if not type or not action then
+        return false
+    end
+
+    action = self:GetAction(action)
+
+    if not action then
         return false
     end
 
