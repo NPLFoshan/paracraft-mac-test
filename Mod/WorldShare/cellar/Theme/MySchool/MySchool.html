@@ -172,12 +172,12 @@
                 function open_teaching_plan_center()
                     local data = get_data()
                     local curData = data[index] or {}
-
+                    echo(curData, true)
                     if not curData or not curData.orgUrl then
                         return
                     end
 
-                    MySchool:OpenTeachingPlanCenter(curData.orgUrl)
+                    -- MySchool:OpenTeachingPlanCenter(curData.orgUrl)
                 end
             ]]>
         </script>
