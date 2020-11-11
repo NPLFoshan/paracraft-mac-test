@@ -169,7 +169,7 @@
                     end
                 end
 
-                function open_teaching_plan_center()
+                function open_teaching_plan_center(index)
                     local data = get_data()
                     local curData = data[index] or {}
                     echo(curData, true)
@@ -177,7 +177,7 @@
                         return
                     end
 
-                    -- MySchool:OpenTeachingPlanCenter(curData.orgUrl)
+                    MySchool:OpenTeachingPlanCenter(curData.orgUrl)
                 end
             ]]>
         </script>
