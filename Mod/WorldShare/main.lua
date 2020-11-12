@@ -11,10 +11,11 @@ local WorldShare = commonlib.gettable("Mod.WorldShare")
 
 CODE GUIDELINE
 
-1. all classes and functions use upper camel case
-2. all variables use lower camel case
-3. all files use use upper camel case
-4. all templates variables and functions use underscore case
+1. all classes and functions use upper camel case.
+2. all variables use lower camel case.
+3. all files use use upper camel case.
+4. all templates variables and functions use underscore case.
+5. single quotation marks are used for strings.
 
 ]]
 
@@ -267,8 +268,8 @@ function WorldShare:init()
     -- filter user behavior
     GameLogic:GetFilters():add_filter(
         "user_behavior",
-        function(type, action)
-            EventTrackingService:Send(type, action)
+        function(type, action, extra)
+            EventTrackingService:Send(type, action, extra)
         end
     )
 
@@ -341,12 +342,14 @@ function WorldShare:OnWorldLoad()
         end)
     end)
 
-    EventTrackingService:Send(2, "duration.world.stay")
+    EventTrackingService:Send(2, 'duration.world.stay', { started = true })
 
-    if GameLogic.GameMode:GetMode() == 'editor'then
-        EventTrackingService:Send(1, "click.world.edit")
+    if GameLogic.GameMode:GetMode() == 'editor' then
+        EventTrackingService:Send(1, 'click.world.edit')
+        EventTrackingService:Send(2, 'duration.world.edit', { started = true })
     else
         EventTrackingService:Send(1, 'click.world.play')
+        EventTrackingService:Send(2, 'duration.world.play', { started = true })
     end
 end
 
@@ -354,7 +357,13 @@ function WorldShare:OnLeaveWorld()
     local isEnterWorld = Mod.WorldShare.Store:Get('world/isEnterWorld')
 
     if isEnterWorld then
-        EventTrackingService:Send(2, "duration.world.stay")
+        EventTrackingService:Send(2, 'duration.world.stay', { ended = true })
+
+        if GameLogic.GameMode:GetMode() == 'editor' then
+            EventTrackingService:Send(2, 'duration.world.edit', { ended = true })
+        else
+            EventTrackingService:Send(2, 'duration.world.play', { ended = true })
+        end
     end
 
     Store:Remove("world/currentWorld")
