@@ -172,7 +172,7 @@
                 function open_teaching_plan_center(index)
                     local data = get_data()
                     local curData = data[index] or {}
-                    echo(curData, true)
+
                     if not curData or not curData.orgUrl then
                         return
                     end
