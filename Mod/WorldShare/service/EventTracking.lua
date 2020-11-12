@@ -39,6 +39,51 @@ EventTrackingService.map = {
             edit = 'click.world.edit', -- 切换世界为编辑模式
             play = 'click.world.play', -- 切换世界为播放模式
             after_upload = 'click.world.after_upload', -- 上传世界后
+            block = {
+                destroy = 'click.world.block.destroy', -- 删除方块
+                create = 'click.world.block.create', -- 创建方块
+                DeleteSelection = 'click.world.block.DeleteSelection', -- 删除选择的方块
+            },
+            tool = {
+                pick = 'click.world.tool.pick', -- 拾取方块
+                help = 'click.world.tool.help', -- 查看代码方块帮助
+                browser = 'click.world.tool.browser' -- 角色 显示新页面
+            },
+            help = {
+                browser = {
+                    codeblock = 'click.world.help.browser.codeblock' -- 点击学习Codeblock
+                },
+                startTutorial = 'click.world.help.startTutorial', -- 开始向导
+            },
+            world = {
+                save = 'click.world.world.save', -- 保存世界
+                saveas = 'click.world.world.saveas', -- 另存为世界
+                enter = 'click.world.world.enter', -- 进入世界
+                create = 'click.world.world.create', -- 创建新世界
+                delete = 'click.world.world.delete', -- 删除世界
+            },
+            desktop = {
+                ForceExit = 'click.world.desktop.ForceExit', -- 强制退出世界
+            },
+            cmd = {
+                execute = 'click.world.cmd.execute', -- 执行命令
+            },
+            model = {
+                export = {
+                    bmax = 'click.world.model.export.bmax', -- 保存bmax模型
+                },
+                exportAsTemplate = 'click.world.model.exportAsTemplate', -- 导出模板
+            },
+            paraworld = {
+                DockerClick = 'click.world.paraworld.DockerClick', -- 点击顶部Docker
+            },
+            movie = {
+                play = 'click.world.movie.play', -- 播放电影
+            },
+            actor = {
+                addNPC = 'click.world.actor.addNPC', -- 添加NPC
+                edit = 'click.world.actor.edit', -- 编辑角色
+            }
         },
         mini_map = { -- 小地图
             paraworld_list = 'click.mini_map.paraworld_list', -- 显示所有并行世界
