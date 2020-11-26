@@ -21,7 +21,7 @@ function LoadWorldCommand:Init()
         function(cmd_text, options)
             if options and options.personal then
                 CommandManager:RunCommand("/loadpersonalworld " .. cmd_text)
-                return
+                return false
             end
 
             local refreshMode = nil
