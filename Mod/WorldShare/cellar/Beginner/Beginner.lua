@@ -20,7 +20,7 @@ local Beginner = NPL.export()
 
 Beginner.inited = false
 
-function Beginner:OnWorldLoad()
+function Beginner:Show()
     if not KeepworkServiceSession:IsSignedIn() then
         return
     end

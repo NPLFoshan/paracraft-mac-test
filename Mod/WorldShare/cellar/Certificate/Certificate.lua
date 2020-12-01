@@ -12,9 +12,9 @@ local Certificate = NPL.load("(gl)Mod/WorldShare/cellar/Certificate/Certificate.
 -- service
 local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Session.lua')
 
-local Certificate = NPL.expport()
+local Certificate = NPL.export()
 
-Certificate.certificateCallback
+Certificate.certificateCallback = nil
 
 function Certificate:Init(callback)
     if not KeepworkServiceSession:IsSignedIn() then
@@ -22,19 +22,14 @@ function Certificate:Init(callback)
         return
     end
 
-    if KeepworkServiceSession:IsRealName() then
-        if callback and type(callback) == 'function' then
-            callback(true)
-        end
-        return
-    end
+    -- if KeepworkServiceSession:IsRealName() then
+    --     if callback and type(callback) == 'function' then
+    --         callback(true)
+    --     end
+    --     return
+    -- end
 
     self.certificateCallback = callback
-
-    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
-    if not currentEnterWorld or not currentEnterWorld.worldpath then
-        return
-    end
 
     self:ShowCertificatePage()
 end
@@ -48,7 +43,7 @@ function Certificate:ShowCertificatePage()
     )
 
     if params and type(params) == 'table' and params._page then
-        params._page.CertificateNow = self.ShowCertificateTypePage
+        params._page.CertificateNow = function() self:ShowCertificateTypePage() end
         params._page.certificateCallback = self.certificateCallback
     end
 end
@@ -62,8 +57,8 @@ function Certificate:ShowCertificateTypePage()
     )
 
     if params and type(params) == 'table' and params._page then
-        params._page.SelSchool = self.ShowSchoolPage
-        params._page.SelMyHome = self.ShowMyHomePage
+        params._page.SelSchool = function() self:ShowSchoolPage() end
+        params._page.SelMyHome = function() self:ShowMyHomePage() end
         params._page.certificateCallback = self.certificateCallback
     end
 end
@@ -77,7 +72,7 @@ function Certificate:ShowSchoolPage()
     )
 
     if params and type(params) == 'table' and params._page then
-        params._page.Success = self.ShowSendSmsPage
+        params._page.Success = function() self:ShowSendSmsPage() end
         params._page.certificateCallback = self.certificateCallback
     end
 end
@@ -91,7 +86,7 @@ function Certificate:ShowMyHomePage()
     )
 
     if params and type(params) == 'table' and params._page then
-        params._page.Success = self.ShowSuccessPage
+        params._page.Success = function() self:ShowSuccessPage() end
         params._page.certificateCallback = self.certificateCallback
     end
 end
@@ -105,7 +100,7 @@ function Certificate:ShowSendSmsPage()
     )
 
     if params and type(params) == 'table' and params._page then
-        params._page.Confirm = self.ShowSuccessPage
+        params._page.Confirm = function() self:ShowSuccessPage() end
         params._page.certificateCallback = self.certificateCallback
     end
 end

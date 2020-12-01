@@ -17,17 +17,6 @@
                         page:CloseWindow()
                     end
                 end
-
-                function get_img(relative_url)
-                    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
-                    if not currentEnterWorld and not currentEnterWorld.worldpath then
-                        return
-                    end
-
-                    local worldpath = currentEnterWorld.worldpath
-
-                    return worldpath .. relative_url
-                end
             ]]>
         </script>
         <style type="text/mscc" src="Mod/WorldShare/cellar/Theme/Mcss/Theme1.mcss">
@@ -37,7 +26,7 @@
                 <div class="theme1_header"></div>
                 <div style="padding: 30px;">
                     <div>
-                        <img style="width: 598px;height: 202px;margin-left: 17px;" src="<%= get_img('UI/Textures/paracraft_guide_32bits.png#18 16 598 202') %>" />
+                        <img style="width: 598px;height: 202px;margin-left: 17px;" src="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#18 16 598 202" />
                     </div>
                     <div style="margin-left: 235px;margin-top: 40px;">
                         <input type="button"

@@ -17,17 +17,6 @@
                         page:CloseWindow()
                     end
                 end
-
-                function get_img(relative_url)
-                    local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
-                    if not currentEnterWorld and not currentEnterWorld.worldpath then
-                        return
-                    end
-
-                    local worldpath = currentEnterWorld.worldpath
-
-                    return worldpath .. relative_url
-                end
             ]]>
         </script>
         <style type="text/mscc" src="Mod/WorldShare/cellar/Theme/Mcss/Theme1.mcss">
@@ -37,7 +26,7 @@
                 <div class="theme1_header"></div>
                 <div style="padding: 30px;">
                     <div style="margin-left: 90px;">
-                        <img style="width: 567px;height: 40px;" src="<%= get_img('UI/Textures/paracraft_guide_32bits.png#13 338 567 40') %>" />
+                        <img style="width: 567px;height: 40px;" src="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#13 338 567 40" />
                     </div>
                     <div style="font-size: 18px;base-font-size: 18px;margin-left: 135px;margin-top: 20px;">
                         <%= L'姓名' %>
@@ -49,13 +38,13 @@
                         <input type="button" style="width: 110px;height: 35px;margin-left: 5px;" class="theme1_baby_bule_button" value="<%= L'确认发送' %>" onclick="confirm()"/>
                     </div>
                     <div style="margin-left: 90px;margin-top: 10px;">
-                        <img style="width: 567px;height: 40px;" src="<%= get_img('UI/Textures/paracraft_guide_32bits.png#12 388 567 40') %>" />
+                        <img style="width: 567px;height: 40px;" src="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#12 388 567 40" />
                     </div>
                     <div style="margin-left: 150px;margin-top: 20px;">
-                        <img style="width: 429px;height: 168px;" src="<%= get_img('UI/Textures/paracraft_guide_32bits.png#31 442 429 168') %>" />
+                        <img style="width: 429px;height: 168px;" src="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#31 442 429 168" />
                     </div>
                     <div style="margin-left: 200px;margin-top: 20px;">
-                        <img style="width: 311px;height: 177px;" src="<%= get_img('UI/Textures/paracraft_guide_32bits.png#12 814 311 177') %>" />
+                        <img style="width: 311px;height: 177px;" src="Texture/Aries/Creator/keepwork/paracraft_guide_32bits.png#12 814 311 177" />
                     </div>
                 </div>
             </kp:window>
